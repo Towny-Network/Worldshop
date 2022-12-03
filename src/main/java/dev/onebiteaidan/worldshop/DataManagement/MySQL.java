@@ -25,18 +25,14 @@ public class MySQL implements Database {
         hikari.addDataSourceProperty("password", PASSWORD);
     }
 
-    public void disconnect() {
-        if (this.isConnected()) {
-            hikari.close();
-        }
-    }
-
     public boolean isConnected() {
         return hikari != null;
     }
 
-    public HikariDataSource getHikari() {
-        return hikari;
+    public void disconnect() {
+        if (this.isConnected()) {
+            hikari.close();
+        }
     }
 
     @Override
@@ -60,10 +56,31 @@ public class MySQL implements Database {
         }
     }
 
+    @Override
+    public void insert(String insertion) {
+        try (Connection connection = hikari.getConnection();
+             PreparedStatement statement = connection.prepareStatement(insertion)) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void delete(String deletion) {
+        try (Connection connection = hikari.getConnection();
+             PreparedStatement statement = connection.prepareStatement(deletion)) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void run(String command) {
         try (Connection connection = hikari.getConnection();
              PreparedStatement statement = connection.prepareStatement(command)) {
-            statement.executeUpdate();
+            statement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }

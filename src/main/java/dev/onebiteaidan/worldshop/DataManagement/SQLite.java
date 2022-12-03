@@ -3,9 +3,7 @@ package dev.onebiteaidan.worldshop.DataManagement;
 import dev.onebiteaidan.worldshop.WorldShop;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class SQLite implements Database {
@@ -43,12 +41,10 @@ public class SQLite implements Database {
                 "jdbc:sqlite:/" + filename);
     }
 
-    @Override
     public boolean isConnected() {
         return false;
     }
-
-    @Override
+    
     public void disconnect() {
         try {
             connection.close();
@@ -58,9 +54,54 @@ public class SQLite implements Database {
 
     }
 
-    public Connection getConnection() {
-        return connection;
+    @Override
+    public ResultSet query(String query) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            return statement.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
+    @Override
+    public void update(String update) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(update);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @Override
+    public void insert(String insertion) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(insertion);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void delete(String deletion) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(deletion);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run(String command) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(command);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
