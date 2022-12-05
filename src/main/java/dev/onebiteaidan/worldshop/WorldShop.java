@@ -58,14 +58,17 @@ public final class WorldShop extends JavaPlugin {
                                 "purchases int NOT NULL," +
                                 "sales int NOT NULL" +
                                 "CONSTRAINT players_constraint UNIQUE (uuid)" + // Makes it so a UUID of each player cannot repeat in this table
-                                ")");
+                                ");");
 
                 // Initialize the shop table if it doesn't exit
                 database.run(
-                        "CREATE TABLE IF NOT EXISTS shop" +
+                        "CREATE TABLE IF NOT EXISTS trades" +
                                 "id int NOT NULL AUTO_INCREMENT," +
                                 "uuid varchar(36) NOT NULL," + // The length of a UUID will never be longer than 36 characters
-                                ");"); // Todo: figure out how to store itemstacks https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
+                                "forsale BLOB NOT NULL," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
+                                "barter varchar(255) NOT NULL," + // Barter item (the item someone will get in return) will be normal
+                                "numwanted int NOT NULL" +
+                                ");"); // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
 
         } else {
             this.getLogger().severe("WorldShop DID NOT SUCCESSFULLY CONNECT TO ITS DATABASE!!!");
