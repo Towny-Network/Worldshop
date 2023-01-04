@@ -1,4 +1,4 @@
-package dev.onebiteaidan.worldshop;
+package dev.onebiteaidan.worldshop.Utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
