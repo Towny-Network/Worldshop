@@ -1,9 +1,11 @@
 package dev.onebiteaidan.worldshop;
 
+import dev.onebiteaidan.worldshop.Commands.TestCommand;
 import dev.onebiteaidan.worldshop.DataManagement.Config;
 import dev.onebiteaidan.worldshop.DataManagement.Database;
 import dev.onebiteaidan.worldshop.DataManagement.MySQL;
 import dev.onebiteaidan.worldshop.DataManagement.SQLite;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.PreparedStatement;
@@ -13,6 +15,7 @@ public final class WorldShop extends JavaPlugin {
 
     private static Config config;
     private static Database database;
+    private static StoreManager storeManager;
 
     @Override
     public void onEnable() {
@@ -73,6 +76,21 @@ public final class WorldShop extends JavaPlugin {
         } else {
             this.getLogger().severe("WorldShop DID NOT SUCCESSFULLY CONNECT TO ITS DATABASE!!!");
         }
+
+
+        // Initializing the store manager
+        storeManager = new StoreManager();
+
+
+        // Setting up listeners
+        Bukkit.getPluginManager().registerEvents(new StoreListener(), this);
+
+        // Setting up commands
+        getCommand("test").setExecutor(new TestCommand());
+
+
+
+
     }
 
     // Config accessor
@@ -83,6 +101,11 @@ public final class WorldShop extends JavaPlugin {
     // Database accessor
     public static Database getDatabase() {
         return database;
+    }
+
+    // Store Manager accessor
+    public static StoreManager getStoreManager() {
+        return storeManager;
     }
 
     @Override
