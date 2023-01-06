@@ -1,14 +1,12 @@
 package dev.onebiteaidan.worldshop;
 
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class StoreListener implements Listener {

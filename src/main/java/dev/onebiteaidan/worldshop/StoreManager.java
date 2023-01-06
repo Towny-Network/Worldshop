@@ -21,11 +21,36 @@ public class StoreManager {
     private static class Trade {
         ItemStack forSale;
         ItemStack wanted;
+        int amountWanted;
         ItemStack displayItem;
 
-        private Trade(ItemStack forSale, ItemStack wanted) {
+        Player seller;
+
+
+        private Trade(ItemStack forSale, ItemStack wanted, int amountWanted, Player seller) {
             this.forSale = forSale;
             this.wanted = wanted;
+            this.amountWanted = amountWanted;
+            this.seller = seller;
+
+            ItemStack temp = new ItemStack(forSale);
+            ItemMeta tempMeta = temp.getItemMeta();
+            tempMeta.setDisplayName(forSale.getItemMeta().getDisplayName());
+
+            ArrayList<String> lore = new ArrayList<>();
+            if (forSale.getItemMeta().hasLore()) {
+                lore.addAll(forSale.getItemMeta().getLore());
+            }
+            lore.add("");
+            lore.add("Price:");
+            lore.add(amountWanted + "x " + wanted.getItemMeta().getDisplayName());
+            lore.add("Sold By:");
+            lore.add(seller.getName());
+
+            tempMeta.setLore(lore);
+            temp.setItemMeta(tempMeta);
+
+            this.displayItem = temp;
         }
     }
 
@@ -83,7 +108,6 @@ public class StoreManager {
         }
 
         player.openInventory(gui);
-
     }
 
 

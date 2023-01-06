@@ -31,10 +31,12 @@ public final class WorldShop extends JavaPlugin {
         //Setting up database
         switch(Config.getType()) {
             case "SQLite":
+                //System.out.println("GOHSLJSHGLi");
                 database = new SQLite();
                 break;
 
             case "MySQL":
+                //System.out.println("GOHSLJSHGLi2");
                 database = new MySQL();
                 break;
 
