@@ -7,6 +7,6 @@ Database:
   # Database info (This only applies to MySQL setups)
   Host: "localhost"
   Port: 3306
-  Database: "claims"
+  Database: "shop"
   Username: "root"
   Password: ""
