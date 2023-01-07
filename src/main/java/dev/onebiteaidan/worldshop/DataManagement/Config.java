@@ -83,7 +83,7 @@ public class Config {
 
     //region Database methods
 
-    public static String getType() {
+    public static String getDatabaseType() {
         return config.getString("Database.Type");
     }
 

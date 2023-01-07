@@ -29,7 +29,7 @@ public final class WorldShop extends JavaPlugin {
         config = new Config(this, this.getDataFolder(), "config", true, true);
 
         //Setting up database
-        switch(Config.getType()) {
+        switch(Config.getDatabaseType()) {
             case "SQLite":
                 database = new SQLite("shop.db");
                 break;
@@ -39,7 +39,7 @@ public final class WorldShop extends JavaPlugin {
                 break;
 
             default:
-                this.getLogger().severe("Database could not be initialized because '" + Config.getType() + "' is an INVALID database type!!!");
+                this.getLogger().severe("Database could not be initialized because '" + Config.getDatabaseType() + "' is an INVALID database type!!!");
         }
 
         try {
@@ -53,24 +53,27 @@ public final class WorldShop extends JavaPlugin {
             this.getLogger().info("WorldShop connected to its database successfully!");
 
                 // Initialize the players table if it doesn't exist
-                database.run(
+                database.update(
                         "CREATE TABLE IF NOT EXISTS players" +
                                 "(" +
-                                "id int NOT NULL AUTO_INCREMENT," +
-                                "uuid varchar(36) NOT NULL," + // The length of a UUID will never be longer than 36 characters
-                                "purchases int NOT NULL," +
-                                "sales int NOT NULL" +
+                                "id int AUTO_INCREMENT," +
+                                "uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
+                                "purchases int," +
+                                "sales int," +
                                 "CONSTRAINT players_constraint UNIQUE (uuid)" + // Makes it so a UUID of each player cannot repeat in this table
                                 ");");
 
+
+
                 // Initialize the shop table if it doesn't exit
-                database.run(
+                database.update(
                         "CREATE TABLE IF NOT EXISTS trades" +
-                                "id int NOT NULL AUTO_INCREMENT," +
-                                "uuid varchar(36) NOT NULL," + // The length of a UUID will never be longer than 36 characters
-                                "forsale BLOB NOT NULL," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
-                                "barter varchar(255) NOT NULL," + // Barter item (the item someone will get in return) will be normal
-                                "numwanted int NOT NULL" +
+                                "(" +
+                                "id int AUTO_INCREMENT," +
+                                "uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
+                                "forsale BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
+                                "barter varchar(255)," + // Barter item (the item someone will get in return) will be normal
+                                "numwanted int" +
                                 ");"); // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
 
         } else {
