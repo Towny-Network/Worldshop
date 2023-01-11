@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,7 @@ public class StoreManager {
     public StoreManager() {
         // todo: Grabs all of the trades from the database
         playersWithStoreOpen = new ArrayList<>();
+        trades = new ArrayList<>();
     }
 
 
@@ -75,30 +77,30 @@ public class StoreManager {
         ItemMeta prevPageMeta;
 
         if (PageUtils.isPageValid(getAllDisplayItems(), page - 1, 45)) {
-            prevPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            prevPage = new ItemStack(Material.ARROW);
             prevPageMeta = prevPage.getItemMeta();
-            prevPageMeta.setDisplayName(ChatColor.RED + "Go To Page " + (page - 1));
+            prevPageMeta.setDisplayName(ChatColor.RED + "Previous Page");
         } else {
             prevPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
             prevPageMeta = prevPage.getItemMeta();
-            prevPageMeta.setDisplayName(ChatColor.RED + "Go To Page " + (page + 1));
+            prevPageMeta.setDisplayName(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "Previous Page");
         }
         prevPageMeta.setLocalizedName(page + "");
         prevPage.setItemMeta(prevPageMeta);
-        gui.setItem(46, prevPage);
+        gui.setItem(45, prevPage);
 
         // Next Page Button
         ItemStack nextPage;
         ItemMeta nextPageMeta;
 
         if (PageUtils.isPageValid(getAllDisplayItems(), page + 1, 45)) {
-            nextPage = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
+            nextPage = new ItemStack(Material.ARROW);
             nextPageMeta = nextPage.getItemMeta();
-            nextPageMeta.setDisplayName(ChatColor.RED + "Go To Page " + (page + 1));
+            nextPageMeta.setDisplayName(ChatColor.RED + "Next Page");
         } else {
-            nextPage = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
+            nextPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
             nextPageMeta = nextPage.getItemMeta();
-            nextPageMeta.setDisplayName(ChatColor.RED + "Go To Page " + (page - 1));
+            nextPageMeta.setDisplayName(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "Next Page");
         }
         nextPage.setItemMeta(nextPageMeta);
         gui.setItem(53, nextPage);
@@ -108,6 +110,14 @@ public class StoreManager {
         }
 
         player.openInventory(gui);
+    }
+
+    public void nextPage(Player player, int page) {
+
+    }
+
+    public void prevPage(Player player, int page) {
+
     }
 
 
