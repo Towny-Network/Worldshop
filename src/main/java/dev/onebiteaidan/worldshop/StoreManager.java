@@ -1,6 +1,7 @@
 package dev.onebiteaidan.worldshop;
 
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
+import dev.onebiteaidan.worldshop.Utils.Utils;
 import jdk.vm.ci.aarch64.AArch64;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -105,6 +106,53 @@ public class StoreManager {
         nextPage.setItemMeta(nextPageMeta);
         gui.setItem(53, nextPage);
 
+        // View Trades Button
+        ItemStack viewTradesButton;
+        ItemMeta viewTradesButtonMeta;
+
+        viewTradesButton = new ItemStack(Material.CHEST);
+        viewTradesButtonMeta = viewTradesButton.getItemMeta();
+
+        viewTradesButtonMeta.setDisplayName(ChatColor.YELLOW + "View Trades");
+        viewTradesButton.setItemMeta(viewTradesButtonMeta);
+        gui.setItem(51, viewTradesButton);
+
+        // Sell Item Button
+        ItemStack sellButton;
+        ItemMeta sellButtonMeta;
+
+        sellButton = new ItemStack(Material.WRITABLE_BOOK);
+        sellButtonMeta = sellButton.getItemMeta();
+
+        sellButtonMeta.setDisplayName(ChatColor.GREEN + "Sell Item");
+        sellButton.setItemMeta(sellButtonMeta);
+        gui.setItem(50, sellButton);
+
+        // Player head with stats
+        ItemStack statsHead = Utils.createSkull(player);
+        ItemMeta statsHeadMeta = statsHead.getItemMeta();
+
+        statsHeadMeta.setDisplayName(ChatColor.DARK_AQUA + player.getDisplayName() + "'s Stats");
+        statsHead.setItemMeta(statsHeadMeta);
+        gui.setItem(49, statsHead);
+
+        // Sort Trades Button
+        ItemStack sortTrades = new ItemStack(Material.HOPPER);
+        ItemMeta sortTradesMeta = sortTrades.getItemMeta();
+
+        sortTradesMeta.setDisplayName(ChatColor.BLUE + "Sort");
+        sortTrades.setItemMeta(sortTradesMeta);
+        gui.setItem(48, sortTrades);
+
+        // Search Items
+        ItemStack searchItems = new ItemStack(Material.SPYGLASS);
+        ItemMeta searchItemsMeta = searchItems.getItemMeta();
+
+        searchItemsMeta.setDisplayName(ChatColor.AQUA + "Search");
+        searchItems.setItemMeta(searchItemsMeta);
+        gui.setItem(47, searchItems);
+
+        // Add stored trades for the first page
         for (ItemStack item : PageUtils.getPageItems(getAllDisplayItems(), page, 45)) {
             gui.addItem(item);
         }
@@ -142,6 +190,18 @@ public class StoreManager {
 
         
 
+
+    }
+
+    public void viewTrades() {
+
+    }
+
+    public void filterTrades() {
+
+    }
+
+    public void searchTrades() {
 
     }
 

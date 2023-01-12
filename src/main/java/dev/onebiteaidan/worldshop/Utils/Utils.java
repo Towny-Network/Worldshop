@@ -1,13 +1,21 @@
 package dev.onebiteaidan.worldshop.Utils;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import net.minecraft.nbt.NBTCompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.SkullMeta;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.UUID;
 
-import net.minecraft.nbt.NBTCompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.item.ItemStack;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 
 public class Utils {
 
@@ -30,6 +38,39 @@ public class Utils {
         // Reverse the process by reading the byte[] as ByteArrayInputStream and passing that to the NBT reader of Minecraft
         NBTTagCompound tag = NBTCompressedStreamTools.a(input);
         // At last load the ItemStack from the NBT Compound Tag and convert it back to an Bukkit ItemStack
-        return CraftItemStack.asBukkitCopy(ItemStack.a(tag));
+        return CraftItemStack.asBukkitCopy(net.minecraft.world.item.ItemStack.a(tag));
     }
+
+    //Function to create playerheads
+    public static ItemStack createSkull(String url) {
+        ItemStack head = new org.bukkit.inventory.ItemStack(Material.PLAYER_HEAD, 1);
+        if (url.isEmpty()) return head;
+
+        SkullMeta headMeta = (SkullMeta) head.getItemMeta();
+        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+
+        profile.getProperties().put("textures", new Property("textures", url));
+
+        try {
+            Field profileField = headMeta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(headMeta, profile);
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        head.setItemMeta(headMeta);
+        return head;
+    }
+
+    public static ItemStack createSkull(Player player) {
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
+        SkullMeta meta = (SkullMeta) head.getItemMeta();
+
+        meta.setOwner(player.getName());
+
+        head.setItemMeta(meta);
+
+        return head;
+    }
+
 }
