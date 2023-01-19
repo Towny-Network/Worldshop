@@ -2,19 +2,13 @@ package dev.onebiteaidan.worldshop;
 
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import jdk.vm.ci.aarch64.AArch64;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.entity.Item;
+import org.bukkit.Material;;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,13 +57,17 @@ public class StoreManager {
     public StoreManager() {
         // todo: Grabs all of the trades from the database
 
+    }
 
+
+
+    public void buy (Player player, Trade trade) {
 
         playersWithStoreOpen = new ArrayList<>();
         trades = new ArrayList<>();
     }
 
-    public void openShop(Player player, int page) {
+    public void openShop (Player player,int page) {
         playersWithStoreOpen.add(player);
 
         Inventory gui = Bukkit.createInventory(null, 54, "WorldShop - " + page); //Todo: make the title of the store change based on nation it's in
@@ -161,27 +159,27 @@ public class StoreManager {
         player.openInventory(gui);
     }
 
-    public void nextPage(Player player, int currentPage) {
+    public void nextPage (Player player,int currentPage){
         openShop(player, currentPage + 1);
     }
 
-    public void prevPage(Player player, int currentPage) {
+    public void prevPage (Player player,int currentPage){
         openShop(player, currentPage - 1);
     }
 
-    public void search(Player player) {
+    public void search (Player player){
 
     }
 
-    public void filter(Player player) {
+    public void filter (Player player){
 
     }
 
-    public void viewCurrentTrades(Player player) {
+    public void viewCurrentTrades (Player player){
 
     }
 
-    public void sellItem(Player player) {
+    public void sellItem (Player player){
         // Todo: Build a gui for inputting item + amount wanted for trade
         // Build a gui that has two parts. A part for entering the name via a sign
         // A part where you can set the number of items using like (-5, -1, +1, +5)
@@ -254,11 +252,11 @@ public class StoreManager {
         player.openInventory(gui);
     }
 
-    public void buyItem(Player player) {
+    public void buyItem (Player player) {
 
     }
 
-    private List<ItemStack> getAllDisplayItems() {
+    private List<ItemStack> getAllDisplayItems () {
         List<ItemStack> items = new ArrayList<>();
         for (Trade t : trades) {
             items.add(t.forSale);
