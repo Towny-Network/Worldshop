@@ -56,7 +56,8 @@ public class StoreManager {
 
     public StoreManager() {
         // todo: Grabs all of the trades from the database
-
+        trades = new ArrayList<>();
+        playersWithStoreOpen = new ArrayList<>();
     }
 
 
@@ -205,7 +206,7 @@ public class StoreManager {
         ItemStack priceButton = new ItemStack(Material.HAY_BLOCK);
         ItemMeta priceButtonMeta = priceButton.getItemMeta();
         priceButtonMeta.setDisplayName("Right Click the item in your inventory you want to receive in trade!");
-        gui.setItem(15, confirmTradeButton);
+        gui.setItem(15, priceButton);
 
         // Go back to the main menu button
         ItemStack backButton = new ItemStack(Material.BARRIER);
