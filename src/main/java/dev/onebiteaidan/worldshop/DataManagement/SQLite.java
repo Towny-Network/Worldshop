@@ -5,7 +5,6 @@ import dev.onebiteaidan.worldshop.WorldShop;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
 
 public class SQLite implements Database {
 

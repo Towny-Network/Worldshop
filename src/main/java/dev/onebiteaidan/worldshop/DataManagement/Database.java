@@ -17,5 +17,4 @@ public interface Database {
    void delete(String deletion);
    void run(String command);
 
-
 }

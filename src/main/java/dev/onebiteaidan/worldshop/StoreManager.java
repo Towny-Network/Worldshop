@@ -189,6 +189,13 @@ public class StoreManager {
 
         Inventory gui = Bukkit.createInventory(null, 27, "What would you like to sell?");
 
+        // Confirm the trade button
+        ItemStack confirmTradeButton = new ItemStack(Material.YELLOW_CONCRETE_POWDER);
+        ItemMeta confirmTradeButtonMeta = confirmTradeButton.getItemMeta();
+        confirmTradeButtonMeta.setDisplayName("Confirm");
+        confirmTradeButton.setItemMeta(confirmTradeButtonMeta);
+        gui.setItem(0, confirmTradeButton);
+
         // Item player wants to sell
         ItemStack blankItemSpotButton = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
         ItemMeta blankItemSpotButtonMeta = blankItemSpotButton.getItemMeta();
@@ -196,59 +203,33 @@ public class StoreManager {
         blankItemSpotButton.setItemMeta(blankItemSpotButtonMeta);
         gui.setItem(11, blankItemSpotButton);
 
-        // Confirm the trade button
-        ItemStack confirmTradeButton = new ItemStack(Material.RED_WOOL);
-        ItemMeta confirmTradeButtonMeta = confirmTradeButton.getItemMeta();
-        confirmTradeButtonMeta.setDisplayName("Click to list item!");
-        gui.setItem(13, confirmTradeButton);
-
-        // Item player wants to receive
-        ItemStack priceButton = new ItemStack(Material.HAY_BLOCK);
-        ItemMeta priceButtonMeta = priceButton.getItemMeta();
-        priceButtonMeta.setDisplayName("Right Click the item in your inventory you want to receive in trade!");
-        gui.setItem(15, priceButton);
-
-        // Go back to the main menu button
-        ItemStack backButton = new ItemStack(Material.BARRIER);
-        ItemMeta backButtonMeta = backButton.getItemMeta();
-        backButtonMeta.setDisplayName("Back");
-        backButton.setItemMeta(backButtonMeta);
-        gui.setItem(18, backButton);
-
-        // Add 5 to the number of items the player wants in return
-        ItemStack addFiveToPriceButton = new ItemStack(Material.GREEN_CONCRETE, 5);
-        ItemMeta addFiveToPriceButtonMeta = addFiveToPriceButton.getItemMeta();
-        addFiveToPriceButtonMeta.setDisplayName("Add 5 to price");
-        addFiveToPriceButton.setItemMeta(addFiveToPriceButtonMeta);
-        gui.setItem(22, addFiveToPriceButton);
-
-        // Add 1 to the number of items the player wants in return
-        ItemStack addOneToPriceButton = new ItemStack(Material.GREEN_CONCRETE, 1);
-        ItemMeta addOneToPriceButtonMeta = addOneToPriceButton.getItemMeta();
-        addOneToPriceButtonMeta.setDisplayName("Add 1 to price");
-        addOneToPriceButton.setItemMeta(addOneToPriceButtonMeta);
-        gui.setItem(23, addOneToPriceButton);
-
         // Reset the number of items the player wants in return back to 1
         ItemStack resetPriceButton = new ItemStack(Material.YELLOW_CONCRETE);
         ItemMeta resetPriceButtonMeta = resetPriceButton.getItemMeta();
         resetPriceButtonMeta.setDisplayName("Reset price");
         resetPriceButton.setItemMeta(resetPriceButtonMeta);
-        gui.setItem(24, resetPriceButton);
+        gui.setItem(14, resetPriceButton);
 
-        // Remove 1 from the number of items the player wants in return
-        ItemStack removeOneFromPriceButton = new ItemStack(Material.RED_CONCRETE, 1);
-        ItemMeta removeOneFromPriceButtonMeta = removeOneFromPriceButton.getItemMeta();
-        removeOneFromPriceButtonMeta.setDisplayName("Remove 1 from price");
-        removeOneFromPriceButton.setItemMeta(removeOneFromPriceButtonMeta);
-        gui.setItem(25, removeOneFromPriceButton);
+        // Item player wants to receive
+        ItemStack priceButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        ItemMeta priceButtonMeta = priceButton.getItemMeta();
+        priceButtonMeta.setDisplayName("Right Click the item in your inventory you want to receive in trade!");
+        gui.setItem(15, priceButton);
 
-        // Remove 5 from the number of items the player wants in return
-        ItemStack removeFiveFromPriceButton = new ItemStack(Material.RED_CONCRETE, 5);
-        ItemMeta removeFiveFromPriceButtonMeta = removeFiveFromPriceButton.getItemMeta();
-        removeFiveFromPriceButtonMeta.setDisplayName("Remove 5 from price");
-        removeFiveFromPriceButton.setItemMeta(removeFiveFromPriceButtonMeta);
-        gui.setItem(26, removeFiveFromPriceButton);
+        // Set the number of items the player wants in return
+        ItemStack setPriceButton = new ItemStack(Material.OAK_SIGN);
+        ItemMeta setPriceButtonMeta = setPriceButton.getItemMeta();
+        setPriceButtonMeta.setDisplayName("Set price");
+        setPriceButton.setItemMeta(setPriceButtonMeta);
+        gui.setItem(16, setPriceButton);
+
+        // Go back to the main menu button
+        ItemStack backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
+        ItemMeta backButtonMeta = backButton.getItemMeta();
+        backButtonMeta.setDisplayName("Back");
+        backButton.setItemMeta(backButtonMeta);
+        gui.setItem(18, backButton);
+
 
         player.openInventory(gui);
     }
