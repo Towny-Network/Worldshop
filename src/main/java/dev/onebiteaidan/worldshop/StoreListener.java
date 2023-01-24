@@ -7,6 +7,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.calledmethods.qual.EnsuresCalledMethodsVarArgs;
 
 import java.util.ArrayList;
@@ -73,40 +76,83 @@ public class StoreListener implements Listener {
 
 
             switch(e.getRawSlot()) {
-                case 11: // Is this necessary for our implementation
-                    break;
+                case 0: // Is this necessary for our implementation
+                    //Todo:  Checks if both itemstack spots are filled before confirming the trade
 
-                case 13: // Approve trade. Todo:This has to include error checking and also a double confirm
-                    break;
 
-                case 15:// Is this necessary for our implementation
-                    break;
+                    // Checks if this is the first click
+                    if (e.getInventory().getItem(0).getType().equals(Material.YELLOW_CONCRETE_POWDER)) {
+
+                        // Confirm the trade button
+                        ItemStack confirmTradeButton = new ItemStack(Material.LIME_CONCRETE_POWDER);
+                        ItemMeta confirmTradeButtonMeta = confirmTradeButton.getItemMeta();
+                        confirmTradeButtonMeta.setDisplayName("Confirm");
+                        confirmTradeButton.setItemMeta(confirmTradeButtonMeta);
+
+                        e.getInventory().setItem(0, confirmTradeButton);
+
+                    } else { // Should be second click at this point. So add the item to the store.
+
+                        Inventory inven = e.getInventory();
+                        ItemStack forSale = inven.getItem(12);
+                        ItemStack wanted = inven.getItem(15);
+                        int amountWanted = wanted.getAmount();
+
+                        WorldShop.getStoreManager().addToStore(forSale, wanted, amountWanted, (Player) e.getWhoClicked());
+                    }
 
                 case 18: // Back button
                     // Brings the player back to the main page of the store.
                     WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
                     break;
 
-                case 22: // Add 5 to price
+
+
+                case 14: // Reset price to 1
+                    // Doing something other than back button or confirm; reset the confirm button
+                    resetConfirmButton(e.getInventory());
+
+                    e.getInventory().getItem(15).setAmount(1);
                     break;
 
-                case 23: // Add 1 to price
+                case 16: // Set the price
+                    // Doing something other than back button or confirm; reset the confirm button
+                    resetConfirmButton(e.getInventory());
+
+                    // TODO: make an sign interface to entering the number of items wanted.
+
                     break;
 
-                case 24: // Reset price to 1
-                    break;
+                default: // Right and left clicks out of the gui set the wanted and forsale item
+                    // Check if item exists here and also check if it was a left or right click
 
-                case 25: // Remove 1 from price
-                    break;
+                    if (!e.getCurrentItem().getType().equals(Material.AIR)) {
+                        // Doing something other than back button or confirm; reset the confirm button
+                        resetConfirmButton(e.getInventory());
 
-                case 26: // Remove 5 from price
-                    break;
+                        // Determine if it's a right or left click
+                        if (e.getClick().isLeftClick()) { // Set the item we are selling
+                            e.getInventory().setItem(12, e.getCurrentItem());
 
-                default: // Not sure what will go here or if needed
+                        } else if (e.getClick().isShiftClick()) {
+                            e.getInventory().setItem(15, e.getCurrentItem());
+                        }
+                    }
+
+                    break;
 
             }
-
         }
+    }
+
+    private void resetConfirmButton(Inventory inventory) {
+        // Confirm the trade button
+        ItemStack confirmTradeButton = new ItemStack(Material.YELLOW_CONCRETE_POWDER);
+        ItemMeta confirmTradeButtonMeta = confirmTradeButton.getItemMeta();
+        confirmTradeButtonMeta.setDisplayName("Confirm");
+        confirmTradeButton.setItemMeta(confirmTradeButtonMeta);
+
+        inventory.setItem(0, confirmTradeButton);
     }
 
     @EventHandler

@@ -19,45 +19,104 @@ public class StoreManager {
         ItemStack forSale;
         ItemStack wanted;
         int amountWanted;
-        ItemStack displayItem;
+
         Player seller;
+        Player buyer;
+        int tradeID;
+        long timeListed;// Unix time
 
 
-        private Trade(ItemStack forSale, ItemStack wanted, int amountWanted, Player seller) {
+        /**
+         * Constructor for when a player creates a new trade via the gui.
+         * @param forSale Item player is trading away
+         * @param wanted Item player is trading for
+         * @param amountWanted Amount they want
+         * @param seller Person selling the forSale item
+         */
+        private Trade(ItemStack forSale, ItemStack wanted, int amountWanted, Player seller, int tradeID) {
             this.forSale = forSale;
             this.wanted = wanted;
             this.amountWanted = amountWanted;
             this.seller = seller;
 
-            ItemStack temp = new ItemStack(forSale);
-            ItemMeta tempMeta = temp.getItemMeta();
-            tempMeta.setDisplayName(forSale.getItemMeta().getDisplayName());
+            this.buyer = null;
+            this.tradeID = tradeID;
+            long timeListed = System.currentTimeMillis();
+        }
 
-            ArrayList<String> lore = new ArrayList<>();
-            if (forSale.getItemMeta().hasLore()) {
-                lore.addAll(forSale.getItemMeta().getLore());
-            }
-            lore.add("");
-            lore.add("Price:");
-            lore.add(amountWanted + "x " + wanted.getItemMeta().getDisplayName());
-            lore.add("Sold By:");
-            lore.add(seller.getName());
+        /**
+         * Constructor for rebuilding from the Database.
+         * @param forSale Item player is trading away
+         * @param wanted Item player is trading for
+         * @param amountWanted Amount they want
+         * @param seller Person selling the forSale item
+         * @param buyer Person who bought the item if trade is complete (null otherwise)
+         * @param tradeID ID of the trade;
+         * @param timeListed Time that the trade was listed (in Unix time)
+         */
+        private Trade(ItemStack forSale, ItemStack wanted, int amountWanted, Player seller, Player buyer, int tradeID, long timeListed) {
+            this.forSale = forSale;
+            this.wanted = wanted;
+            this.amountWanted = amountWanted;
+            this.seller = seller;
 
-            tempMeta.setLore(lore);
-            temp.setItemMeta(tempMeta);
+            this.tradeID = tradeID;
+            this.buyer = buyer;
+            this.timeListed = timeListed;
 
-            this.displayItem = temp;
+//            ItemStack temp = new ItemStack(forSale);
+//            ItemMeta tempMeta = temp.getItemMeta();
+//            tempMeta.setDisplayName(forSale.getItemMeta().getDisplayName());
+//
+//            ArrayList<String> lore = new ArrayList<>();
+//            if (forSale.getItemMeta().hasLore()) {
+//                lore.addAll(forSale.getItemMeta().getLore());
+//            }
+//            lore.add("");
+//            lore.add("Price:");
+//            lore.add(amountWanted + "x " + wanted.getItemMeta().getDisplayName());
+//            lore.add("Sold By:");
+//            lore.add(seller.getName());
+//            lore.add(String.valueOf(tradeID));
+//
+//            tempMeta.setLore(lore);
+//            temp.setItemMeta(tempMeta);
+//
+//            this.displayItem = temp;
+
+
         }
     }
 
     ArrayList<Trade> trades;
     ArrayList<Player> playersWithStoreOpen;
+    int mostRecentTradeID;
 
 
     public StoreManager() {
         // todo: Grabs all of the trades from the database
+        // all trades greater than 30 days old should be removed from the db
+
         trades = new ArrayList<>();
         playersWithStoreOpen = new ArrayList<>();
+    }
+
+    public int getNextTradeID() {
+        return mostRecentTradeID++;
+    }
+
+    public void addToStore(Trade trade) {
+        trades.add(trade);
+    }
+
+    public void addToStore(ItemStack forSale, ItemStack wanted, int amountWanted, Player seller) {
+        trades.add(new Trade(forSale, wanted, amountWanted, seller, getNextTradeID()));
+    }
+
+    public void removeFromStore(Trade trade) {
+
+        trades.remove(trade);
+
     }
 
 
@@ -201,7 +260,7 @@ public class StoreManager {
         ItemMeta blankItemSpotButtonMeta = blankItemSpotButton.getItemMeta();
         blankItemSpotButtonMeta.setDisplayName("Left click the item in your inventory you want to sell!");
         blankItemSpotButton.setItemMeta(blankItemSpotButtonMeta);
-        gui.setItem(11, blankItemSpotButton);
+        gui.setItem(12, blankItemSpotButton);
 
         // Reset the number of items the player wants in return back to 1
         ItemStack resetPriceButton = new ItemStack(Material.YELLOW_CONCRETE);
