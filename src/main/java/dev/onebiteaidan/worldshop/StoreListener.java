@@ -62,10 +62,19 @@ public class StoreListener implements Listener {
     }
 
     @EventHandler
+    public void testListener(InventoryClickEvent e) {
+        System.out.println(e.getInventory().toString() + " SLOT: " + String.valueOf(e.getRawSlot()));
+    }
+
+    @EventHandler
     public void onSellScreenClick(InventoryClickEvent e) {
         if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getTitle().contains("What would you like to sell?")) {
 
-            e.setCancelled(true); //Todo: this needs error checking to make sure it's not just a chest with the name "What would you like to sell?"
+            // Checks if the player is clicking items in their inventory or items in the gui.
+            // Also prevents shift clicking into the area they aren't supposed to.
+            if (e.getRawSlot() < 27 && !e.getClick().isShiftClick()) { //TODO: Players can still shift click items into the sell screen menu.
+                e.setCancelled(true); //Todo: this needs error checking to make sure it's not just a chest with the name "What would you like to sell?"
+            }
 
             //Todo: Flush out how the player will put the items into the respective itemToSell and itemInReturn slots.
             // Current ideas include:
@@ -119,12 +128,24 @@ public class StoreListener implements Listener {
                     // Doing something other than back button or confirm; reset the confirm button
                     resetConfirmButton(e.getInventory());
 
+                    Inventory savedInven = e.getInventory();
+
+                    Player player = (Player) e.getWhoClicked();
+                    player.closeInventory();
+
+                    player.sendMessage("How how many of these would you like to sell this item for?");
+
+
+
                     // TODO: make an sign interface to entering the number of items wanted.
 
                     break;
 
                 default: // Right and left clicks out of the gui set the wanted and forsale item
                     // Check if item exists here and also check if it was a left or right click
+                    //TODO: This needs a way to make it so players can interact w/ their inventory but not the chestgui.
+                    // So they can split up stacks n stuff
+
 
                     if (!e.getCurrentItem().getType().equals(Material.AIR)) {
                         // Doing something other than back button or confirm; reset the confirm button
@@ -134,7 +155,7 @@ public class StoreListener implements Listener {
                         if (e.getClick().isLeftClick()) { // Set the item we are selling
                             e.getInventory().setItem(12, e.getCurrentItem());
 
-                        } else if (e.getClick().isShiftClick()) {
+                        } else if (e.getClick().isRightClick()) {
                             e.getInventory().setItem(15, e.getCurrentItem());
                         }
                     }
