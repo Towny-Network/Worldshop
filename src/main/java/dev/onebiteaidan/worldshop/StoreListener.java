@@ -1,5 +1,7 @@
 package dev.onebiteaidan.worldshop;
 
+import dev.onebiteaidan.worldshop.Utils.Utils;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -70,45 +72,53 @@ public class StoreListener implements Listener {
     public void onSellScreenClick(InventoryClickEvent e) {
         if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getTitle().contains("What would you like to sell?")) {
 
-            // Checks if the player is clicking items in their inventory or items in the gui.
-            // Also prevents shift clicking into the area they aren't supposed to.
-            if (e.getRawSlot() < 27 && !e.getClick().isShiftClick()) { //TODO: Players can still shift click items into the sell screen menu.
-                e.setCancelled(true); //Todo: this needs error checking to make sure it's not just a chest with the name "What would you like to sell?"
-            }
 
-            //Todo: Flush out how the player will put the items into the respective itemToSell and itemInReturn slots.
-            // Current ideas include:
-            // -Using left and right clicks to determine which one (the only downside to this is that the player cannot manage their local inventory
-            //  while in the shop screen. What if they want to sell only half a stack. Or only 1 item out of a whole stack.)
-            // -Drag and drop itemstacks into the spot they want to put them into.
-            // -Click on whatever space they want to put it in (sell or inReturn) to enter a mode then have them double click the itemstack they want put in.
+            e.setCancelled(true); //Todo: this needs error checking to make sure it's not just a chest with the name "What would you like to sell?"
+
+
+
 
 
             switch(e.getRawSlot()) {
-                case 0: // Is this necessary for our implementation
-                    //Todo:  Checks if both itemstack spots are filled before confirming the trade
+                case 0: // Submit button
+                    // Check what the condition of the slot is
+                    String name = e.getInventory().getItem(0).getItemMeta().getDisplayName();
+                    name = ChatColor.stripColor(name);
+                    switch(name) {
+                        case "You cannot confirm until you have put in a sell item and a price item!":
+                            break;
 
+                        case "Click to Confirm!":
+                            // Set the confirm buttton to Green Check
 
-                    // Checks if this is the first click
-                    if (e.getInventory().getItem(0).getType().equals(Material.YELLOW_CONCRETE_POWDER)) {
+                            System.out.println("Hitting correct case");
 
-                        // Confirm the trade button
-                        ItemStack confirmTradeButton = new ItemStack(Material.LIME_CONCRETE_POWDER);
-                        ItemMeta confirmTradeButtonMeta = confirmTradeButton.getItemMeta();
-                        confirmTradeButtonMeta.setDisplayName("Confirm");
-                        confirmTradeButton.setItemMeta(confirmTradeButtonMeta);
+                            ItemStack fullConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=");
+                            ItemMeta fullConfirmMeta = fullConfirm.getItemMeta();
+                            fullConfirmMeta.setDisplayName("Are you sure?");
+                            fullConfirm.setItemMeta(fullConfirmMeta);
+                            e.getInventory().setItem(0, fullConfirm);
+                            return;
 
-                        e.getInventory().setItem(0, confirmTradeButton);
+                        case "Are you sure?":
+                            Inventory inven = e.getInventory();
+                            ItemStack forSale = inven.getItem(12);
+                            ItemStack wanted = inven.getItem(15);
+                            int amountWanted = wanted.getAmount();
 
-                    } else { // Should be second click at this point. So add the item to the store.
+                            WorldShop.getStoreManager().addToStore(forSale, wanted, amountWanted, (Player) e.getWhoClicked());
+                            // Brings the player back to the main page of the store.
+                            WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
+                            break;
 
-                        Inventory inven = e.getInventory();
-                        ItemStack forSale = inven.getItem(12);
-                        ItemStack wanted = inven.getItem(15);
-                        int amountWanted = wanted.getAmount();
-
-                        WorldShop.getStoreManager().addToStore(forSale, wanted, amountWanted, (Player) e.getWhoClicked());
+                        default:
+                            System.out.println("Hitting default case");
+                            System.out.println(name);
+                            System.out.println(name.equals("Click to Confirm!"));
                     }
+
+                    break;
+
 
                 case 18: // Back button
                     // Brings the player back to the main page of the store.
@@ -116,64 +126,57 @@ public class StoreListener implements Listener {
                     break;
 
 
+                case 14: // Increase Price
 
-                case 14: // Reset price to 1
-                    // Doing something other than back button or confirm; reset the confirm button
-                    resetConfirmButton(e.getInventory());
-
-                    e.getInventory().getItem(15).setAmount(1);
+                    if (!e.getInventory().getItem(15).equals(Material.RED_STAINED_GLASS_PANE) && e.getInventory().getItem(15).getAmount() != 64) {
+                        e.getInventory().getItem(15).setAmount(e.getInventory().getItem(15).getAmount() + 1);
+                    }
                     break;
 
-                case 16: // Set the price
-                    // Doing something other than back button or confirm; reset the confirm button
-                    resetConfirmButton(e.getInventory());
 
-                    Inventory savedInven = e.getInventory();
+                case 16: // Decrease Price
 
-                    Player player = (Player) e.getWhoClicked();
-                    player.closeInventory();
-
-                    player.sendMessage("How how many of these would you like to sell this item for?");
-
-
-
-                    // TODO: make an sign interface to entering the number of items wanted.
-
+                    if (!e.getInventory().getItem(15).equals(Material.RED_STAINED_GLASS_PANE) && e.getInventory().getItem(15).getAmount() != 1) {
+                        e.getInventory().getItem(15).setAmount(e.getInventory().getItem(15).getAmount() - 1);
+                    }
                     break;
 
-                default: // Right and left clicks out of the gui set the wanted and forsale item
+
+                default:
                     // Check if item exists here and also check if it was a left or right click
-                    //TODO: This needs a way to make it so players can interact w/ their inventory but not the chestgui.
-                    // So they can split up stacks n stuff
+                    if (!e.getCurrentItem().getType().equals(Material.AIR) && !e.getCurrentItem().getType().equals(Material.GRAY_STAINED_GLASS_PANE)) {
 
-
-                    if (!e.getCurrentItem().getType().equals(Material.AIR)) {
-                        // Doing something other than back button or confirm; reset the confirm button
-                        resetConfirmButton(e.getInventory());
 
                         // Determine if it's a right or left click
                         if (e.getClick().isLeftClick()) { // Set the item we are selling
                             e.getInventory().setItem(12, e.getCurrentItem());
 
                         } else if (e.getClick().isRightClick()) {
-                            e.getInventory().setItem(15, e.getCurrentItem());
+                            ItemStack curr = e.getCurrentItem();
+                            curr.setAmount(1);
+                            e.getInventory().setItem(15, curr);
                         }
                     }
 
                     break;
+            }
+
+            // Check if sell and price slots are filled
+            if (!e.getInventory().getItem(12).getType().equals(Material.RED_STAINED_GLASS_PANE) &&
+                    !e.getInventory().getItem(12).getItemMeta().getDisplayName().equals("Left click the item in your inventory you want to sell!") &&
+                    !e.getInventory().getItem(15).getType().equals(Material.RED_STAINED_GLASS_PANE) &&
+                    !e.getInventory().getItem(15).getItemMeta().getDisplayName().equals("Left click the item in your inventory you want to sell!")) {
+
+                // Change confirm button to Yellow Check
+                ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");
+                ItemMeta halfConfirmMeta = halfConfirm.getItemMeta();
+                halfConfirmMeta.setDisplayName("Click to Confirm!");
+                halfConfirm.setItemMeta(halfConfirmMeta);
+                e.getInventory().setItem(0, halfConfirm);
 
             }
+
         }
-    }
-
-    private void resetConfirmButton(Inventory inventory) {
-        // Confirm the trade button
-        ItemStack confirmTradeButton = new ItemStack(Material.YELLOW_CONCRETE_POWDER);
-        ItemMeta confirmTradeButtonMeta = confirmTradeButton.getItemMeta();
-        confirmTradeButtonMeta.setDisplayName("Confirm");
-        confirmTradeButton.setItemMeta(confirmTradeButtonMeta);
-
-        inventory.setItem(0, confirmTradeButton);
     }
 
     @EventHandler

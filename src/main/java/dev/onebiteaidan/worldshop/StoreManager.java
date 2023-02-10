@@ -248,24 +248,33 @@ public class StoreManager {
 
         Inventory gui = Bukkit.createInventory(null, 27, "What would you like to sell?");
 
+        // Dividers
+        ItemStack divider = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta dividerMeta = divider.getItemMeta();
+        dividerMeta.setDisplayName("\u200E ");
+        divider.setItemMeta(dividerMeta);
+        gui.setItem(1, divider);
+        gui.setItem(10, divider);
+        gui.setItem(19, divider);
+
         // Confirm the trade button
-        ItemStack confirmTradeButton = new ItemStack(Material.YELLOW_CONCRETE_POWDER);
+        ItemStack confirmTradeButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmY5ZDlkZTYyZWNhZTliNzk4NTU1ZmQyM2U4Y2EzNWUyNjA1MjkxOTM5YzE4NjJmZTc5MDY2Njk4Yzk1MDhhNyJ9fX0=");
         ItemMeta confirmTradeButtonMeta = confirmTradeButton.getItemMeta();
-        confirmTradeButtonMeta.setDisplayName("Confirm");
+        confirmTradeButtonMeta.setDisplayName("You cannot confirm until you have put in a sell item and a price item!");
         confirmTradeButton.setItemMeta(confirmTradeButtonMeta);
         gui.setItem(0, confirmTradeButton);
 
         // Item player wants to sell
-        ItemStack blankItemSpotButton = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
+        ItemStack blankItemSpotButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         ItemMeta blankItemSpotButtonMeta = blankItemSpotButton.getItemMeta();
         blankItemSpotButtonMeta.setDisplayName("Left click the item in your inventory you want to sell!");
         blankItemSpotButton.setItemMeta(blankItemSpotButtonMeta);
         gui.setItem(12, blankItemSpotButton);
 
-        // Reset the number of items the player wants in return back to 1
-        ItemStack resetPriceButton = new ItemStack(Material.YELLOW_CONCRETE);
+        // Increase the number of items the player wants in return
+        ItemStack resetPriceButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjA1NmJjMTI0NGZjZmY5OTM0NGYxMmFiYTQyYWMyM2ZlZTZlZjZlMzM1MWQyN2QyNzNjMTU3MjUzMWYifX19");
         ItemMeta resetPriceButtonMeta = resetPriceButton.getItemMeta();
-        resetPriceButtonMeta.setDisplayName("Reset price");
+        resetPriceButtonMeta.setDisplayName("Increase Price by 1");
         resetPriceButton.setItemMeta(resetPriceButtonMeta);
         gui.setItem(14, resetPriceButton);
 
@@ -275,10 +284,10 @@ public class StoreManager {
         priceButtonMeta.setDisplayName("Right Click the item in your inventory you want to receive in trade!");
         gui.setItem(15, priceButton);
 
-        // Set the number of items the player wants in return
-        ItemStack setPriceButton = new ItemStack(Material.OAK_SIGN);
+        // Decrease the number of items the player wants in return
+        ItemStack setPriceButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGU0YjhiOGQyMzYyYzg2NGUwNjIzMDE0ODdkOTRkMzI3MmE2YjU3MGFmYmY4MGMyYzViMTQ4Yzk1NDU3OWQ0NiJ9fX0=");
         ItemMeta setPriceButtonMeta = setPriceButton.getItemMeta();
-        setPriceButtonMeta.setDisplayName("Set price");
+        setPriceButtonMeta.setDisplayName("Decrease Price by 1");
         setPriceButton.setItemMeta(setPriceButtonMeta);
         gui.setItem(16, setPriceButton);
 
