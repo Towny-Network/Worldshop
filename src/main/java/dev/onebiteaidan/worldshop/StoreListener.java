@@ -126,6 +126,26 @@ public class StoreListener implements Listener {
                     break;
 
 
+                case 12: // Reset/remove buy item
+                    // Changes current itemstack back to the original
+                    // Item player wants to sell
+                    ItemStack blankItemSpotButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+                    ItemMeta blankItemSpotButtonMeta = blankItemSpotButton.getItemMeta();
+                    blankItemSpotButtonMeta.setDisplayName("Left click the item in your inventory you want to sell!");
+                    blankItemSpotButton.setItemMeta(blankItemSpotButtonMeta);
+                    e.getInventory().setItem(12, blankItemSpotButton);
+                    break;
+
+
+                case 15: // Reset/remove price item
+                    ItemStack priceButton = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
+                    ItemMeta priceButtonMeta = priceButton.getItemMeta();
+                    priceButtonMeta.setDisplayName("Right Click the item in your inventory you want to receive in trade!");
+                    priceButton.setItemMeta(priceButtonMeta);
+                    e.getInventory().setItem(15, priceButton);
+                    break;
+
+
                 default:
                     // Check if item exists here and also check if it was a left or right click
                     if (!e.getCurrentItem().getType().equals(Material.AIR) && !e.getCurrentItem().getType().equals(Material.GRAY_STAINED_GLASS_PANE)) {

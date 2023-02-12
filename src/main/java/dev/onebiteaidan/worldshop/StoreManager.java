@@ -6,6 +6,7 @@ import dev.onebiteaidan.worldshop.Utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -255,8 +256,10 @@ public class StoreManager {
         gui.setItem(47, searchItems);
 
         // Add stored trades for the first page
-        for (ItemStack item : PageUtils.getPageItems(getAllDisplayItems(), page, 45)) {
-            gui.addItem(item);
+        List<ItemStack> items = PageUtils.getPageItems(getAllDisplayItems(), page, 45);
+        for (int i = 0; i < items.size(); i++) {
+            // Cannot use gui.addItem(item) here because it combines identical listings
+            gui.setItem(i, items.get(i));
         }
 
         player.openInventory(gui);
@@ -325,6 +328,7 @@ public class StoreManager {
         ItemStack priceButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         ItemMeta priceButtonMeta = priceButton.getItemMeta();
         priceButtonMeta.setDisplayName("Right Click the item in your inventory you want to receive in trade!");
+        priceButton.setItemMeta(priceButtonMeta);
         gui.setItem(15, priceButton);
 
         // Decrease the number of items the player wants in return
