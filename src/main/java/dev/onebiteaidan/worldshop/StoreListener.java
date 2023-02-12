@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.calledmethods.qual.EnsuresCalledMethodsVarArgs;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class StoreListener implements Listener {
 
@@ -94,8 +94,17 @@ public class StoreListener implements Listener {
                             ItemStack wanted = inven.getItem(15);
                             int amountWanted = wanted.getAmount();
 
+                            // Remove first occurance of a repeat itemstack in the players inventory
+                            if (e.getWhoClicked().getInventory().contains(forSale)) {
+                                e.getWhoClicked().getInventory().setItem(e.getWhoClicked().getInventory().first(forSale), null);
+                            } else {
+                                e.getWhoClicked().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Something went wrong. Please open a ticket on the Discord and let us know c:");
+                                WorldShop.getPlugin(WorldShop.class).getLogger().severe("Player attemtped to sell an item without it being in their inventory");
+                                break;
+                            }
+
                             WorldShop.getStoreManager().addToStore(forSale, wanted, amountWanted, (Player) e.getWhoClicked());
-                            e.getWhoClicked().getInventory().remove(forSale);
+
                             // Brings the player back to the main page of the store.
                             WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
                             break;
@@ -156,7 +165,7 @@ public class StoreListener implements Listener {
                             e.getInventory().setItem(12, e.getCurrentItem());
 
                         } else if (e.getClick().isRightClick()) {
-                            ItemStack curr = e.getCurrentItem();
+                            ItemStack curr = new ItemStack(e.getCurrentItem());
                             curr.setAmount(1);
                             e.getInventory().setItem(15, curr);
                         }
