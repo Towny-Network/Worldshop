@@ -1,5 +1,6 @@
 package dev.onebiteaidan.worldshop;
 
+import com.google.common.base.Joiner;
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import org.bukkit.Bukkit;
@@ -9,15 +10,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class StoreManager {
 
     private static class Trade {
         ItemStack forSale;
         ItemStack wanted;
+        ItemStack displayItem;
         int amountWanted;
 
         Player seller;
@@ -42,6 +46,43 @@ public class StoreManager {
             this.buyer = null;
             this.tradeID = tradeID;
             long timeListed = System.currentTimeMillis();
+
+            ItemStack displayItem = new ItemStack(forSale.getType(), forSale.getAmount());
+            ItemMeta displayItemMeta = displayItem.getItemMeta();
+
+            // Items that have displaynames are items that have been renamed to something other than their original title.
+            // Therefore we have to implement this shit system
+            if (forSale.getItemMeta().hasDisplayName()) {
+                displayItemMeta.setDisplayName(ChatColor.YELLOW + forSale.getItemMeta().getDisplayName() + " x" + this.forSale.getAmount());
+            } else {
+                String s = forSale.getType().toString();
+                String[] parts = s.split("_");
+                for (int i = 0; i < parts.length; i++) {
+                    parts[i] = parts[i].toLowerCase();
+                    parts[i] = parts[i].substring(0, 1).toUpperCase() + parts[i].substring(1);
+                }
+
+                displayItemMeta.setDisplayName(ChatColor.YELLOW + String.join(" ", parts) + " x" + this.forSale.getAmount());
+            }
+
+            ArrayList<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Being Sold By: " + this.seller.getDisplayName());
+
+            if (forSale.getItemMeta().hasLore()) {
+                lore.add(ChatColor.DARK_GRAY + "===================");
+                lore.add("");
+                for (String s : forSale.getItemMeta().getLore()) {
+                    lore.add(ChatColor.DARK_PURPLE + s);
+                }
+                lore.add("");
+                lore.add(ChatColor.DARK_GRAY + "===================");
+            }
+
+            lore.add(ChatColor.YELLOW + "" + ChatColor.BOLD + "Click " + ChatColor.RESET + "" + ChatColor.GOLD + "to buy this item");
+
+            displayItemMeta.setLore(lore);
+            displayItem.setItemMeta(displayItemMeta);
+            this.displayItem = displayItem;
         }
 
         /**
@@ -49,14 +90,16 @@ public class StoreManager {
          * @param forSale Item player is trading away
          * @param wanted Item player is trading for
          * @param amountWanted Amount they want
+         * @param displayItem The item that goes on display in the shop homepage
          * @param seller Person selling the forSale item
          * @param buyer Person who bought the item if trade is complete (null otherwise)
          * @param tradeID ID of the trade;
          * @param timeListed Time that the trade was listed (in Unix time)
          */
-        private Trade(ItemStack forSale, ItemStack wanted, int amountWanted, Player seller, Player buyer, int tradeID, long timeListed) {
+        private Trade(ItemStack forSale, ItemStack wanted, ItemStack displayItem, int amountWanted, Player seller, Player buyer, int tradeID, long timeListed) {
             this.forSale = forSale;
             this.wanted = wanted;
+            this.displayItem = displayItem;
             this.amountWanted = amountWanted;
             this.seller = seller;
 
@@ -309,7 +352,7 @@ public class StoreManager {
     private List<ItemStack> getAllDisplayItems () {
         List<ItemStack> items = new ArrayList<>();
         for (Trade t : trades) {
-            items.add(t.forSale);
+            items.add(t.displayItem);
         }
         return items;
     }

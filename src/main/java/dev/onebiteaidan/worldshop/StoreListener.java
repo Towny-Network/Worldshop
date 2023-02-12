@@ -26,7 +26,7 @@ public class StoreListener implements Listener {
 
             int currentPage = Integer.parseInt(e.getInventory().getItem(45).getItemMeta().getLocalizedName());
 
-            switch(e.getRawSlot()) {
+            switch (e.getRawSlot()) {
                 case 45: // Previous Page
                     if (e.getCurrentItem().getType().equals(Material.ARROW)) {
                         WorldShop.getStoreManager().prevPage((Player) e.getWhoClicked(), currentPage);
@@ -64,20 +64,10 @@ public class StoreListener implements Listener {
     }
 
     @EventHandler
-    public void testListener(InventoryClickEvent e) {
-        System.out.println(e.getInventory().toString() + " SLOT: " + String.valueOf(e.getRawSlot()));
-    }
-
-    @EventHandler
     public void onSellScreenClick(InventoryClickEvent e) {
         if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getTitle().contains("What would you like to sell?")) {
-
-
+            
             e.setCancelled(true); //Todo: this needs error checking to make sure it's not just a chest with the name "What would you like to sell?"
-
-
-
-
 
             switch(e.getRawSlot()) {
                 case 0: // Submit button
@@ -90,8 +80,6 @@ public class StoreListener implements Listener {
 
                         case "Click to Confirm!":
                             // Set the confirm buttton to Green Check
-
-                            System.out.println("Hitting correct case");
 
                             ItemStack fullConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=");
                             ItemMeta fullConfirmMeta = fullConfirm.getItemMeta();
@@ -107,14 +95,10 @@ public class StoreListener implements Listener {
                             int amountWanted = wanted.getAmount();
 
                             WorldShop.getStoreManager().addToStore(forSale, wanted, amountWanted, (Player) e.getWhoClicked());
+                            e.getWhoClicked().getInventory().remove(forSale);
                             // Brings the player back to the main page of the store.
                             WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
                             break;
-
-                        default:
-                            System.out.println("Hitting default case");
-                            System.out.println(name);
-                            System.out.println(name.equals("Click to Confirm!"));
                     }
 
                     break;
@@ -175,7 +159,6 @@ public class StoreListener implements Listener {
                 e.getInventory().setItem(0, halfConfirm);
 
             }
-
         }
     }
 
