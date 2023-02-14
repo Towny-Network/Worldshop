@@ -6,6 +6,7 @@ import net.minecraft.nbt.NBTCompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -73,4 +74,13 @@ public class Utils {
         return head;
     }
 
+    public static int getNumOfItems(Player player, ItemStack itemStack) {
+        int amount = 0;
+        for (ItemStack item : player.getInventory()) {
+            if (item.isSimilar(itemStack)) {
+                amount += item.getAmount();
+            }
+        }
+        return amount;
+    }
 }

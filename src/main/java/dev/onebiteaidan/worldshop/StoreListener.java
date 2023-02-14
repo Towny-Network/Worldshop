@@ -57,7 +57,7 @@ public class StoreListener implements Listener {
 
                 default:
                     // Open buy screen for the item that was clicked on
-
+                    WorldShop.getStoreManager().buyItem((Player) e.getWhoClicked(), e.getCurrentItem());
 
             }
         }
@@ -94,7 +94,7 @@ public class StoreListener implements Listener {
                             ItemStack wanted = inven.getItem(15);
                             int amountWanted = wanted.getAmount();
 
-                            // Remove first occurance of a repeat itemstack in the players inventory
+                            // Remove first occurrence of a repeat itemstack in the players inventory
                             if (e.getWhoClicked().getInventory().contains(forSale)) {
                                 e.getWhoClicked().getInventory().setItem(e.getWhoClicked().getInventory().first(forSale), null);
                             } else {
@@ -179,6 +179,73 @@ public class StoreListener implements Listener {
                     !e.getInventory().getItem(12).getItemMeta().getDisplayName().equals("Left click the item in your inventory you want to sell!") &&
                     !e.getInventory().getItem(15).getType().equals(Material.RED_STAINED_GLASS_PANE) &&
                     !e.getInventory().getItem(15).getItemMeta().getDisplayName().equals("Left click the item in your inventory you want to sell!")) {
+
+                // Change confirm button to Yellow Check
+                ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");
+                ItemMeta halfConfirmMeta = halfConfirm.getItemMeta();
+                halfConfirmMeta.setDisplayName("Click to Confirm!");
+                halfConfirm.setItemMeta(halfConfirmMeta);
+                e.getInventory().setItem(0, halfConfirm);
+
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBuyScreenClick(InventoryClickEvent e) {
+        if (e.getInventory() != null && e.getCurrentItem() != null && e.getInventory().getItem(0).getItemMeta().getAsString().equals("BuyItemScreen")) {
+
+            e.setCancelled(true);
+
+            switch(e.getRawSlot()) {
+                case 0: // Back button
+                    // Brings the player back to the main page of the store.
+                    WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
+                    break;
+
+                case 5:
+                    // Check what the condition of the slot is
+                    String name = e.getInventory().getItem(5).getItemMeta().getDisplayName();
+                    name = ChatColor.stripColor(name);
+                    switch(name) {
+                        case "You do not have the required items to buy this!":
+                            break;
+
+                        case "Click to Confirm!":
+                            // Set the confirm buttton to Green Check
+
+                            ItemStack fullConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=");
+                            ItemMeta fullConfirmMeta = fullConfirm.getItemMeta();
+                            fullConfirmMeta.setDisplayName("Are you sure?");
+                            fullConfirm.setItemMeta(fullConfirmMeta);
+                            e.getInventory().setItem(0, fullConfirm);
+                            return;
+
+                        case "Are you sure?":
+
+                            //Todo: needs finishing
+                            Inventory inven = e.getInventory();
+                            ItemStack forSale = inven.getItem(4);
+                            ItemStack wanted = inven.getItem(6);
+                            int amountWanted = wanted.getAmount();
+
+                            // Remove pay items from the players inventory
+                            HashMap<Integer, ItemStack> remainder = e.getWhoClicked().getInventory().removeItem(wanted);
+
+
+
+                            WorldShop.getStoreManager().addToStore(forSale, wanted, amountWanted, (Player) e.getWhoClicked());
+
+                            // Brings the player back to the main page of the store.
+                            WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
+                            break;
+                    }
+
+                    break;
+            }
+
+            // Check if player has the required items to buy the item
+            if (Utils.getNumOfItems((Player) e.getWhoClicked(), e.getInventory().getItem(6)) == e.getInventory().getItem(6).getAmount()) {
 
                 // Change confirm button to Yellow Check
                 ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");

@@ -349,8 +349,40 @@ public class StoreManager {
         player.openInventory(gui);
     }
 
-    public void buyItem (Player player) {
+    public void buyItem (Player player, ItemStack item) {
+        Trade t = getTradeFromDisplayItem(item);
+        if (t == null) {
+            player.sendMessage(ChatColor.RED + "SOMETHING HAS GONE WRONG. Please open a ticket in our Discord.");
+            return;
+        }
 
+        playersWithStoreOpen.add(player);
+
+        // Build the buy item GUI
+        Inventory gui = Bukkit.createInventory(null, 9, t.displayItem.getItemMeta().getDisplayName());
+
+        // Back button
+        ItemStack backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
+        ItemMeta backButtonMeta = backButton.getItemMeta();
+        backButtonMeta.setDisplayName("Back");
+        backButtonMeta.setLocalizedName("BuyItemScreen");
+        backButton.setItemMeta(backButtonMeta);
+        gui.setItem(0, backButton);
+
+        // Item you're buying
+        ItemStack buyItem = t.forSale;
+        gui.setItem(4, buyItem);
+
+        // Confirm button
+        ItemStack confirmTradeButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmY5ZDlkZTYyZWNhZTliNzk4NTU1ZmQyM2U4Y2EzNWUyNjA1MjkxOTM5YzE4NjJmZTc5MDY2Njk4Yzk1MDhhNyJ9fX0=");
+        ItemMeta confirmTradeButtonMeta = confirmTradeButton.getItemMeta();
+        confirmTradeButtonMeta.setDisplayName("You do not have the required items to buy this!");
+        confirmTradeButton.setItemMeta(confirmTradeButtonMeta);
+        gui.setItem(5, confirmTradeButton);
+
+        // Item you're paying
+        ItemStack payItem = t.wanted;
+        gui.setItem(6, payItem);
     }
 
     private List<ItemStack> getAllDisplayItems () {
@@ -359,5 +391,14 @@ public class StoreManager {
             items.add(t.displayItem);
         }
         return items;
+    }
+
+    private Trade getTradeFromDisplayItem(ItemStack displayItem) {
+        for (Trade t : this.trades) {
+            if (t.displayItem.equals(displayItem)) {
+                return t;
+            }
+        }
+        return null;
     }
 }
