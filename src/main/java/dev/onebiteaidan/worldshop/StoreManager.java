@@ -25,6 +25,7 @@ public class StoreManager {
         ItemStack displayItem;
         int amountWanted;
 
+        boolean completed;
         Player seller;
         Player buyer;
         int tradeID;
@@ -44,9 +45,10 @@ public class StoreManager {
             this.amountWanted = amountWanted;
             this.seller = seller;
 
+            this.completed = false;
             this.buyer = null;
             this.tradeID = tradeID;
-            long timeListed = System.currentTimeMillis();
+            this.timeListed = System.currentTimeMillis();
 
             ItemStack displayItem = new ItemStack(forSale.getType(), forSale.getAmount());
             ItemMeta displayItemMeta = displayItem.getItemMeta();
@@ -82,6 +84,8 @@ public class StoreManager {
             lore.add(ChatColor.YELLOW + "" + ChatColor.BOLD + "Click " + ChatColor.RESET + "" + ChatColor.GOLD + "to buy this item");
 
             displayItemMeta.setLore(lore);
+            // Adding in trade ID for indentification later on
+            displayItemMeta.setLocalizedName(String.valueOf(tradeID));
             displayItem.setItemMeta(displayItemMeta);
             this.displayItem = displayItem;
         }
@@ -97,13 +101,14 @@ public class StoreManager {
          * @param tradeID ID of the trade;
          * @param timeListed Time that the trade was listed (in Unix time)
          */
-        private Trade(ItemStack forSale, ItemStack wanted, ItemStack displayItem, int amountWanted, Player seller, Player buyer, int tradeID, long timeListed) {
+        private Trade(ItemStack forSale, ItemStack wanted, ItemStack displayItem, int amountWanted, Player seller, Player buyer, int tradeID, long timeListed, boolean completed) {
             this.forSale = forSale;
             this.wanted = wanted;
             this.displayItem = displayItem;
             this.amountWanted = amountWanted;
             this.seller = seller;
 
+            this.completed = completed;
             this.tradeID = tradeID;
             this.buyer = buyer;
             this.timeListed = timeListed;
@@ -157,18 +162,16 @@ public class StoreManager {
         trades.add(new Trade(forSale, wanted, amountWanted, seller, getNextTradeID()));
     }
 
-    public void removeFromStore(Trade trade) {
+    public void removeFromStore(Trade trade) { trades.remove(trade); }
 
-        trades.remove(trade);
+    public void buy (Trade trade, Player player) {
+        removeFromStore(trade);
+        trade.buyer = player;
+        trade.completed = true;
 
-    }
+        openShop(player, 1);
 
-
-
-    public void buy (Player player, Trade trade) {
-
-        playersWithStoreOpen = new ArrayList<>();
-        trades = new ArrayList<>();
+        // Todo: figure out a good way to do storages for payment of players
     }
 
     public void openShop (Player player,int page) {
@@ -396,6 +399,17 @@ public class StoreManager {
     private Trade getTradeFromDisplayItem(ItemStack displayItem) {
         for (Trade t : this.trades) {
             if (t.displayItem.equals(displayItem)) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    public Trade getTradeFromTradeID(String id) {
+        int tradeID = Integer.parseInt(id);
+
+        for (Trade t : trades) {
+            if (t.tradeID == tradeID) {
                 return t;
             }
         }

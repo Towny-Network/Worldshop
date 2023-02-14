@@ -231,10 +231,15 @@ public class StoreListener implements Listener {
 
                             // Remove pay items from the players inventory
                             HashMap<Integer, ItemStack> remainder = e.getWhoClicked().getInventory().removeItem(wanted);
+                            if (!remainder.isEmpty()) {
+                                // This case should hopefully never be reached
+                                e.getWhoClicked().sendMessage(ChatColor.RED + "Something Wrong Happened! Please open a ticket on our discord.");
+                                e.getWhoClicked().closeInventory();
+                            }
 
+                            e.getWhoClicked().getInventory().addItem(forSale);
+                            WorldShop.getStoreManager().buy(WorldShop.getStoreManager().getTradeFromTradeID(e.getInventory().getItem(4).getItemMeta().getLocalizedName()), (Player) e.getWhoClicked());
 
-
-                            WorldShop.getStoreManager().addToStore(forSale, wanted, amountWanted, (Player) e.getWhoClicked());
 
                             // Brings the player back to the main page of the store.
                             WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
