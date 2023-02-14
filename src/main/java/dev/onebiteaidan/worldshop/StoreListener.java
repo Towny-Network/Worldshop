@@ -98,7 +98,7 @@ public class StoreListener implements Listener {
                             if (e.getWhoClicked().getInventory().contains(forSale)) {
                                 e.getWhoClicked().getInventory().setItem(e.getWhoClicked().getInventory().first(forSale), null);
                             } else {
-                                e.getWhoClicked().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Something went wrong. Please open a ticket on the Discord and let us know c:");
+                                e.getWhoClicked().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Something went wrong. Please open a ticket on the Discord. ERROR CODE: WS0002");
                                 WorldShop.getPlugin(WorldShop.class).getLogger().severe("Player attemtped to sell an item without it being in their inventory");
                                 break;
                             }
@@ -233,7 +233,7 @@ public class StoreListener implements Listener {
                             HashMap<Integer, ItemStack> remainder = e.getWhoClicked().getInventory().removeItem(wanted);
                             if (!remainder.isEmpty()) {
                                 // This case should hopefully never be reached
-                                e.getWhoClicked().sendMessage(ChatColor.RED + "Something Wrong Happened! Please open a ticket on our discord.");
+                                e.getWhoClicked().sendMessage(ChatColor.RED + "Something Wrong Happened! Please open a ticket on our discord. ERROR CODE: WS0001");
                                 e.getWhoClicked().closeInventory();
                             }
 

@@ -288,11 +288,7 @@ public class StoreManager {
 
     }
 
-    public void sellItem (Player player){
-        // Todo: Build a gui for inputting item + amount wanted for trade
-        // Build a gui that has two parts. A part for entering the name via a sign
-        // A part where you can set the number of items using like (-5, -1, +1, +5)
-
+    public void sellItem (Player player) {
         playersWithStoreOpen.add(player);
 
         Inventory gui = Bukkit.createInventory(null, 27, "What would you like to sell?");
@@ -355,7 +351,7 @@ public class StoreManager {
     public void buyItem (Player player, ItemStack item) {
         Trade t = getTradeFromDisplayItem(item);
         if (t == null) {
-            player.sendMessage(ChatColor.RED + "SOMETHING HAS GONE WRONG. Please open a ticket in our Discord.");
+            player.sendMessage(ChatColor.RED + "SOMETHING HAS GONE WRONG. Please open a ticket in our Discord. ERROR CODE: WS0003");
             return;
         }
 
