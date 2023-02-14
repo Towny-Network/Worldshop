@@ -6,8 +6,7 @@ Todo:
 - Implement ability to use MySQL and SQLite
 - Prevent items from being duped by being sold twice (sell detection)
 - (Maybe) Make nation options like front page nation items 
-- I had another idea but I forgot it
-
+- Some customizable options (inventory texture, thank you messages, etc).
 
 
 ## Error Codes
