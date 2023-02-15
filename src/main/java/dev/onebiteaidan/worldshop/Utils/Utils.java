@@ -77,8 +77,10 @@ public class Utils {
     public static int getNumOfItems(Player player, ItemStack itemStack) {
         int amount = 0;
         for (ItemStack item : player.getInventory()) {
-            if (item.isSimilar(itemStack)) {
-                amount += item.getAmount();
+            if (item != null) {
+                if (item.isSimilar(itemStack)) {
+                    amount += item.getAmount();
+                }
             }
         }
         return amount;

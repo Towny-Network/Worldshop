@@ -358,7 +358,7 @@ public class StoreManager {
         playersWithStoreOpen.add(player);
 
         // Build the buy item GUI
-        Inventory gui = Bukkit.createInventory(null, 9, t.displayItem.getItemMeta().getDisplayName());
+        Inventory gui = Bukkit.createInventory(null, 9, "WorldShop - Buy " + t.displayItem.getItemMeta().getDisplayName());
 
         // Back button
         ItemStack backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
@@ -382,7 +382,13 @@ public class StoreManager {
         // Item you're paying
         ItemStack payItem = t.wanted;
         gui.setItem(6, payItem);
+
+
+        player.openInventory(gui);
     }
+
+
+
 
     private List<ItemStack> getAllDisplayItems () {
         List<ItemStack> items = new ArrayList<>();

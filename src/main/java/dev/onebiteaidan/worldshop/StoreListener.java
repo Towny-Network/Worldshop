@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -189,11 +190,41 @@ public class StoreListener implements Listener {
         }
     }
 
+
+    @EventHandler
+    public void onOpenBuyScreen(InventoryOpenEvent e) {
+        if (e.getInventory() != null && e.getView().getTitle().contains("WorldShop - Buy ")) {
+            // Check if player has the required items to buy the item
+            if (Utils.getNumOfItems((Player) e.getPlayer(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
+
+                // Change confirm button to Yellow Check
+                ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");
+                ItemMeta halfConfirmMeta = halfConfirm.getItemMeta();
+                halfConfirmMeta.setDisplayName("Click to Confirm!");
+                halfConfirm.setItemMeta(halfConfirmMeta);
+                e.getInventory().setItem(5, halfConfirm);
+
+            }
+        }
+    }
+
     @EventHandler
     public void onBuyScreenClick(InventoryClickEvent e) {
-        if (e.getInventory() != null && e.getCurrentItem() != null && e.getInventory().getItem(0).getItemMeta().getAsString().equals("BuyItemScreen")) {
+        if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getTitle().contains("WorldShop - Buy ")) {
 
             e.setCancelled(true);
+
+            // Check if player has the required items to buy the item
+            if (Utils.getNumOfItems((Player) e.getWhoClicked(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
+
+                // Change confirm button to Yellow Check
+                ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");
+                ItemMeta halfConfirmMeta = halfConfirm.getItemMeta();
+                halfConfirmMeta.setDisplayName("Click to Confirm!");
+                halfConfirm.setItemMeta(halfConfirmMeta);
+                e.getInventory().setItem(5, halfConfirm);
+
+            }
 
             switch(e.getRawSlot()) {
                 case 0: // Back button
@@ -216,7 +247,7 @@ public class StoreListener implements Listener {
                             ItemMeta fullConfirmMeta = fullConfirm.getItemMeta();
                             fullConfirmMeta.setDisplayName("Are you sure?");
                             fullConfirm.setItemMeta(fullConfirmMeta);
-                            e.getInventory().setItem(0, fullConfirm);
+                            e.getInventory().setItem(5, fullConfirm);
                             return;
 
                         case "Are you sure?":
@@ -245,18 +276,6 @@ public class StoreListener implements Listener {
                     }
 
                     break;
-            }
-
-            // Check if player has the required items to buy the item
-            if (Utils.getNumOfItems((Player) e.getWhoClicked(), e.getInventory().getItem(6)) == e.getInventory().getItem(6).getAmount()) {
-
-                // Change confirm button to Yellow Check
-                ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");
-                ItemMeta halfConfirmMeta = halfConfirm.getItemMeta();
-                halfConfirmMeta.setDisplayName("Click to Confirm!");
-                halfConfirm.setItemMeta(halfConfirmMeta);
-                e.getInventory().setItem(0, halfConfirm);
-
             }
         }
     }
