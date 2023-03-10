@@ -6,6 +6,8 @@ import dev.onebiteaidan.worldshop.DataManagement.Database;
 import dev.onebiteaidan.worldshop.DataManagement.MySQL;
 import dev.onebiteaidan.worldshop.DataManagement.SQLite;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.PreparedStatement;
@@ -70,11 +72,29 @@ public final class WorldShop extends JavaPlugin {
                         "CREATE TABLE IF NOT EXISTS trades" +
                                 "(" +
                                 "id int AUTO_INCREMENT," +
-                                "uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
-                                "forsale BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
-                                "barter varchar(255)," + // Barter item (the item someone will get in return) will be normal
-                                "numwanted int" +
+                                "trade_id int," +
+                                "seller_uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
+                                "display_item BLOB," +
+                                "for_sale BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
+                                "wanted BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
+                                "num_wanted int," +
+                                "completed boolean," +
+                                "buyer_uuid varchar(36)," +
+                                "time_listed BIGINT" +
                                 ");"); // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
+
+
+
+            ItemStack forSale;
+            ItemStack wanted;
+            ItemStack displayItem;
+            int amountWanted;
+
+            boolean completed;
+            Player seller;
+            Player buyer;
+            int tradeID;
+            long timeListed;// Unix time
 
         } else {
             this.getLogger().severe("WorldShop DID NOT SUCCESSFULLY CONNECT TO ITS DATABASE!!!");

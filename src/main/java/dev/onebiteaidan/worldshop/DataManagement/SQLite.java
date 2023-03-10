@@ -54,6 +54,10 @@ public class SQLite implements Database {
 
     }
 
+    public Connection getConnection() {
+        return this.connection;
+    }
+
     @Override
     public ResultSet query(String query) {
         try {

@@ -22,7 +22,7 @@ public class Utils {
 
     // Next two methods grabbed from https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
 
-    public byte[] saveItemStack(org.bukkit.inventory.ItemStack stack) throws IOException {
+    public static byte[] saveItemStack(org.bukkit.inventory.ItemStack stack) throws IOException {
         // Create a NBT Compound Tag to save the item data into
         NBTTagCompound tag = new NBTTagCompound();
         // Convert the Bukkit ItemStack to an NMS one and use the NMS ItemStack to save the data in NBT
@@ -34,7 +34,7 @@ public class Utils {
         return output.toByteArray();
     }
 
-    public org.bukkit.inventory.ItemStack loadItemStack(byte[] data) throws IOException {
+    public static org.bukkit.inventory.ItemStack loadItemStack(byte[] data) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(data);
         // Reverse the process by reading the byte[] as ByteArrayInputStream and passing that to the NBT reader of Minecraft
         NBTTagCompound tag = NBTCompressedStreamTools.a(input);

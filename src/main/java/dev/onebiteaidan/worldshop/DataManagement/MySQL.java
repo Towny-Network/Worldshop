@@ -35,6 +35,14 @@ public class MySQL implements Database {
         }
     }
 
+    public Connection getConnection() {
+        try {
+            return hikari.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public ResultSet query(String query) {
         try (Connection connection = hikari.getConnection();

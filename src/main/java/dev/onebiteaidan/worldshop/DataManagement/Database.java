@@ -11,6 +11,7 @@ public interface Database {
    void connect() throws SQLException;
    boolean isConnected();
    void disconnect();
+   Connection getConnection();
    ResultSet query(String query);
    void update(String update);
    void insert(String insertion);

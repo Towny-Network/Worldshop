@@ -1,8 +1,10 @@
 package dev.onebiteaidan.worldshop;
 
 import com.google.common.base.Joiner;
+import dev.onebiteaidan.worldshop.DataManagement.SQLite;
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
 import dev.onebiteaidan.worldshop.Utils.Utils;
+import io.netty.resolver.dns.BiDnsQueryLifecycleObserver;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;;
@@ -13,9 +15,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.checkerframework.checker.units.qual.A;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
 
 public class StoreManager {
 
@@ -54,7 +56,7 @@ public class StoreManager {
             ItemMeta displayItemMeta = displayItem.getItemMeta();
 
             // Items that have displaynames are items that have been renamed to something other than their original title.
-            // Therefore we have to implement this shit system
+            // Therefore, we have to implement this shit system
             if (forSale.getItemMeta().hasDisplayName()) {
                 displayItemMeta.setDisplayName(ChatColor.YELLOW + forSale.getItemMeta().getDisplayName() + " x" + this.forSale.getAmount());
             } else {
@@ -146,7 +148,39 @@ public class StoreManager {
         // todo: Grabs all of the trades from the database
         // all trades greater than 30 days old should be removed from the db
 
-        trades = new ArrayList<>();
+        try {
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades WHERE completed = ?;");
+            ps.setBoolean(1, false);
+            ResultSet rs = ps.executeQuery();
+
+            trades = new ArrayList<>();
+
+            while (rs.next()) {
+
+                // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
+                Player buyer = null;
+                String buyerID = rs.getString("buyer_uuid");
+                if (!rs.wasNull()) {
+                    buyer = Bukkit.getPlayer(UUID.fromString(buyerID));
+                }
+
+                trades.add(new Trade(
+                        ItemStack.deserializeBytes(rs.getBytes("for_sale")),
+                        ItemStack.deserializeBytes(rs.getBytes("wanted")),
+                        ItemStack.deserializeBytes(rs.getBytes("display_item")),
+                        rs.getInt("num_wanted"),
+                        Bukkit.getPlayer(UUID.fromString(rs.getString("seller_uuid"))),
+                        buyer,
+                        rs.getInt("trade_id"),
+                        rs.getLong("time_listed"),
+                        rs.getBoolean("completed")
+                ));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         playersWithStoreOpen = new ArrayList<>();
     }
 
@@ -156,13 +190,64 @@ public class StoreManager {
 
     public void addToStore(Trade trade) {
         trades.add(trade);
+
+        try {
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO trades (trade_id, seller_uuid, display_item, for_sale, wanted, num_wanted, completed, buyer_uuid, time_listed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+
+            ps.setInt(1, trade.tradeID);
+            ps.setString(2, String.valueOf(trade.seller.getUniqueId()));
+            ps.setBytes(3, trade.displayItem.serializeAsBytes());
+            ps.setBytes(4, trade.forSale.serializeAsBytes());
+            ps.setBytes(5, trade.wanted.serializeAsBytes());
+            ps.setInt(6, trade.amountWanted);
+            ps.setBoolean(7, trade.completed);
+
+            if ((trade.buyer != null)) {
+                ps.setString(8, String.valueOf(trade.seller.getUniqueId()));
+            } else {
+                ps.setNull(8, Types.NULL);
+            }
+
+            ps.setLong(9, trade.timeListed);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addToStore(ItemStack forSale, ItemStack wanted, int amountWanted, Player seller) {
-        trades.add(new Trade(forSale, wanted, amountWanted, seller, getNextTradeID()));
+        Trade trade = new Trade(forSale, wanted, amountWanted, seller, getNextTradeID());
+        trades.add(trade);
+
+        try {
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO trades (trade_id, seller_uuid, display_item, for_sale, wanted, num_wanted, completed, buyer_uuid, time_listed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+
+            ps.setInt(1, trade.tradeID);
+            ps.setString(2, String.valueOf(trade.seller.getUniqueId()));
+            ps.setBytes(3, trade.displayItem.serializeAsBytes());
+            ps.setBytes(4, trade.forSale.serializeAsBytes());
+            ps.setBytes(5, trade.wanted.serializeAsBytes());
+            ps.setInt(6, trade.amountWanted);
+            ps.setBoolean(7, trade.completed);
+
+            if ((trade.buyer != null)) {
+                ps.setString(8, String.valueOf(trade.seller.getUniqueId()));
+            } else {
+                ps.setNull(8, Types.BLOB);
+            }
+
+            ps.setLong(9, trade.timeListed);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void removeFromStore(Trade trade) { trades.remove(trade); }
+    public void removeFromStore(Trade trade) {
+        trades.remove(trade);
+    }
 
     public void buy (Trade trade, Player player) {
         removeFromStore(trade);
