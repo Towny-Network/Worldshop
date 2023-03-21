@@ -54,10 +54,15 @@ public class StoreListener implements Listener {
                     }
                     break;
 
-                default:
-                    // Open buy screen for the item that was clicked on
-                    WorldShop.getStoreManager().buyItem((Player) e.getWhoClicked(), e.getCurrentItem());
+                default: // Open buy screen for the item that was clicked on
 
+                    // Make sure the player isn't clicking an item in their hotbar or inventory
+                    if (e.getRawSlot() >= 54 && e.getRawSlot() <= 89) {
+                        break;
+                    }
+
+                    // Open the buy screen
+                    WorldShop.getStoreManager().buyItem((Player) e.getWhoClicked(), e.getCurrentItem());
             }
         }
     }
@@ -98,7 +103,7 @@ public class StoreListener implements Listener {
                                 e.getWhoClicked().getInventory().setItem(e.getWhoClicked().getInventory().first(forSale), null);
                             } else {
                                 e.getWhoClicked().sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Something went wrong. Please open a ticket on the Discord. ERROR CODE: WS0002");
-                                WorldShop.getPlugin(WorldShop.class).getLogger().severe("Player attemtped to sell an item without it being in their inventory");
+                                WorldShop.getPlugin(WorldShop.class).getLogger().severe("Player attempted to sell an item without it being in their inventory");
                                 break;
                             }
 

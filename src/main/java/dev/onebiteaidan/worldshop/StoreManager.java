@@ -271,6 +271,7 @@ public class StoreManager {
         openShop(player, 1);
 
         // Todo: figure out a good way to do storages for payment of players
+        // The best way to do this would to probably store it in the player database
     }
 
     /**
