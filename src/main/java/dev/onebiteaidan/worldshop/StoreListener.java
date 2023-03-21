@@ -193,7 +193,7 @@ public class StoreListener implements Listener {
 
     @EventHandler
     public void onOpenBuyScreen(InventoryOpenEvent e) {
-        if (e.getInventory() != null && e.getView().getTitle().contains("WorldShop - Buy ")) {
+        if (e.getInventory() != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
             // Check if player has the required items to buy the item
             if (Utils.getNumOfItems((Player) e.getPlayer(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
 
@@ -210,7 +210,7 @@ public class StoreListener implements Listener {
 
     @EventHandler
     public void onBuyScreenClick(InventoryClickEvent e) {
-        if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getTitle().contains("WorldShop - Buy ")) {
+        if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
 
             e.setCancelled(true);
 

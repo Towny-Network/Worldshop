@@ -181,11 +181,17 @@ public class StoreManager {
             throw new RuntimeException(e);
         }
 
+        if (trades.size() != 0) {
+            mostRecentTradeID = trades.get(trades.size() - 1).tradeID;
+        } else {
+            mostRecentTradeID = 0;
+        }
+
         playersWithStoreOpen = new ArrayList<>();
     }
 
     public int getNextTradeID() {
-        return mostRecentTradeID++;
+        return ++mostRecentTradeID;
     }
 
     public void addToStore(Trade trade) {
@@ -246,7 +252,15 @@ public class StoreManager {
     }
 
     public void removeFromStore(Trade trade) {
-        trades.remove(trade);
+        try {
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE trades SET completed = ? WHERE trade_id = ?");
+            ps.setBoolean(1, true);
+            ps.setInt(2, trade.tradeID);
+
+            trades.remove(trade);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void buy (Trade trade, Player player) {
@@ -259,6 +273,12 @@ public class StoreManager {
         // Todo: figure out a good way to do storages for payment of players
     }
 
+    /**
+     * Opens the WorldShop guy for a player.
+     * LOCALIZED ITEM IDENTIFIER: statsHead "WorldShopHomeScreen"
+     * @param player player you want to open the shop GUI.
+     * @param page sets the page of items you want the player to see.
+     */
     public void openShop (Player player,int page) {
         playersWithStoreOpen.add(player);
 
@@ -324,6 +344,7 @@ public class StoreManager {
         ItemMeta statsHeadMeta = statsHead.getItemMeta();
 
         statsHeadMeta.setDisplayName(ChatColor.DARK_AQUA + player.getDisplayName() + "'s Stats");
+        statsHeadMeta.setLocalizedName("WorldShopHomeScreen");
         statsHead.setItemMeta(statsHeadMeta);
         gui.setItem(49, statsHead);
 
@@ -373,6 +394,11 @@ public class StoreManager {
 
     }
 
+    /**
+     * Opens the sell items screen for a player.
+     * LOCALIZED ITEM IDENTIFIER: backButton "SellItemScreen"
+     * @param player player you want to open the item selling interface.
+     */
     public void sellItem (Player player) {
         playersWithStoreOpen.add(player);
 
@@ -426,6 +452,7 @@ public class StoreManager {
         ItemStack backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
         ItemMeta backButtonMeta = backButton.getItemMeta();
         backButtonMeta.setDisplayName("Back");
+        backButtonMeta.setLocalizedName("SellItemScreen");
         backButton.setItemMeta(backButtonMeta);
         gui.setItem(18, backButton);
 
@@ -433,6 +460,12 @@ public class StoreManager {
         player.openInventory(gui);
     }
 
+    /**
+     * Open the buy screen for a player.
+     * LOCALIZED ITEM IDENTIFIER: backButton "BuyItemScreen"
+     * @param player player you want to open the gui.
+     * @param item the display item they clicked on that corresponds to the trade to pull up.
+     */
     public void buyItem (Player player, ItemStack item) {
         Trade t = getTradeFromDisplayItem(item);
         if (t == null) {
@@ -443,7 +476,7 @@ public class StoreManager {
         playersWithStoreOpen.add(player);
 
         // Build the buy item GUI
-        Inventory gui = Bukkit.createInventory(null, 9, "WorldShop - Buy " + t.displayItem.getItemMeta().getDisplayName());
+        Inventory gui = Bukkit.createInventory(null, 9, "WorldShop - Buy" + t.displayItem.getItemMeta().getDisplayName());
 
         // Back button
         ItemStack backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
@@ -471,7 +504,6 @@ public class StoreManager {
 
         player.openInventory(gui);
     }
-
 
 
 
