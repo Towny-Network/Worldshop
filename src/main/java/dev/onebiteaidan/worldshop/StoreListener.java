@@ -19,7 +19,7 @@ public class StoreListener implements Listener {
 
     @EventHandler
     public void onWorldShopScreenClick(InventoryClickEvent e) {
-        if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getTitle().contains("WorldShop")) {
+        if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getItem(49) != null && e.getView().getItem(49).getItemMeta().hasLocalizedName() && e.getView().getItem(49).getItemMeta().getLocalizedName().equals("WorldShopHomeScreen")) {
 
             e.setCancelled(true); //Todo: this needs error checking to make sure it's not just a chest with the name "WorldsShop"
 
@@ -219,17 +219,17 @@ public class StoreListener implements Listener {
 
             e.setCancelled(true);
 
-            // Check if player has the required items to buy the item
-            if (Utils.getNumOfItems((Player) e.getWhoClicked(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
-
-                // Change confirm button to Yellow Check
-                ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");
-                ItemMeta halfConfirmMeta = halfConfirm.getItemMeta();
-                halfConfirmMeta.setDisplayName("Click to Confirm!");
-                halfConfirm.setItemMeta(halfConfirmMeta);
-                e.getInventory().setItem(5, halfConfirm);
-
-            }
+//            // Check if player has the required items to buy the item
+//            if (Utils.getNumOfItems((Player) e.getWhoClicked(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
+//
+//                // Change confirm button to Yellow Check
+//                ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");
+//                ItemMeta halfConfirmMeta = halfConfirm.getItemMeta();
+//                halfConfirmMeta.setDisplayName("Click to Confirm!");
+//                halfConfirm.setItemMeta(halfConfirmMeta);
+//                e.getInventory().setItem(5, halfConfirm);
+//
+//            }
 
             switch(e.getRawSlot()) {
                 case 0: // Back button
@@ -246,14 +246,15 @@ public class StoreListener implements Listener {
                             break;
 
                         case "Click to Confirm!":
-                            // Set the confirm buttton to Green Check
+                            // Set the confirm button to Green Check
 
                             ItemStack fullConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=");
                             ItemMeta fullConfirmMeta = fullConfirm.getItemMeta();
                             fullConfirmMeta.setDisplayName("Are you sure?");
                             fullConfirm.setItemMeta(fullConfirmMeta);
                             e.getInventory().setItem(5, fullConfirm);
-                            return;
+//                            return;
+                            break;
 
                         case "Are you sure?":
 
@@ -264,19 +265,25 @@ public class StoreListener implements Listener {
                             int amountWanted = wanted.getAmount();
 
                             // Remove pay items from the players inventory
-                            HashMap<Integer, ItemStack> remainder = e.getWhoClicked().getInventory().removeItem(wanted);
-                            if (!remainder.isEmpty()) {
-                                // This case should hopefully never be reached
-                                e.getWhoClicked().sendMessage(ChatColor.RED + "Something Wrong Happened! Please open a ticket on our discord. ERROR CODE: WS0001");
-                                e.getWhoClicked().closeInventory();
+                            e.getWhoClicked().getInventory().removeItem(wanted);
+
+
+//                            HashMap<Integer, ItemStack> remainder = e.getWhoClicked().getInventory().removeItem(wanted);
+//                            if (!remainder.isEmpty()) {
+//                                // This case should hopefully never be reached
+//                                e.getWhoClicked().sendMessage(ChatColor.RED + "Something Wrong Happened! Please open a ticket on our discord. ERROR CODE: WS0001");
+//                                e.getWhoClicked().closeInventory();
+//                            }
+
+                            // Todo: add item to the collection gui
+//                            e.getWhoClicked().getInventory().addItem(forSale);
+                            String tradeID = e.getInventory().getItem(4).getItemMeta().getLocalizedName();
+                            if (tradeID.equals("")) {
+                                System.out.println("An error occurred");
                             }
 
-                            e.getWhoClicked().getInventory().addItem(forSale);
-                            WorldShop.getStoreManager().buy(WorldShop.getStoreManager().getTradeFromTradeID(e.getInventory().getItem(4).getItemMeta().getLocalizedName()), (Player) e.getWhoClicked());
+                            WorldShop.getStoreManager().buy(WorldShop.getStoreManager().getTradeFromTradeID(tradeID), (Player) e.getWhoClicked());
 
-
-                            // Brings the player back to the main page of the store.
-                            WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
                             break;
                     }
 

@@ -257,6 +257,8 @@ public class StoreManager {
             ps.setBoolean(1, true);
             ps.setInt(2, trade.tradeID);
 
+            ps.executeUpdate();
+
             trades.remove(trade);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -275,7 +277,7 @@ public class StoreManager {
     }
 
     /**
-     * Opens the WorldShop guy for a player.
+     * Opens the WorldShop gui for a player.
      * LOCALIZED ITEM IDENTIFIER: statsHead "WorldShopHomeScreen"
      * @param player player you want to open the shop GUI.
      * @param page sets the page of items you want the player to see.
@@ -489,6 +491,9 @@ public class StoreManager {
 
         // Item you're buying
         ItemStack buyItem = t.forSale;
+        ItemMeta buyItemMeta = buyItem.getItemMeta();
+        buyItemMeta.setLocalizedName(String.valueOf(t.tradeID));
+        buyItem.setItemMeta(buyItemMeta);
         gui.setItem(4, buyItem);
 
         // Confirm button

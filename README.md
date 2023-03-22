@@ -7,6 +7,8 @@ Todo:
 - Prevent items from being duped by being sold twice (sell detection)
 - (Maybe) Make nation options like front page nation items 
 - Some customizable options (inventory texture, thank you messages, etc).
+- Simple database lookup website for staff to use to confirm trades n such
+- A discord bot that does the same as above ^^
 
 
 ## Error Codes
