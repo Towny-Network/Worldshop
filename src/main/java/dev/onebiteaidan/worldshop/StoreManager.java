@@ -394,6 +394,33 @@ public class StoreManager {
     }
 
     public void viewCurrentTrades (Player player){
+        playersWithStoreOpen.add(player);
+
+        Inventory gui = Bukkit.createInventory(null, 27, "Trades");
+
+        // View Current Listings Button
+        ItemStack currentListingsButton;
+        ItemMeta currentListingsButtonMeta;
+
+
+
+
+        // View Completed Trades Button
+        ItemStack completedTradesButton;
+        ItemMeta completedTradesButtonMeta;
+
+        completedTradesButton = new ItemStack(Material.BARREL);
+        completedTradesButtonMeta = completedTradesButton.getItemMeta();
+
+
+
+    }
+
+    public void viewCurrentListings (Player player) {
+
+    }
+
+    public void viewCompletedTrades (Player player) {
 
     }
 
