@@ -83,19 +83,6 @@ public final class WorldShop extends JavaPlugin {
                                 "time_listed BIGINT" +
                                 ");"); // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
 
-
-
-            ItemStack forSale;
-            ItemStack wanted;
-            ItemStack displayItem;
-            int amountWanted;
-
-            boolean completed;
-            Player seller;
-            Player buyer;
-            int tradeID;
-            long timeListed;// Unix time
-
         } else {
             this.getLogger().severe("WorldShop DID NOT SUCCESSFULLY CONNECT TO ITS DATABASE!!!");
         }
