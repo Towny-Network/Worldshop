@@ -46,6 +46,7 @@ public class StoreListener implements Listener {
                     break;
 
                 case 51: // View Trades
+                    WorldShop.getStoreManager().viewCurrentTrades((Player) e.getWhoClicked());
                     break;
 
                 case 53: // Next Page
@@ -198,7 +199,7 @@ public class StoreListener implements Listener {
 
     @EventHandler
     public void onOpenBuyScreen(InventoryOpenEvent e) {
-        if (e.getInventory() != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
+        if (e.getInventory() != null && e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
             // Check if player has the required items to buy the item
             if (Utils.getNumOfItems((Player) e.getPlayer(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
 
@@ -215,7 +216,7 @@ public class StoreListener implements Listener {
 
     @EventHandler
     public void onBuyScreenClick(InventoryClickEvent e) {
-        if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
+        if (e.getCurrentItem() != null && e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
 
             e.setCancelled(true);
 
@@ -292,9 +293,30 @@ public class StoreListener implements Listener {
         }
     }
 
+
+    @EventHandler
+    public void onCurrentTradesScreenClick(InventoryClickEvent e) {
+        if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 && e.getView().getItem(22) != null && e.getView().getItem(22).getItemMeta().hasLocalizedName() && e.getView().getItem(22).getItemMeta().getLocalizedName().equals("ViewCurrentTradesScreen")) {
+
+            e.setCancelled(true);
+
+            switch(e.getRawSlot()) {
+                case 11: // View Current Listings Button
+                    WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked());
+                    break;
+
+                case 15: // View Completed Trades Button
+                    WorldShop.getStoreManager().viewCompletedTrades((Player) e.getWhoClicked());
+                    break;
+
+                case 22: // Back Button
+                    WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
+            }
+        }
+    }
+
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
-        ArrayList<Player> playersInStore = WorldShop.getStoreManager().playersWithStoreOpen;
-        playersInStore.remove(e.getPlayer());
+        WorldShop.getStoreManager().playersWithStoreOpen.remove(e.getPlayer());
     }
 }

@@ -393,6 +393,11 @@ public class StoreManager {
 
     }
 
+    /**
+     * Opens the sell items screen for a player.
+     * LOCALIZED ITEM IDENTIFIER: backButton "ViewCurrentTradesScreen"
+     * @param player player you want to open the item selling interface.
+     */
     public void viewCurrentTrades (Player player){
         playersWithStoreOpen.add(player);
 
@@ -402,7 +407,14 @@ public class StoreManager {
         ItemStack currentListingsButton;
         ItemMeta currentListingsButtonMeta;
 
-
+        currentListingsButton = new ItemStack(Material.CHEST);
+        currentListingsButtonMeta = currentListingsButton.getItemMeta();
+        currentListingsButtonMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.GREEN + "Current Listings");
+        ArrayList<String> currentListingsButtonLore = new ArrayList<>();
+        currentListingsButtonLore.add("Click to view your current listings!");
+        currentListingsButtonMeta.setLore(currentListingsButtonLore);
+        currentListingsButton.setItemMeta(currentListingsButtonMeta);
+        gui.setItem(11, currentListingsButton);
 
 
         // View Completed Trades Button
@@ -411,16 +423,99 @@ public class StoreManager {
 
         completedTradesButton = new ItemStack(Material.BARREL);
         completedTradesButtonMeta = completedTradesButton.getItemMeta();
+        completedTradesButtonMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.YELLOW + "Completed Trades");
+        ArrayList<String> completedTradesButtonLore  = new ArrayList<>();
+        completedTradesButtonLore.add("Click to view your recently completed trades!");
+        completedTradesButtonMeta.setLore(completedTradesButtonLore);
+        completedTradesButton.setItemMeta(completedTradesButtonMeta);
+        gui.setItem(15, completedTradesButton);
 
 
+        // Back Button
+        ItemStack backButton;
+        ItemMeta backButtonMeta;
 
+        backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
+        backButtonMeta = backButton.getItemMeta();
+        backButtonMeta.setDisplayName("Back");
+        backButtonMeta.setLocalizedName("ViewCurrentTradesScreen");
+        backButton.setItemMeta(backButtonMeta);
+        gui.setItem(22, backButton);
+
+
+        player.openInventory(gui);
     }
 
+    /**
+     * Opens the sell items screen for a player.
+     * LOCALIZED ITEM IDENTIFIER: backButton "ViewCurrentListingsScreen"
+     * @param player player you want to open the item selling interface.
+     */
     public void viewCurrentListings (Player player) {
+        playersWithStoreOpen.add(player);
+
+        Inventory gui = Bukkit.createInventory(null, 27, "Current Listings");
+
+        // Back Button
+        ItemStack backButton;
+        ItemMeta backButtonMeta;
+
+        backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
+        backButtonMeta = backButton.getItemMeta();
+        backButtonMeta.setDisplayName("Back");
+        backButtonMeta.setLocalizedName("ViewCurrentListingsScreen");
+        backButton.setItemMeta(backButtonMeta);
+        gui.setItem(0, backButton);
+
+        // Dividers
+        ItemStack divider = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta dividerMeta = divider.getItemMeta();
+
+        dividerMeta.setDisplayName("\u200E ");
+        divider.setItemMeta(dividerMeta);
+        gui.setItem(1, divider);
+        gui.setItem(10, divider);
+        gui.setItem(19, divider);
+
+
+        //Todo: Populate remaining slots w/ open trades posted by player
 
     }
 
+    /**
+     * Opens the sell items screen for a player.
+     * LOCALIZED ITEM IDENTIFIER: backButton "ViewCompletedTradesScreen"
+     * @param player player you want to open the item selling interface.
+     */
     public void viewCompletedTrades (Player player) {
+        playersWithStoreOpen.add(player);
+
+        Inventory gui = Bukkit.createInventory(null, 27, "Completed Trades");
+
+        // Back Button
+        ItemStack backButton;
+        ItemMeta backButtonMeta;
+
+        backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
+        backButtonMeta = backButton.getItemMeta();
+        backButtonMeta.setDisplayName("Back");
+        backButtonMeta.setLocalizedName("ViewCompletedListingsScreen");
+        backButton.setItemMeta(backButtonMeta);
+        gui.setItem(0, backButton);
+
+        // Dividers
+        ItemStack divider = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta dividerMeta = divider.getItemMeta();
+
+        dividerMeta.setDisplayName("\u200E ");
+        divider.setItemMeta(dividerMeta);
+        gui.setItem(1, divider);
+        gui.setItem(10, divider);
+        gui.setItem(19, divider);
+
+        //Todo: Populate remaining slots w/ completed trades posted by player
+        // This may have to be pageable to fit rewards on multiple pages
+        // Also there should also probably be an expire time on the rewards
 
     }
 
