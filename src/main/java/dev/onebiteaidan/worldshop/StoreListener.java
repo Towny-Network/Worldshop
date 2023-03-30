@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -23,9 +24,9 @@ public class StoreListener implements Listener {
      */
     @EventHandler
     public void onWorldShopScreenClick(InventoryClickEvent e) {
-        if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getItem(49) != null && e.getView().getItem(49).getItemMeta().hasLocalizedName() && e.getView().getItem(49).getItemMeta().getLocalizedName().equals("WorldShopHomeScreen")) {
+        if (e.getCurrentItem() != null && e.getView().getItem(49) != null && e.getView().getItem(49).getItemMeta().hasLocalizedName() && e.getView().getItem(49).getItemMeta().getLocalizedName().equals("WorldShopHomeScreen")) {
 
-            e.setCancelled(true); //Todo: this needs error checking to make sure it's not just a chest with the name "WorldsShop"
+            e.setCancelled(true);
 
             int currentPage = Integer.parseInt(e.getInventory().getItem(45).getItemMeta().getLocalizedName());
 
@@ -78,9 +79,10 @@ public class StoreListener implements Listener {
      */
     @EventHandler
     public void onSellScreenClick(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null && e.getView().getTitle().contains("What would you like to sell?")) { // Fixme: Needs to check for the back buttons localized name
+        InventoryView v = e.getView();
+        if (e.getInventory().getSize() == 27 && v.getItem(18) != null && v.getItem(18).getItemMeta().getLocalizedName().equals("SellItemScreen") && e.getCurrentItem() != null && v.getTitle().contains("What would you like to sell?")) { // Fixme: Needs to check for the back buttons localized name
             
-            e.setCancelled(true); //Todo: this needs error checking to make sure it's not just a chest with the name "What would you like to sell?"
+            e.setCancelled(true);
 
             switch(e.getRawSlot()) {
                 case 0: // Submit button
@@ -171,7 +173,7 @@ public class StoreListener implements Listener {
 
                 default:
                     // Check if item exists here and also check if it was a left or right click
-                    if (!e.getCurrentItem().getType().equals(Material.AIR) && !e.getCurrentItem().getType().equals(Material.GRAY_STAINED_GLASS_PANE)) { // Fixme: This would make it so players cannot sell gray stained glass
+                    if (!e.getCurrentItem().getType().equals(Material.AIR) && !e.getCurrentItem().getItemMeta().hasLocalizedName() && !e.getCurrentItem().getItemMeta().getLocalizedName().equals("Divider")) {
 
                         // Determine if it's a right or left click
                         if (e.getClick().isLeftClick()) { // Set the item we are selling

@@ -18,5 +18,5 @@ Features to add in the future
 > All WorldShop Error Codes are Prefixed with "WS". (i.e. WS0000)
 
 - 0001: While buying an item, the player did not have enough items to proceed w/ purchase even though it was previously checked that they did.
-- 0002: Player attemtped to sell an item without it being in their inventory.
+- 0002: Player attempted to sell an item without it being in their inventory.
 - 0003: No trade was found while searching w/ display item.

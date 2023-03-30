@@ -59,15 +59,14 @@ public final class WorldShop extends JavaPlugin {
                                 "(" +
                                 "id int AUTO_INCREMENT," +
                                 "uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
-                                "purchases int," +
+                                "purchases int," + //Todo: Implement the system for tracking purchases and sales
                                 "sales int," +
                                 "CONSTRAINT players_constraint UNIQUE (uuid)" + // Makes it so a UUID of each player cannot repeat in this table
-                                ");");
-
-
+                                ");"
+                );
 
                 // Initialize the shop table if it doesn't exit
-                database.update(
+                database.update(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
                         "CREATE TABLE IF NOT EXISTS trades" +
                                 "(" +
                                 "id int AUTO_INCREMENT," +
@@ -77,10 +76,25 @@ public final class WorldShop extends JavaPlugin {
                                 "for_sale BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
                                 "wanted BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
                                 "num_wanted int," +
-                                "completed boolean," +
+                                "status ENUM('OPEN', 'COMPLETE', 'EXPIRED', 'REMOVED')," +
                                 "buyer_uuid varchar(36)," +
-                                "time_listed BIGINT" +
-                                ");"); // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
+                                "time_listed BIGINT," +
+                                "time_completed BIGINT," +
+                                ");"
+                );
+
+                // Initialize a rewards pickup table
+                database.update(
+                        "CREATE TABLE IF NOT EXISTS pickup" +
+                                "(" +
+                                "id int AUTO_INCREMENT," +
+                                "player_uuid varchar(36)," +
+                                "trade_id int," +
+                                "pickup_item BLOB," +
+                                "collected boolean," +
+                                "time_collected BIGINT" +
+                                ");"
+                );
 
         } else {
             this.getLogger().severe("WorldShop DID NOT SUCCESSFULLY CONNECT TO ITS DATABASE!!!");

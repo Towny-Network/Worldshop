@@ -1,5 +1,6 @@
 package dev.onebiteaidan.worldshop;
 
+import com.mysql.jdbc.log.NullLogger;
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import org.bukkit.Bukkit;
@@ -9,11 +10,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.checkerframework.checker.units.qual.A;
 
 import java.sql.*;
 import java.util.*;
 
 public class StoreManager {
+
+    private static enum TradeStatus {
+        OPEN,
+        COMPLETE,
+        EXPIRED,
+        REMOVED
+    }
 
     private static class Trade {
         ItemStack forSale;
@@ -21,7 +30,7 @@ public class StoreManager {
         ItemStack displayItem;
         int amountWanted;
 
-        boolean completed;
+        TradeStatus status;
         Player seller;
         Player buyer;
         int tradeID;
@@ -41,7 +50,7 @@ public class StoreManager {
             this.amountWanted = amountWanted;
             this.seller = seller;
 
-            this.completed = false;
+            this.status = TradeStatus.OPEN;
             this.buyer = null;
             this.tradeID = tradeID;
             this.timeListed = System.currentTimeMillis();
@@ -97,38 +106,17 @@ public class StoreManager {
          * @param tradeID ID of the trade;
          * @param timeListed Time that the trade was listed (in Unix time)
          */
-        private Trade(ItemStack forSale, ItemStack wanted, ItemStack displayItem, int amountWanted, Player seller, Player buyer, int tradeID, long timeListed, boolean completed) {
+        private Trade(ItemStack forSale, ItemStack wanted, ItemStack displayItem, int amountWanted, Player seller, Player buyer, int tradeID, long timeListed, TradeStatus status) {
             this.forSale = forSale;
             this.wanted = wanted;
             this.displayItem = displayItem;
             this.amountWanted = amountWanted;
             this.seller = seller;
 
-            this.completed = completed;
+            this.status = status;
             this.tradeID = tradeID;
             this.buyer = buyer;
             this.timeListed = timeListed;
-
-//            ItemStack temp = new ItemStack(forSale);
-//            ItemMeta tempMeta = temp.getItemMeta();
-//            tempMeta.setDisplayName(forSale.getItemMeta().getDisplayName());
-//
-//            ArrayList<String> lore = new ArrayList<>();
-//            if (forSale.getItemMeta().hasLore()) {
-//                lore.addAll(forSale.getItemMeta().getLore());
-//            }
-//            lore.add("");
-//            lore.add("Price:");
-//            lore.add(amountWanted + "x " + wanted.getItemMeta().getDisplayName());
-//            lore.add("Sold By:");
-//            lore.add(seller.getName());
-//            lore.add(String.valueOf(tradeID));
-//
-//            tempMeta.setLore(lore);
-//            temp.setItemMeta(tempMeta);
-//
-//            this.displayItem = temp;
-
 
         }
     }
@@ -136,15 +124,17 @@ public class StoreManager {
     ArrayList<Trade> trades;
     ArrayList<Player> playersWithStoreOpen;
     int mostRecentTradeID;
+    HashMap<Player, ArrayList<ItemStack>> itemPickup;
 
 
     public StoreManager() {
         // todo: Grabs all the trades from the database
         //  all trades greater than 30 days old should be removed from the market and returned to the owner
 
+        // Populate the trades table
         try {
             PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades WHERE completed = ?;");
-            ps.setBoolean(1, false);
+            ps.setInt(1, TradeStatus.OPEN.ordinal());
             ResultSet rs = ps.executeQuery();
 
             trades = new ArrayList<>();
@@ -167,7 +157,7 @@ public class StoreManager {
                         buyer,
                         rs.getInt("trade_id"),
                         rs.getLong("time_listed"),
-                        rs.getBoolean("completed")
+                        TradeStatus.values()[rs.getInt("completed")]
                 ));
             }
 
@@ -179,6 +169,35 @@ public class StoreManager {
             mostRecentTradeID = trades.get(trades.size() - 1).tradeID;
         } else {
             mostRecentTradeID = 0;
+        }
+
+        // Populate the itemPickup table
+        try {
+            // Add all complete trades to the database
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM pickup WHERE status = ?;");
+            ps.setInt(1, TradeStatus.COMPLETE.ordinal());
+            ResultSet rs = ps.executeQuery();
+
+            itemPickup = new HashMap<>();
+
+            while (rs.next()) {
+                // Player to store value in
+                Player player = Bukkit.getPlayer(UUID.fromString(rs.getString("player_uuid")));
+                // Itemstack list to add to
+                ArrayList<ItemStack> items = itemPickup.get(player);
+                if (items == null) {
+                    items = new ArrayList<>();
+                }
+
+                // Add the item to the list of trades the player has to collect from
+                items.add(ItemStack.deserializeBytes(rs.getBytes("pickup_item")));
+                // Update the itemPickup table
+                itemPickup.put(player, items);
+            }
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
         playersWithStoreOpen = new ArrayList<>();
@@ -200,7 +219,7 @@ public class StoreManager {
             ps.setBytes(4, trade.forSale.serializeAsBytes());
             ps.setBytes(5, trade.wanted.serializeAsBytes());
             ps.setInt(6, trade.amountWanted);
-            ps.setBoolean(7, trade.completed);
+            ps.setInt(7, trade.status.ordinal());
 
             if ((trade.buyer != null)) {
                 ps.setString(8, String.valueOf(trade.seller.getUniqueId()));
@@ -229,7 +248,7 @@ public class StoreManager {
             ps.setBytes(4, trade.forSale.serializeAsBytes());
             ps.setBytes(5, trade.wanted.serializeAsBytes());
             ps.setInt(6, trade.amountWanted);
-            ps.setBoolean(7, trade.completed);
+            ps.setInt(7, trade.status.ordinal());
 
             if ((trade.buyer != null)) {
                 ps.setString(8, String.valueOf(trade.seller.getUniqueId()));
@@ -262,7 +281,7 @@ public class StoreManager {
     public void buy (Trade trade, Player player) {
         removeFromStore(trade);
         trade.buyer = player;
-        trade.completed = true;
+        trade.status = TradeStatus.COMPLETE;
 
         openShop(player, 1);
 
@@ -466,6 +485,7 @@ public class StoreManager {
         ItemMeta dividerMeta = divider.getItemMeta();
 
         dividerMeta.setDisplayName("\u200E ");
+        dividerMeta.setLocalizedName("Divider");
         divider.setItemMeta(dividerMeta);
         gui.setItem(1, divider);
         gui.setItem(10, divider);
@@ -502,6 +522,7 @@ public class StoreManager {
         ItemMeta dividerMeta = divider.getItemMeta();
 
         dividerMeta.setDisplayName("\u200E ");
+        dividerMeta.setLocalizedName("Divider");
         divider.setItemMeta(dividerMeta);
         gui.setItem(1, divider);
         gui.setItem(10, divider);
@@ -527,6 +548,7 @@ public class StoreManager {
         ItemStack divider = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta dividerMeta = divider.getItemMeta();
         dividerMeta.setDisplayName("\u200E ");
+        dividerMeta.setLocalizedName("Divider");
         divider.setItemMeta(dividerMeta);
         gui.setItem(1, divider);
         gui.setItem(10, divider);
@@ -664,6 +686,20 @@ public class StoreManager {
 
         for (Trade t : trades) {
             if (t.tradeID == tradeID) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the trade from the associated integer trade ID
+     * @param id integer ID associated with the trade.
+     * @return returns the trade associated w/ the ID. Returns null of no trade is found
+     */
+    public Trade getTradeFromTradeID(int id) {
+        for (Trade t : trades) {
+            if (t.tradeID == id) {
                 return t;
             }
         }
