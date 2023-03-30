@@ -9,7 +9,6 @@ import java.sql.*;
 public class SQLite implements Database {
 
     private final String filename;
-
     private Connection connection;
 
     public SQLite(String filename) {

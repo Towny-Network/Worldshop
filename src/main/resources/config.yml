@@ -1,10 +1,10 @@
 # Database configuration
 Database:
-  # The only valid options here are SQLite and MySQL
-  # SQLite uses an internal database and MySQL uses an external one
-  # If you don't know what any of this means, it's safe to leave it alone
+  # The only valid options here are SQLite and MySQL.
+  # SQLite uses an internal database and MySQL uses an external one.
+  # If you don't know what any of this means, it's safe to leave it alone.
   Type: "SQLite"
-  # Database info (This only applies to MySQL setups)
+  # Database info (This only applies to MySQL setups).
   Host: "localhost"
   Port: 3306
   Database: "shop"

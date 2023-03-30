@@ -1,6 +1,5 @@
 package dev.onebiteaidan.worldshop.Utils;
 
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;

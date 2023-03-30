@@ -6,11 +6,8 @@ import dev.onebiteaidan.worldshop.DataManagement.Database;
 import dev.onebiteaidan.worldshop.DataManagement.MySQL;
 import dev.onebiteaidan.worldshop.DataManagement.SQLite;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public final class WorldShop extends JavaPlugin {
@@ -40,14 +37,16 @@ public final class WorldShop extends JavaPlugin {
                 database = new MySQL();
                 break;
 
-            default:
+            default: // Disables the plugin if the database cannot be initialized. //Todo: needs testing
                 this.getLogger().severe("Database could not be initialized because '" + Config.getDatabaseType() + "' is an INVALID database type!!!");
+                this.onDisable();
         }
 
         try {
             database.connect();
         } catch (SQLException e) {
             e.printStackTrace();
+            this.onDisable(); // Todo: idk if calling onDisable actually shuts down the plugin or not
             //Todo: add custom stuff here
         }
 
@@ -91,15 +90,11 @@ public final class WorldShop extends JavaPlugin {
         // Initializing the store manager
         storeManager = new StoreManager();
 
-
         // Setting up listeners
         Bukkit.getPluginManager().registerEvents(new StoreListener(), this);
 
         // Setting up commands
         getCommand("test").setExecutor(new TestCommand());
-
-
-
 
     }
 

@@ -1,11 +1,13 @@
 # Worldshop
 
-Todo:
+Features to do before release:
 - Build shop GUIs
 - Build core trading functionality
 - Implement ability to use MySQL and SQLite
 - Prevent items from being duped by being sold twice (sell detection)
-- (Maybe) Make nation options like front page nation items 
+
+Features to add in the future
+- Make nation options like front page nation items 
 - Some customizable options (inventory texture, thank you messages, etc).
 - Simple database lookup website for staff to use to confirm trades n such
 - A discord bot that does the same as above ^^

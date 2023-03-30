@@ -1,21 +1,15 @@
 package dev.onebiteaidan.worldshop;
 
-import com.google.common.base.Joiner;
-import dev.onebiteaidan.worldshop.DataManagement.SQLite;
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import io.netty.resolver.dns.BiDnsQueryLifecycleObserver;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.units.qual.A;
 
-import java.io.*;
 import java.sql.*;
 import java.util.*;
 
@@ -145,8 +139,8 @@ public class StoreManager {
 
 
     public StoreManager() {
-        // todo: Grabs all of the trades from the database
-        // all trades greater than 30 days old should be removed from the db
+        // todo: Grabs all the trades from the database
+        //  all trades greater than 30 days old should be removed from the market and returned to the owner
 
         try {
             PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades WHERE completed = ?;");
@@ -634,7 +628,10 @@ public class StoreManager {
     }
 
 
-
+    /**
+     * Gets all display items from the store manager for display in the main shop page
+     * @return returns and arraylist of the display itemstacks
+     */
     private List<ItemStack> getAllDisplayItems () {
         List<ItemStack> items = new ArrayList<>();
         for (Trade t : trades) {
@@ -643,7 +640,12 @@ public class StoreManager {
         return items;
     }
 
-    private Trade getTradeFromDisplayItem(ItemStack displayItem) {
+    /**
+     * Gets the trade from the passed in display item.
+     * @param displayItem item to find trade of.
+     * @return returns the itemstack that has the same trade. Returns NULL of no matching itemstack is found
+     */
+    private Trade getTradeFromDisplayItem(ItemStack displayItem) { // Todo: Test if duplicate itemstacks are an issue
         for (Trade t : this.trades) {
             if (t.displayItem.equals(displayItem)) {
                 return t;
@@ -652,6 +654,11 @@ public class StoreManager {
         return null;
     }
 
+    /**
+     * Get the trade from the associated trade ID
+     * @param id ID associated with the trade to pass in.
+     * @return returns thr trade associated w/ the ID. Returns null if no trade is found
+     */
     public Trade getTradeFromTradeID(String id) {
         int tradeID = Integer.parseInt(id);
 

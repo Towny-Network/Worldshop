@@ -6,7 +6,6 @@ import net.minecraft.nbt.NBTCompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -42,7 +41,7 @@ public class Utils {
         return CraftItemStack.asBukkitCopy(net.minecraft.world.item.ItemStack.a(tag));
     }
 
-    //Function to create playerheads
+    // Function to create playerheads
     public static ItemStack createSkull(String url) {
         ItemStack head = new org.bukkit.inventory.ItemStack(Material.PLAYER_HEAD, 1);
         if (url.isEmpty()) return head;
@@ -74,6 +73,12 @@ public class Utils {
         return head;
     }
 
+    /**
+     * Checks the number of items the player has in their inventory that match the itemstack (excluding itemstack amount)
+     * @param player player to check inventory of
+     * @param itemStack itemstack to check for
+     * @return returns the number of items the player has that match the provided itemstack
+     */
     public static int getNumOfItems(Player player, ItemStack itemStack) {
         int amount = 0;
         for (ItemStack item : player.getInventory()) {

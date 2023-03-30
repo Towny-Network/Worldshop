@@ -9,11 +9,18 @@ import java.io.File;
 public class Config {
     protected final boolean createIfNotExist, resource;
     protected final Plugin plugin;
-
     protected static FileConfiguration config;
     protected File file, path;
     protected String name;
 
+    /**
+     * Config Constructor
+     * @param instance Main plugin instance
+     * @param path Filepath to store the config file in (typically in: this.getDataFolder())
+     * @param name Name of the config file (.yml will be appended to the filename on creation)
+     * @param createIfNotExist Creates the file if it doesn't exist
+     * @param resource This is true if the config file is placed in the resources folder of the project
+     */
     public Config(Plugin instance, File path, String name, boolean createIfNotExist, boolean resource) {
         this.plugin = instance;
         this.path = path;
@@ -23,9 +30,10 @@ public class Config {
         create();
     }
 
-    public Config(Plugin instance, String path, String name, boolean createIfNotExist, boolean resource) {
-        this(instance, new File(path), name, createIfNotExist, resource);
-    }
+//
+//    public Config(Plugin instance, String path, String name, boolean createIfNotExist, boolean resource) {
+//        this(instance, new File(path), name, createIfNotExist, resource);
+//    }
 
     public FileConfiguration getConfig() {
         return config;

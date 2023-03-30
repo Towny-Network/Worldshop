@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public interface Database {
 
-   //Todo: All databases need to be fixed to handle SQL Injection Attacks
+   //TODO: All databases need to be fixed to handle SQL Injection Attacks
 
    void connect() throws SQLException;
    boolean isConnected();

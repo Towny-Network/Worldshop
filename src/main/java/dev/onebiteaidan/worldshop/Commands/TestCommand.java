@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class TestCommand implements CommandExecutor {
 
+    //Fixme: THIS COMMAND WILL EVENTUALLY BE REMOVED AND REPLACED WITH THE NATION SHOP SYSTEM
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {

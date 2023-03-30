@@ -3,7 +3,6 @@ package dev.onebiteaidan.worldshop.DataManagement;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.*;
-import java.util.ArrayList;
 
 public class MySQL implements Database {
 

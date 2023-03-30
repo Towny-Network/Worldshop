@@ -17,6 +17,10 @@ import java.util.*;
 
 public class StoreListener implements Listener {
 
+    /**
+     * Event handler for the main shop screen
+     * @param e event
+     */
     @EventHandler
     public void onWorldShopScreenClick(InventoryClickEvent e) {
         if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getItem(49) != null && e.getView().getItem(49).getItemMeta().hasLocalizedName() && e.getView().getItem(49).getItemMeta().getLocalizedName().equals("WorldShopHomeScreen")) {
@@ -68,9 +72,13 @@ public class StoreListener implements Listener {
         }
     }
 
+    /**
+     * Event handler for the screen where the player sells their items
+     * @param e event
+     */
     @EventHandler
     public void onSellScreenClick(InventoryClickEvent e) {
-        if (e.getInventory() != null && e.getCurrentItem() != null && e.getView().getTitle().contains("What would you like to sell?")) {
+        if (e.getCurrentItem() != null && e.getView().getTitle().contains("What would you like to sell?")) { // Fixme: Needs to check for the back buttons localized name
             
             e.setCancelled(true); //Todo: this needs error checking to make sure it's not just a chest with the name "What would you like to sell?"
 
@@ -84,7 +92,7 @@ public class StoreListener implements Listener {
                             break;
 
                         case "Click to Confirm!":
-                            // Set the confirm buttton to Green Check
+                            // Set the confirm button to Green Check
 
                             ItemStack fullConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=");
                             ItemMeta fullConfirmMeta = fullConfirm.getItemMeta();
@@ -152,6 +160,7 @@ public class StoreListener implements Listener {
 
 
                 case 15: // Reset/remove price item
+                    // Item player wants to receive in trade
                     ItemStack priceButton = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
                     ItemMeta priceButtonMeta = priceButton.getItemMeta();
                     priceButtonMeta.setDisplayName("Right Click the item in your inventory you want to receive in trade!");
@@ -162,8 +171,7 @@ public class StoreListener implements Listener {
 
                 default:
                     // Check if item exists here and also check if it was a left or right click
-                    if (!e.getCurrentItem().getType().equals(Material.AIR) && !e.getCurrentItem().getType().equals(Material.GRAY_STAINED_GLASS_PANE)) {
-
+                    if (!e.getCurrentItem().getType().equals(Material.AIR) && !e.getCurrentItem().getType().equals(Material.GRAY_STAINED_GLASS_PANE)) { // Fixme: This would make it so players cannot sell gray stained glass
 
                         // Determine if it's a right or left click
                         if (e.getClick().isLeftClick()) { // Set the item we are selling
@@ -196,10 +204,14 @@ public class StoreListener implements Listener {
         }
     }
 
-
+    /**
+     * Event handler for when the buy screen for an item is opened.
+     * This updater runs to set the initial status of the checkbox based on if the player has enough of the price item
+     * @param e event
+     */
     @EventHandler
     public void onOpenBuyScreen(InventoryOpenEvent e) {
-        if (e.getInventory() != null && e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
+        if (e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
             // Check if player has the required items to buy the item
             if (Utils.getNumOfItems((Player) e.getPlayer(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
 
@@ -214,23 +226,15 @@ public class StoreListener implements Listener {
         }
     }
 
+    /**
+     * Event handler for when the buy screen is clicked.
+     * @param e event
+     */
     @EventHandler
     public void onBuyScreenClick(InventoryClickEvent e) {
         if (e.getCurrentItem() != null && e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
 
             e.setCancelled(true);
-
-//            // Check if player has the required items to buy the item
-//            if (Utils.getNumOfItems((Player) e.getWhoClicked(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
-//
-//                // Change confirm button to Yellow Check
-//                ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");
-//                ItemMeta halfConfirmMeta = halfConfirm.getItemMeta();
-//                halfConfirmMeta.setDisplayName("Click to Confirm!");
-//                halfConfirm.setItemMeta(halfConfirmMeta);
-//                e.getInventory().setItem(5, halfConfirm);
-//
-//            }
 
             switch(e.getRawSlot()) {
                 case 0: // Back button
@@ -293,7 +297,10 @@ public class StoreListener implements Listener {
         }
     }
 
-
+    /**
+     * Event handler for the current trades page.
+     * @param e event
+     */
     @EventHandler
     public void onCurrentTradesScreenClick(InventoryClickEvent e) {
         if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 && e.getView().getItem(22) != null && e.getView().getItem(22).getItemMeta().hasLocalizedName() && e.getView().getItem(22).getItemMeta().getLocalizedName().equals("ViewCurrentTradesScreen")) {
@@ -315,6 +322,11 @@ public class StoreListener implements Listener {
         }
     }
 
+    /**
+     * Event handler to update whether the player has the shop open or not.
+     * This is used for when a listing sells and multiple people have the same trade listing open.
+     * @param e event
+     */
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
         WorldShop.getStoreManager().playersWithStoreOpen.remove(e.getPlayer());
