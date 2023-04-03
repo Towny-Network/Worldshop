@@ -14,7 +14,8 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class StoreListener implements Listener {
 
@@ -80,7 +81,8 @@ public class StoreListener implements Listener {
     @EventHandler
     public void onSellScreenClick(InventoryClickEvent e) {
         InventoryView v = e.getView();
-        if (e.getInventory().getSize() == 27 && v.getItem(18) != null && v.getItem(18).getItemMeta().getLocalizedName().equals("SellItemScreen") && e.getCurrentItem() != null && v.getTitle().contains("What would you like to sell?")) { // Fixme: Needs to check for the back buttons localized name
+        if (e.getInventory().getSize() == 27 && v.getItem(18) != null && v.getItem(18).getItemMeta().hasDisplayName() && v.getItem(18).getItemMeta().getLocalizedName().equals("SellItemScreen") && e.getCurrentItem() != null) {
+
             
             e.setCancelled(true);
 
@@ -320,6 +322,55 @@ public class StoreListener implements Listener {
 
                 case 22: // Back Button
                     WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onCompletedTradesScreenClick(InventoryClickEvent e) {
+        if (e.getCurrentItem() != null &&  e.getInventory().getSize() == 27 && e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("ViewCompletedTradesScreen")) {
+
+           e.setCancelled(true);
+
+            switch(e.getRawSlot()) {
+                case 0: // Back Button
+                    WorldShop.getStoreManager().viewCurrentTrades((Player) e.getWhoClicked());
+
+                case 1:
+                case 9:
+                case 10:
+                case 18:
+                case 19:
+                    break;
+
+                default:
+                    Player p = (Player) e.getWhoClicked();
+                    if (p.getInventory().firstEmpty() != -1) {
+
+                        // Update the database
+                        try {
+                            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE pickup SET collected = ?, time_collected = ? WHERE trade_id = ?;");
+                            ps.setBoolean(1, true);
+                            ps.setLong(2, System.currentTimeMillis());
+                            ps.setInt(3, Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()));
+
+                            ps.executeUpdate();
+
+                        } catch (SQLException ev) {
+                            ev.printStackTrace();
+                        }
+
+                        e.getCurrentItem().setItemMeta(null);
+
+                        p.getInventory().addItem(e.getCurrentItem());
+                        e.getInventory().removeItem(e.getCurrentItem());
+
+
+
+                    } else {
+                        p.sendMessage(ChatColor.RED + "There is not enough space in your inventory to collect the item! Please make some space!");
+                    }
+                    break;
             }
         }
     }

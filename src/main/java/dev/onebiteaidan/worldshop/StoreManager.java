@@ -121,10 +121,26 @@ public class StoreManager {
         }
     }
 
+    private static class Pickup {
+        Player player;
+        ItemStack item;
+        int tradeID;
+        boolean withdrawn;
+        long timeWithdrawn;
+
+        private Pickup(Player player, ItemStack item, int tradeID, boolean withdrawn, long timeWithdrawn) {
+            this.player = player;
+            this.item = item;
+            this.tradeID = tradeID;
+            this.withdrawn = withdrawn;
+            this.timeWithdrawn = timeWithdrawn;
+        }
+    }
+
     ArrayList<Trade> trades;
     ArrayList<Player> playersWithStoreOpen;
     int mostRecentTradeID;
-    HashMap<Player, ArrayList<ItemStack>> itemPickup;
+    HashMap<Player, ArrayList<Pickup>> itemPickup;
 
 
     public StoreManager() {
@@ -133,7 +149,7 @@ public class StoreManager {
 
         // Populate the trades table
         try {
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades WHERE completed = ?;");
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades WHERE status = ?;");
             ps.setInt(1, TradeStatus.OPEN.ordinal());
             ResultSet rs = ps.executeQuery();
 
@@ -157,7 +173,7 @@ public class StoreManager {
                         buyer,
                         rs.getInt("trade_id"),
                         rs.getLong("time_listed"),
-                        TradeStatus.values()[rs.getInt("completed")]
+                        TradeStatus.values()[rs.getInt("status")]
                 ));
             }
 
@@ -173,9 +189,8 @@ public class StoreManager {
 
         // Populate the itemPickup table
         try {
-            // Add all complete trades to the database
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM pickup WHERE status = ?;");
-            ps.setInt(1, TradeStatus.COMPLETE.ordinal());
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM pickup WHERE collected = ?;");
+            ps.setBoolean(1, false);
             ResultSet rs = ps.executeQuery();
 
             itemPickup = new HashMap<>();
@@ -184,15 +199,15 @@ public class StoreManager {
                 // Player to store value in
                 Player player = Bukkit.getPlayer(UUID.fromString(rs.getString("player_uuid")));
                 // Itemstack list to add to
-                ArrayList<ItemStack> items = itemPickup.get(player);
-                if (items == null) {
-                    items = new ArrayList<>();
+                ArrayList<Pickup> pickups = itemPickup.get(player);
+                if (pickups == null) {
+                    pickups = new ArrayList<>();
                 }
 
                 // Add the item to the list of trades the player has to collect from
-                items.add(ItemStack.deserializeBytes(rs.getBytes("pickup_item")));
+                pickups.add(new Pickup(player, ItemStack.deserializeBytes(rs.getBytes("pickup_item")), rs.getInt("trade_id"), false, 0L));
                 // Update the itemPickup table
-                itemPickup.put(player, items);
+                itemPickup.put(player, pickups);
             }
 
 
@@ -204,7 +219,8 @@ public class StoreManager {
     }
 
     public int getNextTradeID() {
-        return ++mostRecentTradeID;
+        mostRecentTradeID = mostRecentTradeID + 1;
+        return mostRecentTradeID;
     }
 
     public void addToStore(Trade trade) {
@@ -240,7 +256,7 @@ public class StoreManager {
         trades.add(trade);
 
         try {
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO trades (trade_id, seller_uuid, display_item, for_sale, wanted, num_wanted, completed, buyer_uuid, time_listed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO trades (trade_id, seller_uuid, display_item, for_sale, wanted, num_wanted, status, buyer_uuid, time_listed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
 
             ps.setInt(1, trade.tradeID);
             ps.setString(2, String.valueOf(trade.seller.getUniqueId()));
@@ -264,11 +280,14 @@ public class StoreManager {
         }
     }
 
-    public void removeFromStore(Trade trade) {
+    public void removeFromStore(Trade trade, Player buyer) {
         try {
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE trades SET completed = ? WHERE trade_id = ?");
-            ps.setBoolean(1, true);
-            ps.setInt(2, trade.tradeID);
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE trades SET status = ?, buyer_uuid = ? WHERE trade_id = ?;");
+            trade.status = TradeStatus.COMPLETE;
+            trade.buyer = buyer;
+            ps.setInt(1, trade.status.ordinal());
+            ps.setString(2, String.valueOf(trade.buyer.getUniqueId()));
+            ps.setInt(3, trade.tradeID);
 
             ps.executeUpdate();
 
@@ -279,14 +298,54 @@ public class StoreManager {
     }
 
     public void buy (Trade trade, Player player) {
-        removeFromStore(trade);
-        trade.buyer = player;
-        trade.status = TradeStatus.COMPLETE;
+        // Update the trades table and remove from trades list
+        removeFromStore(trade, player);
 
+        // Put the player back on page 1 of the shop
         openShop(player, 1);
 
-        // Todo: figure out a good way to do storages for payment of players
-        // The best way to do this would to probably store it in the player database
+
+        // Add the buyer and seller pickups to the pickup database.
+        Pickup buyerPickup = new Pickup(player, trade.forSale, trade.tradeID, false, 0L);
+        Pickup sellerPickup = new Pickup(trade.seller, trade.wanted, trade.tradeID, false, 0L);
+
+        // buyer
+        try {
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO pickup (player_uuid, trade_id, pickup_item, collected, time_collected) VALUES (?, ?, ?, ?, ?); ");
+            ps.setString(1, String.valueOf(player.getUniqueId()));
+            ps.setInt(2, trade.tradeID);
+            ps.setBytes(3, trade.wanted.serializeAsBytes());
+            ps.setBoolean(4, buyerPickup.withdrawn);
+            ps.setLong(5, buyerPickup.timeWithdrawn);
+
+            itemPickup.computeIfAbsent(player, k -> new ArrayList<>());
+
+            itemPickup.get(player).add(buyerPickup);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // seller
+        try {
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO pickup (player_uuid, trade_id, pickup_item, collected, time_collected) VALUES (?, ?, ?, ?, ?); ");
+            ps.setString(1, String.valueOf(trade.seller.getUniqueId()));
+            ps.setInt(2, trade.tradeID);
+            ps.setBytes(3, trade.forSale.serializeAsBytes());
+            ps.setBoolean(4, sellerPickup.withdrawn);
+            ps.setLong(5, sellerPickup.timeWithdrawn);
+
+            itemPickup.computeIfAbsent(trade.seller, k -> new ArrayList<>());
+
+            itemPickup.get(player).add(sellerPickup);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -513,7 +572,7 @@ public class StoreManager {
         backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
         backButtonMeta = backButton.getItemMeta();
         backButtonMeta.setDisplayName("Back");
-        backButtonMeta.setLocalizedName("ViewCompletedListingsScreen");
+        backButtonMeta.setLocalizedName("ViewCompletedTradesScreen");
         backButton.setItemMeta(backButtonMeta);
         gui.setItem(0, backButton);
 
@@ -531,6 +590,41 @@ public class StoreManager {
         //Todo: Populate remaining slots w/ completed trades posted by player
         // This may have to be pageable to fit rewards on multiple pages
         // Also there should also probably be an expire time on the rewards
+        ArrayList<Pickup> pickups = new ArrayList<>();
+        try {
+
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM pickup WHERE player_uuid = ? AND collected = ?;");
+            ps.setString(1, String.valueOf(player.getUniqueId()));
+            ps.setBoolean(2, false);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                pickups.add(new Pickup(Bukkit.getPlayer(UUID.fromString(rs.getString("player_uuid"))),
+                        ItemStack.deserializeBytes(rs.getBytes("pickup_item")),
+                        rs.getInt("trade_id"), rs.getBoolean("collected"),
+                        rs.getLong("time_collected"))
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        int count = 0;
+
+        for (Pickup p : pickups) {
+            ItemStack item = p.item;
+            ItemMeta itemMeta = item.getItemMeta();
+            itemMeta.setLocalizedName(String.valueOf(p.tradeID));
+            item.setItemMeta(itemMeta);
+
+            gui.setItem((count % 9) + 2, item);
+            count++;
+        }
+
+        player.openInventory(gui);
+
+
 
     }
 

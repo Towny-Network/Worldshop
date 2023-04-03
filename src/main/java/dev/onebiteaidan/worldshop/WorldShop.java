@@ -76,10 +76,10 @@ public final class WorldShop extends JavaPlugin {
                                 "for_sale BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
                                 "wanted BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
                                 "num_wanted int," +
-                                "status ENUM('OPEN', 'COMPLETE', 'EXPIRED', 'REMOVED')," +
+                                "status int," + // ENUM statuses include: OPEN, COMPLETE, EXPIRED, REMOVED
                                 "buyer_uuid varchar(36)," +
                                 "time_listed BIGINT," +
-                                "time_completed BIGINT," +
+                                "time_completed BIGINT" +
                                 ");"
                 );
 
