@@ -272,7 +272,7 @@ public class StoreManager {
         viewTradesButton = new ItemStack(Material.CHEST);
         viewTradesButtonMeta = viewTradesButton.getItemMeta();
 
-        viewTradesButtonMeta.setDisplayName(ChatColor.YELLOW + "View Trades");
+        viewTradesButtonMeta.setDisplayName(ChatColor.YELLOW + "Manage Trades");
         viewTradesButton.setItemMeta(viewTradesButtonMeta);
         gui.setItem(51, viewTradesButton);
 
@@ -655,7 +655,7 @@ public class StoreManager {
 
         player.openInventory(gui);
     }
-//endregion
+    //endregion
 
     //region Utility methods
 
