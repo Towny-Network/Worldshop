@@ -1,6 +1,7 @@
 package dev.onebiteaidan.worldshop;
 
 import com.mysql.jdbc.log.NullLogger;
+import com.sun.jna.platform.win32.DdemlUtil;
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import org.bukkit.Bukkit;
@@ -181,9 +182,14 @@ public class StoreManager {
             throw new RuntimeException(e);
         }
 
-        if (trades.size() != 0) {
-            mostRecentTradeID = trades.get(trades.size() - 1).tradeID;
-        } else {
+        try { // Get the most recent trade ID from the database
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades ORDER BY trade_id DESC LIMIT 1;");
+            ResultSet rs = ps.executeQuery();
+            mostRecentTradeID = rs.getInt("trade_id");
+            System.out.println(mostRecentTradeID);
+
+        } catch (SQLException e) {
+            WorldShop.getPlugin(WorldShop.class).getLogger().warning("No database found or data in database, setting most recent trade ID to 0.");
             mostRecentTradeID = 0;
         }
 
@@ -280,11 +286,11 @@ public class StoreManager {
         }
     }
 
-    public void removeFromStore(Trade trade, Player buyer) {
+    public void removeFromStore(Trade trade, Player player) {
         try {
             PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE trades SET status = ?, buyer_uuid = ? WHERE trade_id = ?;");
-            trade.status = TradeStatus.COMPLETE;
-            trade.buyer = buyer;
+            trade.status = TradeStatus.REMOVED;
+            trade.buyer = player;
             ps.setInt(1, trade.status.ordinal());
             ps.setString(2, String.valueOf(trade.buyer.getUniqueId()));
             ps.setInt(3, trade.tradeID);
@@ -295,11 +301,70 @@ public class StoreManager {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        // Put the player back on page 1 of the shop
+        viewCurrentListings(player);
+
+
+        // Add the buyer and seller pickups to the pickup database.
+        Pickup buyerPickup = new Pickup(player, trade.forSale, trade.tradeID, false, 0L);
+        Pickup sellerPickup = new Pickup(trade.seller, trade.wanted, trade.tradeID, false, 0L);
+
+        // buyer
+        try {
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO pickup (player_uuid, trade_id, pickup_item, collected, time_collected) VALUES (?, ?, ?, ?, ?); ");
+            ps.setString(1, String.valueOf(player.getUniqueId()));
+            ps.setInt(2, trade.tradeID);
+            ps.setBytes(3, trade.wanted.serializeAsBytes());
+            ps.setBoolean(4, buyerPickup.withdrawn);
+            ps.setLong(5, buyerPickup.timeWithdrawn);
+
+            itemPickup.computeIfAbsent(player, k -> new ArrayList<>());
+
+            itemPickup.get(player).add(buyerPickup);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // seller
+        try {
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO pickup (player_uuid, trade_id, pickup_item, collected, time_collected) VALUES (?, ?, ?, ?, ?); ");
+            ps.setString(1, String.valueOf(trade.seller.getUniqueId()));
+            ps.setInt(2, trade.tradeID);
+            ps.setBytes(3, trade.forSale.serializeAsBytes());
+            ps.setBoolean(4, sellerPickup.withdrawn);
+            ps.setLong(5, sellerPickup.timeWithdrawn);
+
+            itemPickup.computeIfAbsent(trade.seller, k -> new ArrayList<>());
+
+            itemPickup.get(player).add(sellerPickup);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void buy (Trade trade, Player player) {
         // Update the trades table and remove from trades list
-        removeFromStore(trade, player);
+        try {
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE trades SET status = ?, buyer_uuid = ? WHERE trade_id = ?;");
+            trade.status = TradeStatus.COMPLETE;
+            trade.buyer = player;
+            ps.setInt(1, trade.status.ordinal());
+            ps.setString(2, String.valueOf(trade.buyer.getUniqueId()));
+            ps.setInt(3, trade.tradeID);
+
+            ps.executeUpdate();
+
+            trades.remove(trade);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         // Put the player back on page 1 of the shop
         openShop(player, 1);
@@ -759,6 +824,29 @@ public class StoreManager {
         ItemStack payItem = t.wanted;
         gui.setItem(6, payItem);
 
+        player.openInventory(gui);
+    }
+
+    public void removeTradeScreen(Trade trade, Player player) {
+        Inventory gui = Bukkit.createInventory(null, 18, "Delete This Trade?");
+
+        // Yes Delete Button
+        ItemStack yesButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=");
+        ItemMeta yesButtonMeta = yesButton.getItemMeta();
+        yesButtonMeta.setDisplayName("Yes");
+        yesButtonMeta.setLocalizedName("RemoveTradeScreen");
+        yesButton.setItemMeta(yesButtonMeta);
+        gui.setItem(11, yesButton);
+
+        // No Don't Delete Button
+        ItemStack noButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmY5ZDlkZTYyZWNhZTliNzk4NTU1ZmQyM2U4Y2EzNWUyNjA1MjkxOTM5YzE4NjJmZTc5MDY2Njk4Yzk1MDhhNyJ9fX0=");
+        ItemMeta noButtonMeta = noButton.getItemMeta();
+        noButtonMeta.setDisplayName("No");
+        noButton.setItemMeta(noButtonMeta);
+        gui.setItem(15, noButton);
+
+        // Trade Display Item
+        gui.setItem(4, trade.displayItem);
 
         player.openInventory(gui);
     }
@@ -768,7 +856,7 @@ public class StoreManager {
      * Gets all display items from the store manager for display in the main shop page
      * @return returns and arraylist of the display itemstacks
      */
-    private List<ItemStack> getAllDisplayItems () {
+    private List<ItemStack> getAllDisplayItems() {
         List<ItemStack> items = new ArrayList<>();
         for (Trade t : trades) {
             items.add(t.displayItem);
@@ -781,7 +869,7 @@ public class StoreManager {
      * @param displayItem item to find trade of.
      * @return returns the itemstack that has the same trade. Returns NULL of no matching itemstack is found
      */
-    private Trade getTradeFromDisplayItem(ItemStack displayItem) { // Todo: Test if duplicate itemstacks are an issue
+    public Trade getTradeFromDisplayItem(ItemStack displayItem) { // Todo: Test if duplicate itemstacks are an issue
         for (Trade t : this.trades) {
             if (t.displayItem.equals(displayItem)) {
                 return t;

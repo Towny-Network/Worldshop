@@ -344,9 +344,36 @@ public class StoreListener implements Listener {
                     break;
 
                 default:
-                    WorldShop.getStoreManager().buyItem((Player) e.getWhoClicked(), e.getCurrentItem());
+                    if (e.getClick().isLeftClick()) {
+                        WorldShop.getStoreManager().buyItem((Player) e.getWhoClicked(), e.getCurrentItem()); // Todo: this should be changed to a viewer
+                    } else if (e.getClick().isRightClick()) {
+                        WorldShop.getStoreManager().removeTradeScreen(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getCurrentItem()), (Player) e.getWhoClicked());
+                    }
+
+                    break;
+
             }
 
+        }
+    }
+
+    @EventHandler public void onDeleteTradeScreen(InventoryClickEvent e) {
+        if (e.getCurrentItem() != null && e.getInventory().getSize() == 18 && e.getView().getItem(11).getItemMeta().hasLocalizedName() && e.getView().getItem(11).getItemMeta().getLocalizedName().equals("RemoveTradeScreen")) {
+
+            e.setCancelled(true);
+
+            switch(e.getRawSlot()) {
+                case 11:
+                    WorldShop.getStoreManager().removeFromStore(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getView().getItem(4)), (Player) e.getWhoClicked());
+                    break;
+
+                case 15:
+                   WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked());
+                   break;
+
+                default:
+                    break;
+            }
         }
     }
 
@@ -398,6 +425,8 @@ public class StoreListener implements Listener {
             }
         }
     }
+
+
 
     /**
      * Event handler to update whether the player has the shop open or not.

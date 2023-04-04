@@ -57,7 +57,7 @@ public final class WorldShop extends JavaPlugin {
                 database.update(
                         "CREATE TABLE IF NOT EXISTS players" +
                                 "(" +
-                                "id int AUTO_INCREMENT," +
+                                //"id int AUTOINCREMENT," + // Todo: Based on SQLite vs MySQL, auto incrementation keyword is AUTOINCREMENT and AUTO_INCREMENT respectively.
                                 "uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
                                 "purchases int," + //Todo: Implement the system for tracking purchases and sales
                                 "sales int," +
@@ -69,7 +69,7 @@ public final class WorldShop extends JavaPlugin {
                 database.update(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
                         "CREATE TABLE IF NOT EXISTS trades" +
                                 "(" +
-                                "id int AUTO_INCREMENT," +
+                                //"id int AUTOINCREMENT," +
                                 "trade_id int," +
                                 "seller_uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
                                 "display_item BLOB," +
@@ -87,7 +87,7 @@ public final class WorldShop extends JavaPlugin {
                 database.update(
                         "CREATE TABLE IF NOT EXISTS pickup" +
                                 "(" +
-                                "id int AUTO_INCREMENT," +
+                                //"id int AUTOINCREMENT," +
                                 "player_uuid varchar(36)," +
                                 "trade_id int," +
                                 "pickup_item BLOB," +
