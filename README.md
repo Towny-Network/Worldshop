@@ -2,9 +2,10 @@
 
 Features to do before release:
 - Build shop GUIs
-- Build core trading functionality
-- Implement ability to use MySQL and SQLite
+~~- Build core trading functionality~~
+- Implement ability to use ~~MySQL~~ and SQLite
 - Prevent items from being duped by being sold twice (sell detection)
+- Refactoring
 
 Features to add in the future
 - Make nation options like front page nation items 

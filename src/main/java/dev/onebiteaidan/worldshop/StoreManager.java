@@ -552,6 +552,28 @@ public class StoreManager {
 
 
         //Todo: Populate remaining slots w/ open trades posted by player
+        ArrayList<Trade> openTrades = new ArrayList<>();
+        try {
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades WHERE seller_uuid = ? AND status = ?;");
+            ps.setString(1, player.getUniqueId().toString());
+            ps.setInt(2, TradeStatus.OPEN.ordinal());
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                openTrades.add(getTradeFromTradeID(rs.getInt("trade_id")));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        int count = 0;
+        for (Trade t : openTrades) {
+            gui.setItem((count % 9) + 2, t.displayItem);
+            count++;
+        }
+
+        player.openInventory(gui);
 
     }
 
@@ -623,8 +645,6 @@ public class StoreManager {
         }
 
         player.openInventory(gui);
-
-
 
     }
 
