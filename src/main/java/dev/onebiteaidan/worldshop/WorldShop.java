@@ -37,7 +37,7 @@ public final class WorldShop extends JavaPlugin {
                 database = new MySQL();
                 break;
 
-            default: // Disables the plugin if the database cannot be initialized. //Todo: needs testing
+            default: // Disables the plugin if the database cannot be initialized.
                 this.getLogger().severe("Database could not be initialized because '" + Config.getDatabaseType() + "' is an INVALID database type!!!");
                 this.onDisable();
         }
@@ -46,8 +46,7 @@ public final class WorldShop extends JavaPlugin {
             database.connect();
         } catch (SQLException e) {
             e.printStackTrace();
-            this.onDisable(); // Todo: idk if calling onDisable actually shuts down the plugin or not
-            //Todo: add custom stuff here
+            this.onDisable();
         }
 
         if (database.isConnected()) {
@@ -57,7 +56,6 @@ public final class WorldShop extends JavaPlugin {
                 database.update(
                         "CREATE TABLE IF NOT EXISTS players" +
                                 "(" +
-                                //"id int AUTOINCREMENT," + // Todo: Based on SQLite vs MySQL, auto incrementation keyword is AUTOINCREMENT and AUTO_INCREMENT respectively.
                                 "uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
                                 "purchases int," + //Todo: Implement the system for tracking purchases and sales
                                 "sales int," +
@@ -69,7 +67,6 @@ public final class WorldShop extends JavaPlugin {
                 database.update(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
                         "CREATE TABLE IF NOT EXISTS trades" +
                                 "(" +
-                                //"id int AUTOINCREMENT," +
                                 "trade_id int," +
                                 "seller_uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
                                 "display_item BLOB," +
@@ -87,7 +84,6 @@ public final class WorldShop extends JavaPlugin {
                 database.update(
                         "CREATE TABLE IF NOT EXISTS pickup" +
                                 "(" +
-                                //"id int AUTOINCREMENT," +
                                 "player_uuid varchar(36)," +
                                 "trade_id int," +
                                 "pickup_item BLOB," +
@@ -99,7 +95,6 @@ public final class WorldShop extends JavaPlugin {
         } else {
             this.getLogger().severe("WorldShop DID NOT SUCCESSFULLY CONNECT TO ITS DATABASE!!!");
         }
-
 
         // Initializing the store manager
         storeManager = new StoreManager();

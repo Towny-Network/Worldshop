@@ -1,142 +1,22 @@
 package dev.onebiteaidan.worldshop;
 
-import com.mysql.jdbc.log.NullLogger;
-import com.sun.jna.platform.win32.DdemlUtil;
+import dev.onebiteaidan.worldshop.StoreDataTypes.Pickup;
+import dev.onebiteaidan.worldshop.StoreDataTypes.Trade;
+import dev.onebiteaidan.worldshop.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.checkerframework.checker.units.qual.A;
 
 import java.sql.*;
 import java.util.*;
 
 public class StoreManager {
-
-    private static enum TradeStatus {
-        OPEN,
-        COMPLETE,
-        EXPIRED,
-        REMOVED
-    }
-
-    private static class Trade {
-        ItemStack forSale;
-        ItemStack wanted;
-        ItemStack displayItem;
-        int amountWanted;
-
-        TradeStatus status;
-        Player seller;
-        Player buyer;
-        int tradeID;
-        long timeListed;// Unix time
-
-
-        /**
-         * Constructor for when a player creates a new trade via the gui.
-         * @param forSale Item player is trading away
-         * @param wanted Item player is trading for
-         * @param amountWanted Amount they want
-         * @param seller Person selling the forSale item
-         */
-        private Trade(ItemStack forSale, ItemStack wanted, int amountWanted, Player seller, int tradeID) {
-            this.forSale = forSale;
-            this.wanted = wanted;
-            this.amountWanted = amountWanted;
-            this.seller = seller;
-
-            this.status = TradeStatus.OPEN;
-            this.buyer = null;
-            this.tradeID = tradeID;
-            this.timeListed = System.currentTimeMillis();
-
-            ItemStack displayItem = new ItemStack(forSale.getType(), forSale.getAmount());
-            ItemMeta displayItemMeta = displayItem.getItemMeta();
-
-            // Items that have displaynames are items that have been renamed to something other than their original title.
-            // Therefore, we have to implement this shit system
-            if (forSale.getItemMeta().hasDisplayName()) {
-                displayItemMeta.setDisplayName(ChatColor.YELLOW + forSale.getItemMeta().getDisplayName() + " x" + this.forSale.getAmount());
-            } else {
-                String s = forSale.getType().toString();
-                String[] parts = s.split("_");
-                for (int i = 0; i < parts.length; i++) {
-                    parts[i] = parts[i].toLowerCase();
-                    parts[i] = parts[i].substring(0, 1).toUpperCase() + parts[i].substring(1);
-                }
-
-                displayItemMeta.setDisplayName(ChatColor.YELLOW + String.join(" ", parts) + " x" + this.forSale.getAmount());
-            }
-
-            ArrayList<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Being Sold By: " + this.seller.getDisplayName());
-
-            if (forSale.getItemMeta().hasLore()) {
-                lore.add(ChatColor.DARK_GRAY + "===================");
-                lore.add("");
-                for (String s : forSale.getItemMeta().getLore()) {
-                    lore.add(ChatColor.DARK_PURPLE + s);
-                }
-                lore.add("");
-                lore.add(ChatColor.DARK_GRAY + "===================");
-            }
-
-            lore.add(ChatColor.YELLOW + "" + ChatColor.BOLD + "Click " + ChatColor.RESET + "" + ChatColor.GOLD + "to buy this item");
-
-            displayItemMeta.setLore(lore);
-            // Adding in trade ID for indentification later on
-            displayItemMeta.setLocalizedName(String.valueOf(tradeID));
-            displayItem.setItemMeta(displayItemMeta);
-            this.displayItem = displayItem;
-        }
-
-        /**
-         * Constructor for rebuilding from the Database.
-         * @param forSale Item player is trading away
-         * @param wanted Item player is trading for
-         * @param amountWanted Amount they want
-         * @param displayItem The item that goes on display in the shop homepage
-         * @param seller Person selling the forSale item
-         * @param buyer Person who bought the item if trade is complete (null otherwise)
-         * @param tradeID ID of the trade;
-         * @param timeListed Time that the trade was listed (in Unix time)
-         */
-        private Trade(ItemStack forSale, ItemStack wanted, ItemStack displayItem, int amountWanted, Player seller, Player buyer, int tradeID, long timeListed, TradeStatus status) {
-            this.forSale = forSale;
-            this.wanted = wanted;
-            this.displayItem = displayItem;
-            this.amountWanted = amountWanted;
-            this.seller = seller;
-
-            this.status = status;
-            this.tradeID = tradeID;
-            this.buyer = buyer;
-            this.timeListed = timeListed;
-
-        }
-    }
-
-    private static class Pickup {
-        Player player;
-        ItemStack item;
-        int tradeID;
-        boolean withdrawn;
-        long timeWithdrawn;
-
-        private Pickup(Player player, ItemStack item, int tradeID, boolean withdrawn, long timeWithdrawn) {
-            this.player = player;
-            this.item = item;
-            this.tradeID = tradeID;
-            this.withdrawn = withdrawn;
-            this.timeWithdrawn = timeWithdrawn;
-        }
-    }
 
     ArrayList<Trade> trades;
     ArrayList<Player> playersWithStoreOpen;
@@ -224,32 +104,27 @@ public class StoreManager {
         playersWithStoreOpen = new ArrayList<>();
     }
 
-    public int getNextTradeID() {
-        mostRecentTradeID = mostRecentTradeID + 1;
-        return mostRecentTradeID;
-    }
-
     public void addToStore(Trade trade) {
         trades.add(trade);
 
         try {
             PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO trades (trade_id, seller_uuid, display_item, for_sale, wanted, num_wanted, completed, buyer_uuid, time_listed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
 
-            ps.setInt(1, trade.tradeID);
-            ps.setString(2, String.valueOf(trade.seller.getUniqueId()));
-            ps.setBytes(3, trade.displayItem.serializeAsBytes());
-            ps.setBytes(4, trade.forSale.serializeAsBytes());
-            ps.setBytes(5, trade.wanted.serializeAsBytes());
-            ps.setInt(6, trade.amountWanted);
-            ps.setInt(7, trade.status.ordinal());
+            ps.setInt(1, trade.getTradeID());
+            ps.setString(2, String.valueOf(trade.getSeller().getUniqueId()));
+            ps.setBytes(3, trade.getDisplayItem().serializeAsBytes());
+            ps.setBytes(4, trade.getForSale().serializeAsBytes());
+            ps.setBytes(5, trade.getWanted().serializeAsBytes());
+            ps.setInt(6, trade.getAmountWanted());
+            ps.setInt(7, trade.getStatus().ordinal());
 
-            if ((trade.buyer != null)) {
-                ps.setString(8, String.valueOf(trade.seller.getUniqueId()));
+            if ((trade.getBuyer() != null)) {
+                ps.setString(8, String.valueOf(trade.getSeller().getUniqueId()));
             } else {
                 ps.setNull(8, Types.NULL);
             }
 
-            ps.setLong(9, trade.timeListed);
+            ps.setLong(9, trade.getTimeListed());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -264,21 +139,21 @@ public class StoreManager {
         try {
             PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO trades (trade_id, seller_uuid, display_item, for_sale, wanted, num_wanted, status, buyer_uuid, time_listed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
 
-            ps.setInt(1, trade.tradeID);
-            ps.setString(2, String.valueOf(trade.seller.getUniqueId()));
-            ps.setBytes(3, trade.displayItem.serializeAsBytes());
-            ps.setBytes(4, trade.forSale.serializeAsBytes());
-            ps.setBytes(5, trade.wanted.serializeAsBytes());
-            ps.setInt(6, trade.amountWanted);
-            ps.setInt(7, trade.status.ordinal());
+            ps.setInt(1, trade.getTradeID());
+            ps.setString(2, String.valueOf(trade.getSeller().getUniqueId()));
+            ps.setBytes(3, trade.getDisplayItem().serializeAsBytes());
+            ps.setBytes(4, trade.getForSale().serializeAsBytes());
+            ps.setBytes(5, trade.getWanted().serializeAsBytes());
+            ps.setInt(6, trade.getAmountWanted());
+            ps.setInt(7, trade.getStatus().ordinal());
 
-            if ((trade.buyer != null)) {
-                ps.setString(8, String.valueOf(trade.seller.getUniqueId()));
+            if ((trade.getBuyer() != null)) {
+                ps.setString(8, String.valueOf(trade.getSeller().getUniqueId()));
             } else {
-                ps.setNull(8, Types.BLOB);
+                ps.setNull(8, Types.NULL);
             }
 
-            ps.setLong(9, trade.timeListed);
+            ps.setLong(9, trade.getTimeListed());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -286,14 +161,14 @@ public class StoreManager {
         }
     }
 
-    public void removeFromStore(Trade trade, Player player) {
+    public void removeFromStore(Trade trade, Player player, TradeStatus status) {
         try {
             PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE trades SET status = ?, buyer_uuid = ? WHERE trade_id = ?;");
-            trade.status = TradeStatus.REMOVED;
-            trade.buyer = player;
-            ps.setInt(1, trade.status.ordinal());
-            ps.setString(2, String.valueOf(trade.buyer.getUniqueId()));
-            ps.setInt(3, trade.tradeID);
+            trade.setStatus(status);
+            trade.setBuyer(player);
+            ps.setInt(1, trade.getStatus().ordinal());
+            ps.setString(2, String.valueOf(trade.getBuyer().getUniqueId()));
+            ps.setInt(3, trade.getTradeID());
 
             ps.executeUpdate();
 
@@ -302,22 +177,18 @@ public class StoreManager {
             throw new RuntimeException(e);
         }
 
-        // Put the player back on page 1 of the shop
-        viewCurrentListings(player);
-
-
         // Add the buyer and seller pickups to the pickup database.
-        Pickup buyerPickup = new Pickup(player, trade.forSale, trade.tradeID, false, 0L);
-        Pickup sellerPickup = new Pickup(trade.seller, trade.wanted, trade.tradeID, false, 0L);
+        Pickup buyerPickup = new Pickup(player, trade.getForSale(), trade.getTradeID(), false, 0L);
+        Pickup sellerPickup = new Pickup(trade.getSeller(), trade.getWanted(), trade.getTradeID(), false, 0L);
 
         // buyer
         try {
             PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO pickup (player_uuid, trade_id, pickup_item, collected, time_collected) VALUES (?, ?, ?, ?, ?); ");
             ps.setString(1, String.valueOf(player.getUniqueId()));
-            ps.setInt(2, trade.tradeID);
-            ps.setBytes(3, trade.wanted.serializeAsBytes());
-            ps.setBoolean(4, buyerPickup.withdrawn);
-            ps.setLong(5, buyerPickup.timeWithdrawn);
+            ps.setInt(2, trade.getTradeID());
+            ps.setBytes(3, trade.getWanted().serializeAsBytes());
+            ps.setBoolean(4, buyerPickup.isWithdrawn());
+            ps.setLong(5, buyerPickup.getTimeWithdrawn());
 
             itemPickup.computeIfAbsent(player, k -> new ArrayList<>());
 
@@ -332,77 +203,13 @@ public class StoreManager {
         // seller
         try {
             PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO pickup (player_uuid, trade_id, pickup_item, collected, time_collected) VALUES (?, ?, ?, ?, ?); ");
-            ps.setString(1, String.valueOf(trade.seller.getUniqueId()));
-            ps.setInt(2, trade.tradeID);
-            ps.setBytes(3, trade.forSale.serializeAsBytes());
-            ps.setBoolean(4, sellerPickup.withdrawn);
-            ps.setLong(5, sellerPickup.timeWithdrawn);
+            ps.setString(1, String.valueOf(trade.getSeller().getUniqueId()));
+            ps.setInt(2, trade.getTradeID());
+            ps.setBytes(3, trade.getForSale().serializeAsBytes());
+            ps.setBoolean(4, sellerPickup.isWithdrawn());
+            ps.setLong(5, sellerPickup.getTimeWithdrawn());
 
-            itemPickup.computeIfAbsent(trade.seller, k -> new ArrayList<>());
-
-            itemPickup.get(player).add(sellerPickup);
-
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void buy (Trade trade, Player player) {
-        // Update the trades table and remove from trades list
-        try {
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE trades SET status = ?, buyer_uuid = ? WHERE trade_id = ?;");
-            trade.status = TradeStatus.COMPLETE;
-            trade.buyer = player;
-            ps.setInt(1, trade.status.ordinal());
-            ps.setString(2, String.valueOf(trade.buyer.getUniqueId()));
-            ps.setInt(3, trade.tradeID);
-
-            ps.executeUpdate();
-
-            trades.remove(trade);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        // Put the player back on page 1 of the shop
-        openShop(player, 1);
-
-
-        // Add the buyer and seller pickups to the pickup database.
-        Pickup buyerPickup = new Pickup(player, trade.forSale, trade.tradeID, false, 0L);
-        Pickup sellerPickup = new Pickup(trade.seller, trade.wanted, trade.tradeID, false, 0L);
-
-        // buyer
-        try {
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO pickup (player_uuid, trade_id, pickup_item, collected, time_collected) VALUES (?, ?, ?, ?, ?); ");
-            ps.setString(1, String.valueOf(player.getUniqueId()));
-            ps.setInt(2, trade.tradeID);
-            ps.setBytes(3, trade.wanted.serializeAsBytes());
-            ps.setBoolean(4, buyerPickup.withdrawn);
-            ps.setLong(5, buyerPickup.timeWithdrawn);
-
-            itemPickup.computeIfAbsent(player, k -> new ArrayList<>());
-
-            itemPickup.get(player).add(buyerPickup);
-
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        // seller
-        try {
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("INSERT INTO pickup (player_uuid, trade_id, pickup_item, collected, time_collected) VALUES (?, ?, ?, ?, ?); ");
-            ps.setString(1, String.valueOf(trade.seller.getUniqueId()));
-            ps.setInt(2, trade.tradeID);
-            ps.setBytes(3, trade.forSale.serializeAsBytes());
-            ps.setBoolean(4, sellerPickup.withdrawn);
-            ps.setLong(5, sellerPickup.timeWithdrawn);
-
-            itemPickup.computeIfAbsent(trade.seller, k -> new ArrayList<>());
+            itemPickup.computeIfAbsent(trade.getSeller(), k -> new ArrayList<>());
 
             itemPickup.get(player).add(sellerPickup);
 
@@ -413,6 +220,7 @@ public class StoreManager {
         }
     }
 
+    //region Shop GUIS
     /**
      * Opens the WorldShop gui for a player.
      * LOCALIZED ITEM IDENTIFIER: statsHead "WorldShopHomeScreen"
@@ -532,10 +340,77 @@ public class StoreManager {
 
     /**
      * Opens the sell items screen for a player.
+     * LOCALIZED ITEM IDENTIFIER: backButton "SellItemScreen"
+     * @param player player you want to open the item selling interface.
+     */
+    public void sellItem (Player player) {
+        playersWithStoreOpen.add(player);
+
+        Inventory gui = Bukkit.createInventory(null, 27, "What would you like to sell?");
+
+        // Dividers
+        ItemStack divider = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta dividerMeta = divider.getItemMeta();
+        dividerMeta.setDisplayName("\u200E ");
+        dividerMeta.setLocalizedName("Divider");
+        divider.setItemMeta(dividerMeta);
+        gui.setItem(1, divider);
+        gui.setItem(10, divider);
+        gui.setItem(19, divider);
+
+        // Confirm the trade button
+        ItemStack confirmTradeButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmY5ZDlkZTYyZWNhZTliNzk4NTU1ZmQyM2U4Y2EzNWUyNjA1MjkxOTM5YzE4NjJmZTc5MDY2Njk4Yzk1MDhhNyJ9fX0=");
+        ItemMeta confirmTradeButtonMeta = confirmTradeButton.getItemMeta();
+        confirmTradeButtonMeta.setDisplayName("You cannot confirm until you have put in a sell item and a price item!");
+        confirmTradeButton.setItemMeta(confirmTradeButtonMeta);
+        gui.setItem(0, confirmTradeButton);
+
+        // Item player wants to sell
+        ItemStack blankItemSpotButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        ItemMeta blankItemSpotButtonMeta = blankItemSpotButton.getItemMeta();
+        blankItemSpotButtonMeta.setDisplayName("Left click the item in your inventory you want to sell!");
+        blankItemSpotButton.setItemMeta(blankItemSpotButtonMeta);
+        gui.setItem(12, blankItemSpotButton);
+
+        // Increase the number of items the player wants in return
+        ItemStack resetPriceButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjA1NmJjMTI0NGZjZmY5OTM0NGYxMmFiYTQyYWMyM2ZlZTZlZjZlMzM1MWQyN2QyNzNjMTU3MjUzMWYifX19");
+        ItemMeta resetPriceButtonMeta = resetPriceButton.getItemMeta();
+        resetPriceButtonMeta.setDisplayName("Increase Price by 1");
+        resetPriceButton.setItemMeta(resetPriceButtonMeta);
+        gui.setItem(14, resetPriceButton);
+
+        // Item player wants to receive
+        ItemStack priceButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        ItemMeta priceButtonMeta = priceButton.getItemMeta();
+        priceButtonMeta.setDisplayName("Right Click the item in your inventory you want to receive in trade!");
+        priceButton.setItemMeta(priceButtonMeta);
+        gui.setItem(15, priceButton);
+
+        // Decrease the number of items the player wants in return
+        ItemStack setPriceButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGU0YjhiOGQyMzYyYzg2NGUwNjIzMDE0ODdkOTRkMzI3MmE2YjU3MGFmYmY4MGMyYzViMTQ4Yzk1NDU3OWQ0NiJ9fX0=");
+        ItemMeta setPriceButtonMeta = setPriceButton.getItemMeta();
+        setPriceButtonMeta.setDisplayName("Decrease Price by 1");
+        setPriceButton.setItemMeta(setPriceButtonMeta);
+        gui.setItem(16, setPriceButton);
+
+        // Go back to the main menu button
+        ItemStack backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
+        ItemMeta backButtonMeta = backButton.getItemMeta();
+        backButtonMeta.setDisplayName("Back");
+        backButtonMeta.setLocalizedName("SellItemScreen");
+        backButton.setItemMeta(backButtonMeta);
+        gui.setItem(18, backButton);
+
+
+        player.openInventory(gui);
+    }
+
+    /**
+     * Shows the GUI where players can collect from completed trades and manage open trades.
      * LOCALIZED ITEM IDENTIFIER: backButton "ViewCurrentTradesScreen"
      * @param player player you want to open the item selling interface.
      */
-    public void viewCurrentTrades (Player player){
+    public void manageTrades (Player player){
         playersWithStoreOpen.add(player);
 
         Inventory gui = Bukkit.createInventory(null, 27, "Trades");
@@ -616,7 +491,6 @@ public class StoreManager {
         gui.setItem(19, divider);
 
 
-        //Todo: Populate remaining slots w/ open trades posted by player
         ArrayList<Trade> openTrades = new ArrayList<>();
         try {
             PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades WHERE seller_uuid = ? AND status = ?;");
@@ -634,12 +508,35 @@ public class StoreManager {
 
         int count = 0;
         for (Trade t : openTrades) {
-            gui.setItem((count % 9) + 2, t.displayItem);
+            gui.setItem((count % 9) + 2, t.getDisplayItem());
             count++;
         }
 
         player.openInventory(gui);
 
+    }
+    public void removeTradeScreen(Trade trade, Player player) {
+        Inventory gui = Bukkit.createInventory(null, 18, "Delete This Trade?");
+
+        // Yes Delete Button
+        ItemStack yesButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=");
+        ItemMeta yesButtonMeta = yesButton.getItemMeta();
+        yesButtonMeta.setDisplayName("Yes");
+        yesButtonMeta.setLocalizedName("RemoveTradeScreen");
+        yesButton.setItemMeta(yesButtonMeta);
+        gui.setItem(11, yesButton);
+
+        // No Don't Delete Button
+        ItemStack noButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmY5ZDlkZTYyZWNhZTliNzk4NTU1ZmQyM2U4Y2EzNWUyNjA1MjkxOTM5YzE4NjJmZTc5MDY2Njk4Yzk1MDhhNyJ9fX0=");
+        ItemMeta noButtonMeta = noButton.getItemMeta();
+        noButtonMeta.setDisplayName("No");
+        noButton.setItemMeta(noButtonMeta);
+        gui.setItem(15, noButton);
+
+        // Trade Display Item
+        gui.setItem(4, trade.getDisplayItem());
+
+        player.openInventory(gui);
     }
 
     /**
@@ -700,82 +597,14 @@ public class StoreManager {
         int count = 0;
 
         for (Pickup p : pickups) {
-            ItemStack item = p.item;
+            ItemStack item = p.getItem();
             ItemMeta itemMeta = item.getItemMeta();
-            itemMeta.setLocalizedName(String.valueOf(p.tradeID));
+            itemMeta.setLocalizedName(String.valueOf(p.getTradeID()));
             item.setItemMeta(itemMeta);
 
             gui.setItem((count % 9) + 2, item);
             count++;
         }
-
-        player.openInventory(gui);
-
-    }
-
-    /**
-     * Opens the sell items screen for a player.
-     * LOCALIZED ITEM IDENTIFIER: backButton "SellItemScreen"
-     * @param player player you want to open the item selling interface.
-     */
-    public void sellItem (Player player) {
-        playersWithStoreOpen.add(player);
-
-        Inventory gui = Bukkit.createInventory(null, 27, "What would you like to sell?");
-
-        // Dividers
-        ItemStack divider = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta dividerMeta = divider.getItemMeta();
-        dividerMeta.setDisplayName("\u200E ");
-        dividerMeta.setLocalizedName("Divider");
-        divider.setItemMeta(dividerMeta);
-        gui.setItem(1, divider);
-        gui.setItem(10, divider);
-        gui.setItem(19, divider);
-
-        // Confirm the trade button
-        ItemStack confirmTradeButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmY5ZDlkZTYyZWNhZTliNzk4NTU1ZmQyM2U4Y2EzNWUyNjA1MjkxOTM5YzE4NjJmZTc5MDY2Njk4Yzk1MDhhNyJ9fX0=");
-        ItemMeta confirmTradeButtonMeta = confirmTradeButton.getItemMeta();
-        confirmTradeButtonMeta.setDisplayName("You cannot confirm until you have put in a sell item and a price item!");
-        confirmTradeButton.setItemMeta(confirmTradeButtonMeta);
-        gui.setItem(0, confirmTradeButton);
-
-        // Item player wants to sell
-        ItemStack blankItemSpotButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
-        ItemMeta blankItemSpotButtonMeta = blankItemSpotButton.getItemMeta();
-        blankItemSpotButtonMeta.setDisplayName("Left click the item in your inventory you want to sell!");
-        blankItemSpotButton.setItemMeta(blankItemSpotButtonMeta);
-        gui.setItem(12, blankItemSpotButton);
-
-        // Increase the number of items the player wants in return
-        ItemStack resetPriceButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjA1NmJjMTI0NGZjZmY5OTM0NGYxMmFiYTQyYWMyM2ZlZTZlZjZlMzM1MWQyN2QyNzNjMTU3MjUzMWYifX19");
-        ItemMeta resetPriceButtonMeta = resetPriceButton.getItemMeta();
-        resetPriceButtonMeta.setDisplayName("Increase Price by 1");
-        resetPriceButton.setItemMeta(resetPriceButtonMeta);
-        gui.setItem(14, resetPriceButton);
-
-        // Item player wants to receive
-        ItemStack priceButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
-        ItemMeta priceButtonMeta = priceButton.getItemMeta();
-        priceButtonMeta.setDisplayName("Right Click the item in your inventory you want to receive in trade!");
-        priceButton.setItemMeta(priceButtonMeta);
-        gui.setItem(15, priceButton);
-
-        // Decrease the number of items the player wants in return
-        ItemStack setPriceButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGU0YjhiOGQyMzYyYzg2NGUwNjIzMDE0ODdkOTRkMzI3MmE2YjU3MGFmYmY4MGMyYzViMTQ4Yzk1NDU3OWQ0NiJ9fX0=");
-        ItemMeta setPriceButtonMeta = setPriceButton.getItemMeta();
-        setPriceButtonMeta.setDisplayName("Decrease Price by 1");
-        setPriceButton.setItemMeta(setPriceButtonMeta);
-        gui.setItem(16, setPriceButton);
-
-        // Go back to the main menu button
-        ItemStack backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
-        ItemMeta backButtonMeta = backButton.getItemMeta();
-        backButtonMeta.setDisplayName("Back");
-        backButtonMeta.setLocalizedName("SellItemScreen");
-        backButton.setItemMeta(backButtonMeta);
-        gui.setItem(18, backButton);
-
 
         player.openInventory(gui);
     }
@@ -796,7 +625,7 @@ public class StoreManager {
         playersWithStoreOpen.add(player);
 
         // Build the buy item GUI
-        Inventory gui = Bukkit.createInventory(null, 9, "WorldShop - Buy" + t.displayItem.getItemMeta().getDisplayName());
+        Inventory gui = Bukkit.createInventory(null, 9, "WorldShop - Buy" + t.getDisplayItem().getItemMeta().getDisplayName());
 
         // Back button
         ItemStack backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
@@ -807,9 +636,9 @@ public class StoreManager {
         gui.setItem(0, backButton);
 
         // Item you're buying
-        ItemStack buyItem = t.forSale;
+        ItemStack buyItem = t.getForSale();
         ItemMeta buyItemMeta = buyItem.getItemMeta();
-        buyItemMeta.setLocalizedName(String.valueOf(t.tradeID));
+        buyItemMeta.setLocalizedName(String.valueOf(t.getTradeID()));
         buyItem.setItemMeta(buyItemMeta);
         gui.setItem(4, buyItem);
 
@@ -821,36 +650,14 @@ public class StoreManager {
         gui.setItem(5, confirmTradeButton);
 
         // Item you're paying
-        ItemStack payItem = t.wanted;
+        ItemStack payItem = t.getWanted();
         gui.setItem(6, payItem);
 
         player.openInventory(gui);
     }
+//endregion
 
-    public void removeTradeScreen(Trade trade, Player player) {
-        Inventory gui = Bukkit.createInventory(null, 18, "Delete This Trade?");
-
-        // Yes Delete Button
-        ItemStack yesButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=");
-        ItemMeta yesButtonMeta = yesButton.getItemMeta();
-        yesButtonMeta.setDisplayName("Yes");
-        yesButtonMeta.setLocalizedName("RemoveTradeScreen");
-        yesButton.setItemMeta(yesButtonMeta);
-        gui.setItem(11, yesButton);
-
-        // No Don't Delete Button
-        ItemStack noButton = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmY5ZDlkZTYyZWNhZTliNzk4NTU1ZmQyM2U4Y2EzNWUyNjA1MjkxOTM5YzE4NjJmZTc5MDY2Njk4Yzk1MDhhNyJ9fX0=");
-        ItemMeta noButtonMeta = noButton.getItemMeta();
-        noButtonMeta.setDisplayName("No");
-        noButton.setItemMeta(noButtonMeta);
-        gui.setItem(15, noButton);
-
-        // Trade Display Item
-        gui.setItem(4, trade.displayItem);
-
-        player.openInventory(gui);
-    }
-
+    //region Utility methods
 
     /**
      * Gets all display items from the store manager for display in the main shop page
@@ -859,7 +666,7 @@ public class StoreManager {
     private List<ItemStack> getAllDisplayItems() {
         List<ItemStack> items = new ArrayList<>();
         for (Trade t : trades) {
-            items.add(t.displayItem);
+            items.add(t.getDisplayItem());
         }
         return items;
     }
@@ -871,7 +678,7 @@ public class StoreManager {
      */
     public Trade getTradeFromDisplayItem(ItemStack displayItem) { // Todo: Test if duplicate itemstacks are an issue
         for (Trade t : this.trades) {
-            if (t.displayItem.equals(displayItem)) {
+            if (t.getDisplayItem().equals(displayItem)) {
                 return t;
             }
         }
@@ -887,7 +694,7 @@ public class StoreManager {
         int tradeID = Integer.parseInt(id);
 
         for (Trade t : trades) {
-            if (t.tradeID == tradeID) {
+            if (t.getTradeID() == tradeID) {
                 return t;
             }
         }
@@ -901,10 +708,20 @@ public class StoreManager {
      */
     public Trade getTradeFromTradeID(int id) {
         for (Trade t : trades) {
-            if (t.tradeID == id) {
+            if (t.getTradeID() == id) {
                 return t;
             }
         }
         return null;
     }
+
+    /**
+     * Get the next trade ID.
+     * @return the next trade ID
+     */
+    public int getNextTradeID() {
+        mostRecentTradeID = mostRecentTradeID + 1;
+        return mostRecentTradeID;
+    }
+    //endregion
 }
