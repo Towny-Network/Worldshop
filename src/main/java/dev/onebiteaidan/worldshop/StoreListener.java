@@ -1,5 +1,6 @@
 package dev.onebiteaidan.worldshop;
 
+import dev.onebiteaidan.worldshop.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -52,7 +53,7 @@ public class StoreListener implements Listener {
                     break;
 
                 case 51: // View Trades
-                    WorldShop.getStoreManager().viewCurrentTrades((Player) e.getWhoClicked());
+                    WorldShop.getStoreManager().manageTrades((Player) e.getWhoClicked());
                     break;
 
                 case 53: // Next Page
@@ -97,7 +98,6 @@ public class StoreListener implements Listener {
 
                         case "Click to Confirm!":
                             // Set the confirm button to Green Check
-
                             ItemStack fullConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=");
                             ItemMeta fullConfirmMeta = fullConfirm.getItemMeta();
                             fullConfirmMeta.setDisplayName("Are you sure?");
@@ -262,12 +262,10 @@ public class StoreListener implements Listener {
                             fullConfirmMeta.setDisplayName("Are you sure?");
                             fullConfirm.setItemMeta(fullConfirmMeta);
                             e.getInventory().setItem(5, fullConfirm);
-//                            return;
                             break;
 
                         case "Are you sure?":
 
-                            //Todo: needs finishing
                             Inventory inven = e.getInventory();
                             ItemStack forSale = inven.getItem(4);
                             ItemStack wanted = inven.getItem(6);
@@ -276,26 +274,17 @@ public class StoreListener implements Listener {
                             // Remove pay items from the players inventory
                             e.getWhoClicked().getInventory().removeItem(wanted);
 
-
-//                            HashMap<Integer, ItemStack> remainder = e.getWhoClicked().getInventory().removeItem(wanted);
-//                            if (!remainder.isEmpty()) {
-//                                // This case should hopefully never be reached
-//                                e.getWhoClicked().sendMessage(ChatColor.RED + "Something Wrong Happened! Please open a ticket on our discord. ERROR CODE: WS0001");
-//                                e.getWhoClicked().closeInventory();
-//                            }
-
-                            // Todo: add item to the collection gui
-//                            e.getWhoClicked().getInventory().addItem(forSale);
                             String tradeID = e.getInventory().getItem(4).getItemMeta().getLocalizedName();
                             if (tradeID.equals("")) {
                                 System.out.println("An error occurred");
                             }
 
-                            WorldShop.getStoreManager().buy(WorldShop.getStoreManager().getTradeFromTradeID(tradeID), (Player) e.getWhoClicked());
+                            WorldShop.getStoreManager().removeFromStore(WorldShop.getStoreManager().getTradeFromTradeID(tradeID), (Player) e.getWhoClicked(), TradeStatus.COMPLETE);
+                            // Put the player back on page 1 of the shop
+                            WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
 
                             break;
                     }
-
                     break;
             }
         }
@@ -334,7 +323,7 @@ public class StoreListener implements Listener {
 
             switch(e.getRawSlot()) {
                 case 0: // Back Button
-                    WorldShop.getStoreManager().viewCurrentTrades((Player) e.getWhoClicked());
+                    WorldShop.getStoreManager().manageTrades((Player) e.getWhoClicked());
 
                 case 1:
                 case 9:
@@ -351,9 +340,7 @@ public class StoreListener implements Listener {
                     }
 
                     break;
-
             }
-
         }
     }
 
@@ -364,7 +351,9 @@ public class StoreListener implements Listener {
 
             switch(e.getRawSlot()) {
                 case 11:
-                    WorldShop.getStoreManager().removeFromStore(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getView().getItem(4)), (Player) e.getWhoClicked());
+                    WorldShop.getStoreManager().removeFromStore(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getView().getItem(4)), (Player) e.getWhoClicked(), TradeStatus.REMOVED);
+                    // Put the player back on page 1 of the shop
+                    WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked());
                     break;
 
                 case 15:
@@ -385,7 +374,7 @@ public class StoreListener implements Listener {
 
             switch(e.getRawSlot()) {
                 case 0: // Back Button
-                    WorldShop.getStoreManager().viewCurrentTrades((Player) e.getWhoClicked());
+                    WorldShop.getStoreManager().manageTrades((Player) e.getWhoClicked());
 
                 case 1:
                 case 9:
@@ -415,8 +404,6 @@ public class StoreListener implements Listener {
 
                         p.getInventory().addItem(e.getCurrentItem());
                         e.getInventory().removeItem(e.getCurrentItem());
-
-
 
                     } else {
                         p.sendMessage(ChatColor.RED + "There is not enough space in your inventory to collect the item! Please make some space!");

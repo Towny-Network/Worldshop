@@ -30,16 +30,16 @@ public class Config {
         create();
     }
 
-//
-//    public Config(Plugin instance, String path, String name, boolean createIfNotExist, boolean resource) {
-//        this(instance, new File(path), name, createIfNotExist, resource);
-//    }
+    public Config(Plugin instance, String path, String name, boolean createIfNotExist, boolean resource) {
+        this(instance, new File(path), name, createIfNotExist, resource);
+    }
 
     public FileConfiguration getConfig() {
         return config;
     }
 
-    // Getters, variables and constructors
+
+    //region Getters, variables and constructors
 
     public void save() {
         try {
@@ -85,12 +85,12 @@ public class Config {
             reloadConfig();
         }
     }
+    //endregion
 
 
     // Methods to grab values from the config file
 
     //region Database methods
-
     public static String getDatabaseType() {
         return config.getString("Database.Type");
     }
