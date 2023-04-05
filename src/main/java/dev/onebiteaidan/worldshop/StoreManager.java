@@ -66,7 +66,6 @@ public class StoreManager {
             PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades ORDER BY trade_id DESC LIMIT 1;");
             ResultSet rs = ps.executeQuery();
             mostRecentTradeID = rs.getInt("trade_id");
-            System.out.println(mostRecentTradeID);
 
         } catch (SQLException e) {
             WorldShop.getPlugin(WorldShop.class).getLogger().warning("No database found or data in database, setting most recent trade ID to 0.");
@@ -313,7 +312,7 @@ public class StoreManager {
         gui.setItem(47, searchItems);
 
         // Add stored trades for the first page
-        List<ItemStack> items = PageUtils.getPageItems(getAllDisplayItems(), page, 45);
+        List<ItemStack> items = PageUtils.getPageItems(getAllDisplayItems(player), page, 45);
         for (int i = 0; i < items.size(); i++) {
             // Cannot use gui.addItem(item) here because it combines identical listings
             gui.setItem(i, items.get(i));
@@ -667,6 +666,21 @@ public class StoreManager {
         List<ItemStack> items = new ArrayList<>();
         for (Trade t : trades) {
             items.add(t.getDisplayItem());
+        }
+        return items;
+    }
+
+    /**
+     * Gets all display items from the store manager for display in the main shop page
+     * @param player Removes any trades with this player as the seller
+     * @return returns and arraylist of the display itemstacks
+     */
+    private List<ItemStack> getAllDisplayItems(Player player) {
+        List<ItemStack> items = new ArrayList<>();
+        for (Trade t : trades) {
+            if (!t.getSeller().equals(player)) {
+                items.add(t.getDisplayItem());
+            }
         }
         return items;
     }
