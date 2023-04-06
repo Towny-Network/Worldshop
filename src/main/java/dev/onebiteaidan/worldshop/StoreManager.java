@@ -45,12 +45,17 @@ public class StoreManager {
                     buyer = Bukkit.getPlayer(UUID.fromString(buyerID));
                 }
 
+                String sellerID = rs.getString("seller_uuid");
+                if (rs.wasNull()) {
+                    System.out.println(rs.getInt("trade_id"));
+                }
+
                 trades.add(new Trade(
                         ItemStack.deserializeBytes(rs.getBytes("for_sale")),
                         ItemStack.deserializeBytes(rs.getBytes("wanted")),
                         ItemStack.deserializeBytes(rs.getBytes("display_item")),
                         rs.getInt("num_wanted"),
-                        Bukkit.getPlayer(UUID.fromString(rs.getString("seller_uuid"))),
+                        Bukkit.getPlayer(UUID.fromString(sellerID)),
                         buyer,
                         rs.getInt("trade_id"),
                         rs.getLong("time_listed"),
@@ -311,6 +316,7 @@ public class StoreManager {
         searchItems.setItemMeta(searchItemsMeta);
         gui.setItem(47, searchItems);
 
+
         // Add stored trades for the first page
         List<ItemStack> items = PageUtils.getPageItems(getAllDisplayItems(player), page, 45);
         for (int i = 0; i < items.size(); i++) {
@@ -514,6 +520,55 @@ public class StoreManager {
         player.openInventory(gui);
 
     }
+
+    public void viewTrade(Trade trade, Player player) {
+        Inventory gui = Bukkit.createInventory(null, 27, "Trade Viewer");
+
+        // Item Being Sold
+        ItemStack beingSold = trade.getForSale();
+        gui.setItem(2, beingSold);
+
+        // Item Being Sold Marker
+        ItemStack beingSoldMarker = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjIyMWRhNDQxOGJkM2JmYjQyZWI2NGQyYWI0MjljNjFkZWNiOGY0YmY3ZDRjZmI3N2ExNjJiZTNkY2IwYjkyNyJ9fX0=");
+        ItemMeta beingSoldMarkerMeta = beingSoldMarker.getItemMeta();
+        beingSoldMarkerMeta.setDisplayName("You are selling this item!");
+        ArrayList<String> beingSoldLore = new ArrayList<>();
+        beingSoldLore.add("This will go to the player who buys the item from you.");
+        beingSoldLore.add("In return, you will receive the payment item(s) you specified.");
+        beingSoldMarkerMeta.setLore(beingSoldLore);
+        beingSoldMarker.setItemMeta(beingSoldMarkerMeta);
+        gui.setItem(11, beingSoldMarker);
+
+        // Payment Item
+        ItemStack paymentItem = trade.getWanted();
+        gui.setItem(6, paymentItem);
+
+        // Payment Item Marker
+        ItemStack paymentItemMarker = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2U0ZjJmOTY5OGMzZjE4NmZlNDRjYzYzZDJmM2M0ZjlhMjQxMjIzYWNmMDU4MTc3NWQ5Y2VjZDcwNzUifX19");
+        ItemMeta paymentItemMarkerMeta = beingSoldMarker.getItemMeta();
+        beingSoldMarkerMeta.setDisplayName("This is the item you requested as payment!");
+        ArrayList<String> paymentItemLore = new ArrayList<>();
+        paymentItemLore.add("This will go to you after another player buys from you.");
+        paymentItemLore.add("In return, the buyer will receive the item you are selling.");
+        beingSoldMarkerMeta.setLore(paymentItemLore);
+        beingSoldMarker.setItemMeta(beingSoldMarkerMeta);
+        gui.setItem(15, beingSoldMarker);
+
+        // Back Button
+        ItemStack backButton;
+        ItemMeta backButtonMeta;
+
+        backButton = new ItemStack(Material.RED_CONCRETE_POWDER);
+        backButtonMeta = backButton.getItemMeta();
+        backButtonMeta.setDisplayName("Back");
+        backButtonMeta.setLocalizedName("ViewTradeScreen");
+        backButton.setItemMeta(backButtonMeta);
+        gui.setItem(22, backButton);
+
+
+        player.openInventory(gui);
+    }
+
     public void removeTradeScreen(Trade trade, Player player) {
         Inventory gui = Bukkit.createInventory(null, 18, "Delete This Trade?");
 

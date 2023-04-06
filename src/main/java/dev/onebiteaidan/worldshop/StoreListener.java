@@ -316,7 +316,7 @@ public class StoreListener implements Listener {
     }
 
     @EventHandler
-    public void onCurrentListingsScreenclick(InventoryClickEvent e) {
+    public void onCurrentListingsScreenClick(InventoryClickEvent e) {
         if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 && e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("ViewCurrentListingsScreen")) {
 
             e.setCancelled(true);
@@ -334,13 +334,30 @@ public class StoreListener implements Listener {
 
                 default:
                     if (e.getClick().isLeftClick()) {
-                        WorldShop.getStoreManager().buyItem((Player) e.getWhoClicked(), e.getCurrentItem()); // Todo: this should be changed to a viewer
+                        WorldShop.getStoreManager().viewTrade(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getCurrentItem()), (Player) e.getWhoClicked()); // Todo: this should be changed to a viewer
                     } else if (e.getClick().isRightClick()) {
                         WorldShop.getStoreManager().removeTradeScreen(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getCurrentItem()), (Player) e.getWhoClicked());
                     }
 
                     break;
             }
+        }
+    }
+
+    @EventHandler public void onViewTradeScreen(InventoryClickEvent e) {
+        if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 &&e.getView().getItem(22) != null && e.getView().getItem(22).getItemMeta().hasLocalizedName() && e.getView().getItem(22).getItemMeta().getLocalizedName().equals("ViewTradeScreen")) {
+
+            e.setCancelled(true);
+
+            switch(e.getRawSlot()) {
+                case 22: // Back button
+                    WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked());
+                    break;
+
+                default:
+                    break;
+            }
+
         }
     }
 
