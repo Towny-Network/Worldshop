@@ -3,6 +3,7 @@ package dev.onebiteaidan.worldshop.DataManagement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public interface Database {
 
@@ -10,10 +11,11 @@ public interface Database {
    boolean isConnected();
    void disconnect();
    Connection getConnection();
-   ResultSet query(String query);
-   void update(String update);
-   void insert(String insertion);
-   void delete(String deletion);
-   void run(String command);
+   ResultSet query(String query, Object[] arguments, int[] types);
+   void update(String update, Object[] arguments, int[] types);
+   void run (String command);
+   void createTradesTable();
+   void createPickupsTable();
+   void createPlayersTable();
 
 }

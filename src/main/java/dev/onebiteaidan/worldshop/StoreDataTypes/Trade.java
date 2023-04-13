@@ -1,45 +1,67 @@
 package dev.onebiteaidan.worldshop.StoreDataTypes;
 
+import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.management.MemoryType;
+import java.sql.Types;
 import java.util.ArrayList;
 
 
 public class Trade {
-    ItemStack forSale;
-    ItemStack wanted;
-    ItemStack displayItem;
-    int amountWanted;
 
-    TradeStatus status;
-    Player seller;
-    Player buyer;
     int tradeID;
+    TradeStatus status;
+    OfflinePlayer seller;
+    OfflinePlayer buyer;
+    ItemStack forSale;
+    ItemStack inReturn;
     long timeListed;// Unix time
+    long timeCompleted;
 
 
     /**
      * Constructor for when a player creates a new trade via the gui.
-     *
      * @param forSale      Item player is trading away
-     * @param wanted       Item player is trading for
-     * @param amountWanted Amount they want
      * @param seller       Person selling the forSale item
      */
-    public Trade(ItemStack forSale, ItemStack wanted, int amountWanted, Player seller, int tradeID) {
-        this.forSale = forSale;
-        this.wanted = wanted;
-        this.amountWanted = amountWanted;
-        this.seller = seller;
-
+    public Trade(Player seller, ItemStack forSale, ItemStack inReturn) {
         this.status = TradeStatus.OPEN;
+        this.seller = seller;
         this.buyer = null;
-        this.tradeID = tradeID;
+        this.forSale = forSale;
+        this.inReturn = inReturn;
         this.timeListed = System.currentTimeMillis();
+        this.timeCompleted = 0L;
+    }
 
+    /**
+     * Constructor for rebuilding from the Database.
+     * @param tradeID The ID of the trade.
+     * @param status The status of the trade.
+     * @param seller The player who is selling the forSale itemstack
+     * @param buyer The player who paying the inReturn itemstack
+     * @param forSale The item that is for sale
+     * @param inReturn The item the seller wants in return for the forSale itemstack
+     * @param timeListed The time that the trade is made
+     * @param timeCompleted The time that the trade is completed
+     */
+    public Trade(int tradeID, TradeStatus status, OfflinePlayer seller, OfflinePlayer buyer, ItemStack forSale, ItemStack inReturn, long timeListed, long timeCompleted) {
+        this.tradeID = tradeID;
+        this.status = status;
+        this.seller = seller;
+        this.buyer = buyer;
+        this.forSale = forSale;
+        this.inReturn = inReturn;
+        this.timeListed = timeListed;
+        this.timeCompleted = timeCompleted;
+    }
+
+    public ItemStack generateDisplayItem() {
         ItemStack displayItem = new ItemStack(forSale.getType(), forSale.getAmount());
         ItemMeta displayItemMeta = displayItem.getItemMeta();
 
@@ -59,7 +81,7 @@ public class Trade {
         }
 
         ArrayList<String> lore = new ArrayList<>();
-        lore.add(ChatColor.GRAY + "Being Sold By: " + this.seller.getDisplayName());
+        lore.add(ChatColor.GRAY + "Being Sold By: " + this.seller.getName());
 
         if (forSale.getItemMeta().hasLore()) {
             lore.add(ChatColor.DARK_GRAY + "===================");
@@ -77,65 +99,16 @@ public class Trade {
         // Adding in trade ID for indentification later on
         displayItemMeta.setLocalizedName(String.valueOf(tradeID));
         displayItem.setItemMeta(displayItemMeta);
-        this.displayItem = displayItem;
-    }
 
-    /**
-     * Constructor for rebuilding from the Database.
-     *
-     * @param forSale      Item player is trading away
-     * @param wanted       Item player is trading for
-     * @param amountWanted Amount they want
-     * @param displayItem  The item that goes on display in the shop homepage
-     * @param seller       Person selling the forSale item
-     * @param buyer        Person who bought the item if trade is complete (null otherwise)
-     * @param tradeID      ID of the trade;
-     * @param timeListed   Time that the trade was listed (in Unix time)
-     */
-    public Trade(ItemStack forSale, ItemStack wanted, ItemStack displayItem, int amountWanted, Player seller, Player buyer, int tradeID, long timeListed, TradeStatus status) {
-        this.forSale = forSale;
-        this.wanted = wanted;
-        this.displayItem = displayItem;
-        this.amountWanted = amountWanted;
-        this.seller = seller;
-
-        this.status = status;
-        this.tradeID = tradeID;
-        this.buyer = buyer;
-        this.timeListed = timeListed;
-
+        return displayItem;
     }
 
     public ItemStack getForSale() {
         return forSale;
     }
 
-    public void setForSale(ItemStack forSale) {
-        this.forSale = forSale;
-    }
-
-    public ItemStack getWanted() {
-        return wanted;
-    }
-
-    public void setWanted(ItemStack wanted) {
-        this.wanted = wanted;
-    }
-
-    public ItemStack getDisplayItem() {
-        return displayItem;
-    }
-
-    public void setDisplayItem(ItemStack displayItem) {
-        this.displayItem = displayItem;
-    }
-
-    public int getAmountWanted() {
-        return amountWanted;
-    }
-
-    public void setAmountWanted(int amountWanted) {
-        this.amountWanted = amountWanted;
+    public ItemStack getInReturn() {
+        return inReturn;
     }
 
     public TradeStatus getStatus() {
@@ -143,22 +116,28 @@ public class Trade {
     }
 
     public void setStatus(TradeStatus status) {
+        WorldShop.getDatabase().update("UPDATE trades SET status = ? WHERE trade_id = ?;",
+                new Object[]{status.ordinal(), this.tradeID},
+                new int[]{Types.INTEGER, Types.INTEGER}
+        );
+
         this.status = status;
     }
 
-    public Player getSeller() {
+    public OfflinePlayer getSeller() {
         return seller;
     }
 
-    public void setSeller(Player seller) {
-        this.seller = seller;
-    }
-
-    public Player getBuyer() {
+    public OfflinePlayer getBuyer() {
         return buyer;
     }
 
     public void setBuyer(Player buyer) {
+        WorldShop.getDatabase().update("UPDATE trades SET buyer_uuid = ? WHERE trade_id = ?;",
+                new Object[]{buyer.getUniqueId(), this.tradeID},
+                new int[]{Types.VARCHAR, Types.INTEGER}
+        );
+
         this.buyer = buyer;
     }
 
@@ -166,15 +145,18 @@ public class Trade {
         return tradeID;
     }
 
-    public void setTradeID(int tradeID) {
-        this.tradeID = tradeID;
-    }
-
     public long getTimeListed() {
         return timeListed;
     }
 
-    public void setTimeListed(long timeListed) {
-        this.timeListed = timeListed;
+    public void setTimeCompleted(long timeCompleted) {
+        WorldShop.getDatabase().update("UPDATE trades SET time_completed = ? WHERE trade_id = ?;",
+                new Object[]{timeCompleted, this.tradeID},
+                new int[]{Types.BIGINT, Types.INTEGER});
     }
+
+    public long getTimeCompleted() {
+        return timeCompleted;
+    }
+
 }

@@ -14,7 +14,9 @@ public final class WorldShop extends JavaPlugin {
 
     private static Config config;
     private static Database database;
+    private static PlayerManager playerManager;
     private static StoreManager storeManager;
+
 
     @Override
     public void onEnable() {
@@ -26,6 +28,7 @@ public final class WorldShop extends JavaPlugin {
 
         //Setting up Config
         config = new Config(this, this.getDataFolder(), "config", true, true);
+        this.getLogger().info("Setting up the config.yml...");
 
         //Setting up database
         switch(Config.getDatabaseType()) {
@@ -38,63 +41,43 @@ public final class WorldShop extends JavaPlugin {
                 break;
 
             default: // Disables the plugin if the database cannot be initialized.
-                this.getLogger().severe("Database could not be initialized because '" + Config.getDatabaseType() + "' is an INVALID database type!!!");
+                this.getLogger().severe("DATABASE COULD NOT BE INITIALIZED BECAUSE '" + Config.getDatabaseType() + "' IS AN INVALID DATABASE TYPE");
                 this.onDisable();
         }
 
         try {
             database.connect();
-        } catch (SQLException e) {
+        } catch (SQLException e) { // Disabled the plugin if the database throws exception while trying to connect.
             e.printStackTrace();
+            this.getLogger().severe("ERROR THROWN WHILE CONNECTING TO THE DATABASE!");
             this.onDisable();
         }
 
         if (database.isConnected()) {
-            this.getLogger().info("WorldShop connected to its database successfully!");
+            this.getLogger().info("Connected to its database successfully!");
 
                 // Initialize the players table if it doesn't exist
-                database.update(
-                        "CREATE TABLE IF NOT EXISTS players" +
-                                "(" +
-                                "uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
-                                "purchases int," + //Todo: Implement the system for tracking purchases and sales
-                                "sales int," +
-                                "CONSTRAINT players_constraint UNIQUE (uuid)" + // Makes it so a UUID of each player cannot repeat in this table
-                                ");"
-                );
+                database.createPlayersTable();
 
                 // Initialize the shop table if it doesn't exit
-                database.update(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
-                        "CREATE TABLE IF NOT EXISTS trades" +
-                                "(" +
-                                "trade_id int," +
-                                "seller_uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
-                                "display_item BLOB," +
-                                "for_sale BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
-                                "wanted BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
-                                "num_wanted int," +
-                                "status int," + // ENUM statuses include: OPEN, COMPLETE, EXPIRED, REMOVED
-                                "buyer_uuid varchar(36)," +
-                                "time_listed BIGINT," +
-                                "time_completed BIGINT" +
-                                ");"
-                );
+                database.createTradesTable();
 
                 // Initialize a rewards pickup table
-                database.update(
-                        "CREATE TABLE IF NOT EXISTS pickup" +
-                                "(" +
-                                "player_uuid varchar(36)," +
-                                "trade_id int," +
-                                "pickup_item BLOB," +
-                                "collected boolean," +
-                                "time_collected BIGINT" +
-                                ");"
-                );
+                database.createPickupsTable();
 
         } else {
-            this.getLogger().severe("WorldShop DID NOT SUCCESSFULLY CONNECT TO ITS DATABASE!!!");
+            this.getLogger().severe("UNABLE TO CONNECT TO THE DATABASE!");
+            // Disables the plugin if the database doesn't connect.
+            this.onDisable();
         }
+
+        // todo: Initialize runnable that checks every second for expired trades
+        // A better way to do this may be checking when the next expiration will be and run the runnable at that time
+        // On loading the database, all trades past the expiry time need to be removed
+        // Expiry time should be specified in the config file
+
+        // Initializing the player manager
+        playerManager = new PlayerManager();
 
         // Initializing the store manager
         storeManager = new StoreManager();
@@ -115,6 +98,11 @@ public final class WorldShop extends JavaPlugin {
     // Database accessor
     public static Database getDatabase() {
         return database;
+    }
+
+    // Player Manager accessor
+    public static PlayerManager getPlayerManager() {
+        return playerManager;
     }
 
     // Store Manager accessor

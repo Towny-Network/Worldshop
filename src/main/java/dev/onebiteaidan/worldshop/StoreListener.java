@@ -1,5 +1,6 @@
 package dev.onebiteaidan.worldshop;
 
+import dev.onebiteaidan.worldshop.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import org.bukkit.ChatColor;
@@ -108,8 +109,7 @@ public class StoreListener implements Listener {
                         case "Are you sure?":
                             Inventory inven = e.getInventory();
                             ItemStack forSale = inven.getItem(12);
-                            ItemStack wanted = inven.getItem(15);
-                            int amountWanted = wanted.getAmount();
+                            ItemStack inReturn = inven.getItem(15);
 
                             // Remove first occurrence of a repeat itemstack in the players inventory
                             if (e.getWhoClicked().getInventory().contains(forSale)) {
@@ -120,7 +120,7 @@ public class StoreListener implements Listener {
                                 break;
                             }
 
-                            WorldShop.getStoreManager().addToStore(forSale, wanted, amountWanted, (Player) e.getWhoClicked());
+                            WorldShop.getStoreManager().createTrade(new Trade((Player) e.getWhoClicked(), forSale, inReturn));
 
                             // Brings the player back to the main page of the store.
                             WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
@@ -279,7 +279,7 @@ public class StoreListener implements Listener {
                                 System.out.println("An error occurred");
                             }
 
-                            WorldShop.getStoreManager().removeFromStore(WorldShop.getStoreManager().getTradeFromTradeID(tradeID), (Player) e.getWhoClicked(), TradeStatus.COMPLETE);
+                            WorldShop.getStoreManager().completeTrade((Player) e.getWhoClicked(), Integer.parseInt(tradeID));
                             // Put the player back on page 1 of the shop
                             WorldShop.getStoreManager().openShop((Player) e.getWhoClicked(), 1);
 
@@ -368,7 +368,7 @@ public class StoreListener implements Listener {
 
             switch(e.getRawSlot()) {
                 case 11:
-                    WorldShop.getStoreManager().removeFromStore(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getView().getItem(4)), (Player) e.getWhoClicked(), TradeStatus.REMOVED);
+                    WorldShop.getStoreManager().removeTradeScreen(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getView().getItem(4)), (Player) e.getWhoClicked());
                     // Put the player back on page 1 of the shop
                     WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked());
                     break;
@@ -412,6 +412,8 @@ public class StoreListener implements Listener {
                             ps.setInt(3, Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()));
 
                             ps.executeUpdate();
+
+
 
                         } catch (SQLException ev) {
                             ev.printStackTrace();

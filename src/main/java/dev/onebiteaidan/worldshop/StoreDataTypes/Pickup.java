@@ -1,16 +1,17 @@
 package dev.onebiteaidan.worldshop.StoreDataTypes;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class Pickup {
-    Player player;
+    OfflinePlayer player;
     ItemStack item;
     int tradeID;
     boolean withdrawn;
     long timeWithdrawn;
 
-    public Pickup(Player player, ItemStack item, int tradeID, boolean withdrawn, long timeWithdrawn) {
+    public Pickup(OfflinePlayer player, ItemStack item, int tradeID, boolean withdrawn, long timeWithdrawn) {
         this.player = player;
         this.item = item;
         this.tradeID = tradeID;
@@ -18,7 +19,7 @@ public class Pickup {
         this.timeWithdrawn = timeWithdrawn;
     }
 
-    public Player getPlayer() {
+    public OfflinePlayer getPlayer() {
         return player;
     }
 
