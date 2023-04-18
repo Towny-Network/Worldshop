@@ -340,6 +340,8 @@ public class StoreManager {
                 openTrades.add(getTradeFromTradeID(rs.getInt("trade_id")));
             }
 
+            rs.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -476,6 +478,9 @@ public class StoreManager {
                         rs.getLong("time_collected"))
                 );
             }
+
+            rs.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -576,6 +581,9 @@ public class StoreManager {
                         rs.getLong("time_completed")
                 ).generateDisplayItem());
             }
+
+            rs.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -614,6 +622,9 @@ public class StoreManager {
                         rs.getLong("time_completed")
                 ).generateDisplayItem());
             }
+
+            rs.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -644,7 +655,7 @@ public class StoreManager {
                     buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
                 }
 
-                return new Trade(rs.getInt("trade_id"),
+                Trade t = new Trade(rs.getInt("trade_id"),
                         TradeStatus.values()[rs.getInt("status")],
                         Bukkit.getOfflinePlayer(UUID.fromString("seller_uuid")),
                         buyer,
@@ -653,6 +664,10 @@ public class StoreManager {
                         rs.getLong("time_listed"),
                         rs.getLong("time_completed")
                 );
+
+                rs.close();
+
+                return t;
 
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -681,7 +696,7 @@ public class StoreManager {
                 buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
             }
 
-            return new Trade(rs.getInt("trade_id"),
+            Trade t = new Trade(rs.getInt("trade_id"),
                     TradeStatus.values()[rs.getInt("status")],
                     Bukkit.getOfflinePlayer(UUID.fromString("seller_uuid")),
                     buyer,
@@ -690,6 +705,10 @@ public class StoreManager {
                     rs.getLong("time_listed"),
                     rs.getLong("time_completed")
             );
+
+            rs.close();
+
+            return t;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -717,7 +736,7 @@ public class StoreManager {
                 buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
             }
 
-            return new Trade(rs.getInt("trade_id"),
+            Trade t = new Trade(rs.getInt("trade_id"),
                     TradeStatus.values()[rs.getInt("status")],
                     Bukkit.getOfflinePlayer(UUID.fromString("seller_uuid")),
                     buyer,
@@ -726,6 +745,10 @@ public class StoreManager {
                     rs.getLong("time_listed"),
                     rs.getLong("time_completed")
             );
+
+            rs.close();
+
+            return t;
 
         } catch (SQLException e) {
             e.printStackTrace();

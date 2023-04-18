@@ -32,11 +32,15 @@ public class PlayerManager {
 
             rs.next();
 
-            return new PlayerProfile(
+            PlayerProfile pp = new PlayerProfile(
                     Bukkit.getOfflinePlayer(rs.getString("uuid")),
                     rs.getInt("purchases"),
                     rs.getInt("sales")
             );
+
+            rs.close();
+
+            return pp;
 
         } catch (SQLException e) {
             e.printStackTrace();
