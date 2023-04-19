@@ -80,7 +80,7 @@ public class SQLite implements Database {
                         ps.setBytes(i + 1, ((ItemStack) arguments[i]).serializeAsBytes());
                         break;
                     case Types.VARCHAR:
-                        ps.setString(i + 1, (String) arguments[i]);
+                        ps.setString(i + 1, arguments[i].toString());
                         break;
                     default:
                         break;
@@ -101,6 +101,10 @@ public class SQLite implements Database {
         try {
             PreparedStatement ps = connection.prepareStatement(update);
             for (int i = 0; i < arguments.length; i++) {
+                if (arguments[i] == null) {
+                    ps.setNull(i + 1, Types.NULL);
+                    continue;
+                }
                 switch (types[i]) {
                     case Types.INTEGER:
                         ps.setInt(i + 1, (int) arguments[i]);
@@ -117,12 +121,14 @@ public class SQLite implements Database {
                         ps.setBytes(i + 1, ((ItemStack) arguments[i]).serializeAsBytes());
                         break;
                     case Types.VARCHAR:
-                        ps.setString(i + 1, (String) arguments[i]);
+                        ps.setString(i + 1, arguments[i].toString());
                         break;
                     default:
                         break;
                 }
             }
+
+            ps.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -144,7 +150,7 @@ public class SQLite implements Database {
         this.run(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
                 "CREATE TABLE IF NOT EXISTS trades" +
                         "(" +
-                        "trade_id int UNIQUE AUTOINCREMENT," +
+                        "trade_id INTEGER PRIMARY KEY," +
                         "seller_uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
                         "for_sale BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
                         "in_return BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
@@ -177,7 +183,7 @@ public class SQLite implements Database {
                         "(" +
                         "uuid varchar(36) UNIQUE," + // The length of a UUID will never be longer than 36 characters and will always be unique
                         "purchases int DEFAULT 0," + // Number of purchases
-                        "sales int DEFAULT 0," + // Number of sales
+                        "sales int DEFAULT 0" + // Number of sales
                         ");"
         );
     }

@@ -26,7 +26,7 @@ public class StoreManager {
 
     public void createTrade(Trade t) {
         WorldShop.getDatabase().update("INSERT INTO trades (seller_uuid, buyer_uuid, for_sale, in_return, status, time_listed, time_completed) VALUES (?,?,?,?,?,?,?);",
-                new Object[]{t.getSeller(), null, t.getForSale(), t.getInReturn(), t.getStatus(), t.getTimeListed(), 0L},
+                new Object[]{t.getSeller().getUniqueId(), null, t.getForSale(), t.getInReturn(), t.getStatus().ordinal(), t.getTimeListed(), 0L},
                 new int[]{Types.VARCHAR, Types.NULL, Types.BLOB, Types.BLOB, Types.INTEGER, Types.BIGINT, Types.BIGINT}
         );
     }
@@ -37,7 +37,18 @@ public class StoreManager {
         t.setBuyer(buyer);
         t.setTimeCompleted(System.currentTimeMillis());
 
-        // TODO: add pickups to the pickup table
+        Pickup buyerPickup = new Pickup(buyer, t.getForSale(), tradeID, false, 0L);
+        Pickup sellerPickup = new Pickup(t.getSeller(), t.getInReturn(), tradeID, false, 0L);
+
+        WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
+                new Object[]{buyerPickup.getPlayer().getUniqueId(), buyerPickup.getItem(), buyerPickup.getTradeID(), buyerPickup.isWithdrawn(), buyerPickup.getTimeWithdrawn()},
+                new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
+        );
+
+        WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
+                new Object[]{sellerPickup.getPlayer().getUniqueId(), sellerPickup.getItem(), sellerPickup.getTradeID(), sellerPickup.isWithdrawn(), sellerPickup.getTimeWithdrawn()},
+                new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
+        );
     }
 
     public void expireTrade(int tradeID) {
@@ -45,7 +56,12 @@ public class StoreManager {
         t.setStatus(TradeStatus.EXPIRED);
         t.setTimeCompleted(System.currentTimeMillis());
 
-        // TODO: add pickups to the pickup table
+        Pickup forSalePickup = new Pickup(t.getSeller(), t.getForSale(), tradeID, false, 0L);
+
+        WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
+                new Object[]{forSalePickup.getPlayer().getUniqueId(), forSalePickup.getItem(), forSalePickup.getTradeID(), forSalePickup.isWithdrawn(), forSalePickup.getTimeWithdrawn()},
+                new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
+        );
     }
 
     public void deleteTrade(int tradeID) {
@@ -53,8 +69,12 @@ public class StoreManager {
         t.setStatus(TradeStatus.REMOVED);
         t.setTimeCompleted(System.currentTimeMillis());
 
-        // TODO: add pickups to the pickup table
+        Pickup forSalePickup = new Pickup(t.getSeller(), t.getForSale(), tradeID, false, 0L);
 
+        WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
+                new Object[]{forSalePickup.getPlayer().getUniqueId(), forSalePickup.getItem(), forSalePickup.getTradeID(), forSalePickup.isWithdrawn(), forSalePickup.getTimeWithdrawn()},
+                new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
+        );
     }
 
     //region Shop GUIS
@@ -466,7 +486,7 @@ public class StoreManager {
         ArrayList<Pickup> pickups = new ArrayList<>();
         try {
 
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM pickup WHERE player_uuid = ? AND collected = ?;");
+            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM pickups WHERE player_uuid = ? AND collected = ?;");
             ps.setString(1, String.valueOf(player.getUniqueId()));
             ps.setBoolean(2, false);
 
@@ -573,7 +593,7 @@ public class StoreManager {
 
                 items.add(new Trade(rs.getInt("trade_id"),
                         TradeStatus.values()[rs.getInt("status")],
-                        Bukkit.getOfflinePlayer(UUID.fromString("seller_uuid")),
+                        Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
                         buyer,
                         ItemStack.deserializeBytes(rs.getBytes("for_sale")),
                         ItemStack.deserializeBytes(rs.getBytes("in_return")),
@@ -614,7 +634,7 @@ public class StoreManager {
 
                 items.add(new Trade(rs.getInt("trade_id"),
                         TradeStatus.values()[rs.getInt("status")],
-                        Bukkit.getOfflinePlayer(UUID.fromString("seller_uuid")),
+                        Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
                         buyer,
                         ItemStack.deserializeBytes(rs.getBytes("for_sale")),
                         ItemStack.deserializeBytes(rs.getBytes("in_return")),
@@ -657,7 +677,7 @@ public class StoreManager {
 
                 Trade t = new Trade(rs.getInt("trade_id"),
                         TradeStatus.values()[rs.getInt("status")],
-                        Bukkit.getOfflinePlayer(UUID.fromString("seller_uuid")),
+                        Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
                         buyer,
                         ItemStack.deserializeBytes(rs.getBytes("for_sale")),
                         ItemStack.deserializeBytes(rs.getBytes("in_return")),
@@ -698,7 +718,7 @@ public class StoreManager {
 
             Trade t = new Trade(rs.getInt("trade_id"),
                     TradeStatus.values()[rs.getInt("status")],
-                    Bukkit.getOfflinePlayer(UUID.fromString("seller_uuid")),
+                    Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
                     buyer,
                     ItemStack.deserializeBytes(rs.getBytes("for_sale")),
                     ItemStack.deserializeBytes(rs.getBytes("in_return")),
@@ -738,7 +758,7 @@ public class StoreManager {
 
             Trade t = new Trade(rs.getInt("trade_id"),
                     TradeStatus.values()[rs.getInt("status")],
-                    Bukkit.getOfflinePlayer(UUID.fromString("seller_uuid")),
+                    Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
                     buyer,
                     ItemStack.deserializeBytes(rs.getBytes("for_sale")),
                     ItemStack.deserializeBytes(rs.getBytes("in_return")),
