@@ -5,6 +5,7 @@ import dev.onebiteaidan.worldshop.DataManagement.Config;
 import dev.onebiteaidan.worldshop.DataManagement.Database;
 import dev.onebiteaidan.worldshop.DataManagement.MySQL;
 import dev.onebiteaidan.worldshop.DataManagement.SQLite;
+import dev.onebiteaidan.worldshop.Utils.PlayerListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -84,6 +85,7 @@ public final class WorldShop extends JavaPlugin {
 
         // Setting up listeners
         Bukkit.getPluginManager().registerEvents(new StoreListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
 
         // Setting up commands
         getCommand("test").setExecutor(new TestCommand());

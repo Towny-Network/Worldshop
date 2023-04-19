@@ -10,7 +10,7 @@ import java.sql.Types;
 
 public class PlayerManager {
 
-    private static class PlayerProfile {
+    public static class PlayerProfile {
         OfflinePlayer player;
         int purchases;
         int sales;
@@ -48,15 +48,22 @@ public class PlayerManager {
         return null;
     }
 
-    public void incrementPlayerPurchases(Player player) {
+    public void incrementPlayerPurchases(OfflinePlayer player) {
         WorldShop.getDatabase().update("UPDATE players SET purchases = purchases + ? WHERE uuid = ?;",
                 new Object[]{1, player.getUniqueId()},
                 new int[]{Types.INTEGER, Types.VARCHAR});
     }
 
-    public void incrementPlayerSales(Player player) {
+    public void incrementPlayerSales(OfflinePlayer player) {
         WorldShop.getDatabase().update("UPDATE players SET sales = sales + ? WHERE uuid = ?;",
                 new Object[]{1, player.getUniqueId()},
                 new int[]{Types.INTEGER, Types.VARCHAR});
+    }
+
+    public void addNewPlayer(Player player) {
+        // Check if the player is in the database (using player.hasPlayedBefore() doesn't work when plugin added after players have played before
+        WorldShop.getDatabase().update("INSERT INTO players (uuid, purchases, sales) SELECT ?, ?, ? WHERE NOT EXISTS(SELECT 1 FROM players WHERE uuid = ?);",
+                new Object[]{player.getUniqueId(), 0, 0, player.getUniqueId()},
+                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR});
     }
 }

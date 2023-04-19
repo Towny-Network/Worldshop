@@ -49,6 +49,9 @@ public class StoreManager {
                 new Object[]{sellerPickup.getPlayer().getUniqueId(), sellerPickup.getItem(), sellerPickup.getTradeID(), sellerPickup.isWithdrawn(), sellerPickup.getTimeWithdrawn()},
                 new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
         );
+
+        WorldShop.getPlayerManager().incrementPlayerSales(t.getSeller());
+        WorldShop.getPlayerManager().incrementPlayerPurchases(t.getBuyer());
     }
 
     public void expireTrade(int tradeID) {

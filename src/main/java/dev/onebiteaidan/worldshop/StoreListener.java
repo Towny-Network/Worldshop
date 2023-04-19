@@ -335,7 +335,7 @@ public class StoreListener implements Listener {
 
                     default:
                         if (e.getClick().isLeftClick()) {
-                            WorldShop.getStoreManager().viewTrade(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getCurrentItem()), (Player) e.getWhoClicked()); // Todo: this should be changed to a viewer
+                            WorldShop.getStoreManager().viewTrade(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getCurrentItem()), (Player) e.getWhoClicked());
                         } else if (e.getClick().isRightClick()) {
                             WorldShop.getStoreManager().removeTradeScreen(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getCurrentItem()), (Player) e.getWhoClicked());
                         }
