@@ -103,6 +103,58 @@ public class Trade {
         return displayItem;
     }
 
+    public ItemStack generateCurrentTradeDisplayItem() {
+        ItemStack displayItem = new ItemStack(forSale.getType(), forSale.getAmount());
+        ItemMeta displayItemMeta = displayItem.getItemMeta();
+
+        // Items that have displaynames are items that have been renamed to something other than their original title.
+        // Therefore, we have to implement this shit system
+        if (forSale.getItemMeta().hasDisplayName()) {
+            displayItemMeta.setDisplayName(ChatColor.YELLOW + forSale.getItemMeta().getDisplayName() + " x" + this.forSale.getAmount());
+        } else {
+            String s = forSale.getType().toString();
+            String[] parts = s.split("_");
+            for (int i = 0; i < parts.length; i++) {
+                parts[i] = parts[i].toLowerCase();
+                parts[i] = parts[i].substring(0, 1).toUpperCase() + parts[i].substring(1);
+            }
+
+            displayItemMeta.setDisplayName(ChatColor.YELLOW + String.join(" ", parts) + " x" + this.forSale.getAmount());
+        }
+
+        ArrayList<String> lore = new ArrayList<>();
+        lore.add(ChatColor.GRAY + "Being Sold By: " + this.seller.getName());
+
+        if (forSale.getItemMeta().hasLore()) {
+            lore.add(ChatColor.DARK_GRAY + "===================");
+            lore.add("");
+            for (String s : forSale.getItemMeta().getLore()) {
+                lore.add(ChatColor.DARK_PURPLE + s);
+            }
+            lore.add("");
+            lore.add(ChatColor.DARK_GRAY + "===================");
+        }
+
+        lore.add("");
+        lore.add(ChatColor.YELLOW + "" + ChatColor.BOLD + "Click " + ChatColor.RESET + "" + ChatColor.GOLD + "to view this trade");
+        lore.add(ChatColor.RED + "" + ChatColor.BOLD + "Right click " + ChatColor.RESET + "" + ChatColor.RED + "to DELETE this item");
+        lore.add("");
+
+        long timeRemaining = 2592000000L - (System.currentTimeMillis() - timeListed); // Time limit - (CurrentTime - TimeListed)
+        int minutes = (int) (timeRemaining / (1000*60)) % 60; // Minutes
+        int hours = (int) (timeRemaining / (1000*60*60)) % 24; // Hours
+        int days = (int) (timeRemaining / (1000*60*60*24)); // Days
+
+        lore.add("Time until trade expires: " + days + "d, " + hours + "h, " + minutes + "m");
+
+        displayItemMeta.setLore(lore);
+        // Adding in trade ID for indentification later on
+        displayItemMeta.setLocalizedName(String.valueOf(tradeID));
+        displayItem.setItemMeta(displayItemMeta);
+
+        return displayItem;
+    }
+
     public ItemStack getForSale() {
         return forSale;
     }

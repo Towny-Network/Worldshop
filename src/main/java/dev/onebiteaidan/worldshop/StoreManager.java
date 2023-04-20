@@ -348,27 +348,44 @@ public class StoreManager {
         gui.setItem(10, divider);
         gui.setItem(19, divider);
 
+        // Prev Page Button
+        ItemStack prevPage;
+        ItemMeta prevPageMeta;
 
-        ArrayList<Trade> openTrades = new ArrayList<>();
-        try {
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades WHERE seller_uuid = ? AND status = ?;");
-            ps.setString(1, player.getUniqueId().toString());
-            ps.setInt(2, TradeStatus.OPEN.ordinal());
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                openTrades.add(getTradeFromTradeID(rs.getInt("trade_id")));
-            }
-
-            rs.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (PageUtils.isPageValid(getAllDisplayItems(), 1, 45)) {
+            prevPage = new ItemStack(Material.ARROW);
+            prevPageMeta = prevPage.getItemMeta();
+            prevPageMeta.setDisplayName(ChatColor.RED + "Previous Page");
+        } else {
+            prevPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            prevPageMeta = prevPage.getItemMeta();
+            prevPageMeta.setDisplayName(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "Previous Page");
         }
+//        prevPageMeta.setLocalizedName(page + "");
+        prevPage.setItemMeta(prevPageMeta);
+        gui.setItem(9, prevPage);
+
+        // Next Page Button
+        ItemStack nextPage;
+        ItemMeta nextPageMeta;
+
+        if (PageUtils.isPageValid(getAllDisplayItems(), 1, 45)) {
+            nextPage = new ItemStack(Material.ARROW);
+            nextPageMeta = nextPage.getItemMeta();
+            nextPageMeta.setDisplayName(ChatColor.RED + "Next Page");
+        } else {
+            nextPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            nextPageMeta = nextPage.getItemMeta();
+            nextPageMeta.setDisplayName(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "Next Page");
+        }
+        nextPage.setItemMeta(nextPageMeta);
+        gui.setItem(18, nextPage);
 
         int count = 0;
-        for (Trade t : openTrades) {
-            gui.setItem((count % 9) + 2, t.generateDisplayItem());
+        for (ItemStack item: getAllCurrentTradesDisplayItems(player)) {
+            if (count < 15) {
+                gui.addItem();
+            }
             count++;
         }
 
@@ -480,6 +497,39 @@ public class StoreManager {
         gui.setItem(10, divider);
         gui.setItem(19, divider);
 
+        // Prev Page Button
+        ItemStack prevPage;
+        ItemMeta prevPageMeta;
+
+        if (PageUtils.isPageValid(getAllDisplayItems(), 1, 45)) {
+            prevPage = new ItemStack(Material.ARROW);
+            prevPageMeta = prevPage.getItemMeta();
+            prevPageMeta.setDisplayName(ChatColor.RED + "Previous Page");
+        } else {
+            prevPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            prevPageMeta = prevPage.getItemMeta();
+            prevPageMeta.setDisplayName(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "Previous Page");
+        }
+        //prevPageMeta.setLocalizedName(page + "");
+        prevPage.setItemMeta(prevPageMeta);
+        gui.setItem(9, prevPage);
+
+        // Next Page Button
+        ItemStack nextPage;
+        ItemMeta nextPageMeta;
+
+        if (PageUtils.isPageValid(getAllDisplayItems(), 1, 45)) {
+            nextPage = new ItemStack(Material.ARROW);
+            nextPageMeta = nextPage.getItemMeta();
+            nextPageMeta.setDisplayName(ChatColor.RED + "Next Page");
+        } else {
+            nextPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            nextPageMeta = nextPage.getItemMeta();
+            nextPageMeta.setDisplayName(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "Next Page");
+        }
+        nextPage.setItemMeta(nextPageMeta);
+        gui.setItem(18, nextPage);
+
         //Todo: Populate remaining slots w/ completed trades posted by player
         // This may have to be pageable to fit rewards on multiple pages
         // Also there should also probably be an expire time on the rewards
@@ -514,7 +564,9 @@ public class StoreManager {
             itemMeta.setLocalizedName(String.valueOf(p.getTradeID()));
             item.setItemMeta(itemMeta);
 
-            gui.setItem((count % 9) + 2, item);
+            if (count < 15) {
+                gui.addItem(item);
+            }
             count++;
         }
 
@@ -774,6 +826,43 @@ public class StoreManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    public List<ItemStack> getAllCurrentTradesDisplayItems(Player player) {
+        List<ItemStack> items = new ArrayList<>();
+
+        ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE status = ? AND seller_uuid = ?;",
+                new Object[]{TradeStatus.OPEN.ordinal(), player.getUniqueId()},
+                new int[]{Types.INTEGER, Types.VARCHAR});
+
+        try {
+            while (rs.next()) {
+                // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
+                OfflinePlayer buyer = null;
+                String buyerUUID = rs.getString("buyer_uuid");
+                if (!rs.wasNull()) {
+                    buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
+                }
+
+                items.add(new Trade(rs.getInt("trade_id"),
+                        TradeStatus.values()[rs.getInt("status")],
+                        Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
+                        buyer,
+                        ItemStack.deserializeBytes(rs.getBytes("for_sale")),
+                        ItemStack.deserializeBytes(rs.getBytes("in_return")),
+                        rs.getLong("time_listed"),
+                        rs.getLong("time_completed")
+                ).generateCurrentTradeDisplayItem());
+            }
+
+            rs.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return items;
     }
 
     // endregion
