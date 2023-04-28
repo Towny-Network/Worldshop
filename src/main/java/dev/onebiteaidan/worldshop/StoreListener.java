@@ -302,11 +302,11 @@ public class StoreListener implements Listener {
 
             switch(e.getRawSlot()) {
                 case 11: // View Current Listings Button
-                    WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked());
+                    WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked(), 1);
                     break;
 
                 case 15: // View Completed Trades Button
-                    WorldShop.getStoreManager().viewCompletedTrades((Player) e.getWhoClicked());
+                    WorldShop.getStoreManager().viewCompletedTrades((Player) e.getWhoClicked(), 1);
                     break;
 
                 case 22: // Back Button
@@ -317,30 +317,38 @@ public class StoreListener implements Listener {
 
     @EventHandler
     public void onCurrentListingsScreenClick(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 && e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("ViewCurrentListingsScreen")) {
+        if (e.getCurrentItem() != null && e.getInventory().getSize() == 36 && e.getView().getItem(31) != null && e.getView().getItem(31).getItemMeta().hasLocalizedName() && e.getView().getItem(31).getItemMeta().getLocalizedName().equals("ViewCurrentListingsScreen")) {
+
+            int currentPage = Integer.parseInt(e.getView().getItem(29).getItemMeta().getLocalizedName());
 
             e.setCancelled(true);
 
-            if (e.getRawSlot() < 27) {
+            if (e.getRawSlot() > 27) {
                 switch(e.getRawSlot()) {
-                    case 0: // Back Button
+                    case 31: // Back Button
                         WorldShop.getStoreManager().manageTrades((Player) e.getWhoClicked());
+                        break;
 
-                    case 1:
-                    case 9:
-                    case 10:
-                    case 18:
-                    case 19:
+                    case 33: // Next Page
+                        if (e.getCurrentItem().getType().equals(Material.ARROW)) {
+                            WorldShop.getStoreManager().nextCurrentListingsPage((Player) e.getWhoClicked(), currentPage);
+                        }
+                        break;
+
+                    case 29: // Prev Page
+                        if (e.getCurrentItem().getType().equals(Material.ARROW)) {
+                            WorldShop.getStoreManager().prevCurrentListingsPage((Player) e.getWhoClicked(), currentPage);
+                        }
                         break;
 
                     default:
-                        if (e.getClick().isLeftClick()) {
-                            WorldShop.getStoreManager().viewTrade(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getCurrentItem()), (Player) e.getWhoClicked()); // Todo: this should be changed to a viewer
-                        } else if (e.getClick().isRightClick()) {
-                            WorldShop.getStoreManager().removeTradeScreen(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getCurrentItem()), (Player) e.getWhoClicked());
-                        }
-
                         break;
+                }
+            } else {
+                if (e.getClick().isLeftClick()) {
+                    WorldShop.getStoreManager().viewTrade(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getCurrentItem()), (Player) e.getWhoClicked());
+                } else if (e.getClick().isRightClick()) {
+                    WorldShop.getStoreManager().removeTradeScreen(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getCurrentItem()), (Player) e.getWhoClicked());
                 }
             }
         }
@@ -353,7 +361,7 @@ public class StoreListener implements Listener {
 
             switch(e.getRawSlot()) {
                 case 22: // Back button
-                    WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked());
+                    WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked(), 1);
                     break;
 
                 default:
@@ -371,12 +379,12 @@ public class StoreListener implements Listener {
             switch(e.getRawSlot()) {
                 case 11:
                     WorldShop.getStoreManager().deleteTrade(WorldShop.getStoreManager().getTradeFromDisplayItem(e.getInventory().getItem(4)).getTradeID());
-                    // Put the player back on page 1 of the shop
-                    WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked());
+                    // Put the player back on page 1 of current listings
+                    WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked(), 1);
                     break;
 
                 case 15:
-                   WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked());
+                   WorldShop.getStoreManager().viewCurrentListings((Player) e.getWhoClicked(), 1);
                    break;
 
                 default:
@@ -387,49 +395,59 @@ public class StoreListener implements Listener {
 
     @EventHandler
     public void onCompletedTradesScreenClick(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 && e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("ViewCompletedTradesScreen")) {
+        if (e.getCurrentItem() != null && e.getInventory().getSize() == 36 && e.getView().getItem(31) != null && e.getView().getItem(31).getItemMeta().hasLocalizedName() && e.getView().getItem(31).getItemMeta().getLocalizedName().equals("ViewCompletedTradesScreen")) {
 
-           e.setCancelled(true);
+            int currentPage = Integer.parseInt(e.getView().getItem(29).getItemMeta().getLocalizedName());
 
-           if (e.getRawSlot()< 27) {
-               switch(e.getRawSlot()) {
-                   case 0: // Back Button
+            e.setCancelled(true);
+
+           if (e.getRawSlot() > 27) {
+               switch (e.getRawSlot()) {
+                   case 31: // Back Button
                        WorldShop.getStoreManager().manageTrades((Player) e.getWhoClicked());
+                       break;
 
-                   case 1:
-                   case 9:
-                   case 10:
-                   case 18:
-                   case 19:
+                   case 33: // Next Page
+                       if (e.getCurrentItem().getType().equals(Material.ARROW)) {
+                           WorldShop.getStoreManager().nextCompletedTradesPage((Player) e.getWhoClicked(), currentPage);
+                       }
+                       break;
+
+                   case 29: // Prev Page
+                       if (e.getCurrentItem().getType().equals(Material.ARROW)) {
+                           WorldShop.getStoreManager().prevCompletedTradesPage((Player) e.getWhoClicked(), currentPage);
+                       }
                        break;
 
                    default:
-                       Player p = (Player) e.getWhoClicked();
-                       if (p.getInventory().firstEmpty() != -1) {
-
-                           // Update the database
-                           try {
-                               PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ?;");
-                               ps.setBoolean(1, true);
-                               ps.setLong(2, System.currentTimeMillis());
-                               ps.setInt(3, Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()));
-
-                               ps.executeUpdate();
-
-
-                           } catch (SQLException ev) {
-                               ev.printStackTrace();
-                           }
-
-                           e.getCurrentItem().setItemMeta(null);
-
-                           p.getInventory().addItem(e.getCurrentItem());
-                           e.getInventory().removeItem(e.getCurrentItem());
-
-                       } else {
-                           p.sendMessage(ChatColor.RED + "There is not enough space in your inventory to collect the item! Please make some space!");
-                       }
                        break;
+               }
+           } else {
+
+               Player p = (Player) e.getWhoClicked();
+               if (p.getInventory().firstEmpty() != -1) {
+
+                   // Update the database
+                   try {
+                       PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ?;");
+                       ps.setBoolean(1, true);
+                       ps.setLong(2, System.currentTimeMillis());
+                       ps.setInt(3, Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()));
+
+                       ps.executeUpdate();
+
+
+                   } catch (SQLException ev) {
+                       ev.printStackTrace();
+                   }
+
+                   e.getCurrentItem().setItemMeta(null);
+
+                   p.getInventory().addItem(e.getCurrentItem());
+                   e.getInventory().removeItem(e.getCurrentItem());
+
+               } else {
+                   p.sendMessage(ChatColor.RED + "There is not enough space in your inventory to collect the item! Please make some space!");
                }
            }
         }

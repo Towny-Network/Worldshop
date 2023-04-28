@@ -321,10 +321,10 @@ public class StoreManager {
      * LOCALIZED ITEM IDENTIFIER: backButton "ViewCurrentListingsScreen"
      * @param player player you want to open the item selling interface.
      */
-    public void viewCurrentListings (Player player) {
+    public void viewCurrentListings (Player player, int page) {
         playersWithStoreOpen.add(player);
 
-        Inventory gui = Bukkit.createInventory(null, 27, "Current Listings");
+        Inventory gui = Bukkit.createInventory(null, 36, "Current Listings");
 
         // Back Button
         ItemStack backButton;
@@ -335,45 +335,55 @@ public class StoreManager {
         backButtonMeta.setDisplayName("Back");
         backButtonMeta.setLocalizedName("ViewCurrentListingsScreen");
         backButton.setItemMeta(backButtonMeta);
-        gui.setItem(0, backButton);
+        gui.setItem(31, backButton);
 
-        // Dividers
-        ItemStack divider = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta dividerMeta = divider.getItemMeta();
+        // Prev Page Button
+        ItemStack prevPage;
+        ItemMeta prevPageMeta;
 
-        dividerMeta.setDisplayName("\u200E ");
-        dividerMeta.setLocalizedName("Divider");
-        divider.setItemMeta(dividerMeta);
-        gui.setItem(1, divider);
-        gui.setItem(10, divider);
-        gui.setItem(19, divider);
-
-
-        ArrayList<Trade> openTrades = new ArrayList<>();
-        try {
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM trades WHERE seller_uuid = ? AND status = ?;");
-            ps.setString(1, player.getUniqueId().toString());
-            ps.setInt(2, TradeStatus.OPEN.ordinal());
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                openTrades.add(getTradeFromTradeID(rs.getInt("trade_id")));
-            }
-
-            rs.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (PageUtils.isPageValid(getAllCurrentTradesDisplayItems(player), page - 1, 27)) {
+            prevPage = new ItemStack(Material.ARROW);
+            prevPageMeta = prevPage.getItemMeta();
+            prevPageMeta.setDisplayName(ChatColor.RED + "Previous Page");
+        } else {
+            prevPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            prevPageMeta = prevPage.getItemMeta();
+            prevPageMeta.setDisplayName(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "Previous Page");
         }
 
-        int count = 0;
-        for (Trade t : openTrades) {
-            gui.setItem((count % 9) + 2, t.generateDisplayItem());
-            count++;
+        prevPageMeta.setLocalizedName(page + "");
+        prevPage.setItemMeta(prevPageMeta);
+        gui.setItem(29, prevPage);
+
+        // Next Page Button
+        ItemStack nextPage;
+        ItemMeta nextPageMeta;
+
+        if (PageUtils.isPageValid(getAllCurrentTradesDisplayItems(player), page + 1, 27)) {
+            nextPage = new ItemStack(Material.ARROW);
+            nextPageMeta = nextPage.getItemMeta();
+            nextPageMeta.setDisplayName(ChatColor.RED + "Next Page");
+        } else {
+            nextPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            nextPageMeta = nextPage.getItemMeta();
+            nextPageMeta.setDisplayName(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "Next Page");
+        }
+        nextPage.setItemMeta(nextPageMeta);
+        gui.setItem(33, nextPage);
+
+        for (ItemStack item: PageUtils.getPageItems(getAllCurrentTradesDisplayItems(player), page, 27)) {
+            gui.addItem(item);
         }
 
         player.openInventory(gui);
+    }
 
+    public void nextCurrentListingsPage(Player player, int currentPage) {
+        viewCurrentListings(player, currentPage + 1);
+    }
+
+    public void prevCurrentListingsPage(Player player, int currentPage) {
+        viewCurrentListings(player, currentPage - 1);
     }
 
     public void viewTrade(Trade trade, Player player) {
@@ -453,10 +463,10 @@ public class StoreManager {
      * LOCALIZED ITEM IDENTIFIER: backButton "ViewCompletedTradesScreen"
      * @param player player you want to open the item selling interface.
      */
-    public void viewCompletedTrades (Player player) {
+    public void viewCompletedTrades (Player player, int page) {
         playersWithStoreOpen.add(player);
 
-        Inventory gui = Bukkit.createInventory(null, 27, "Completed Trades");
+        Inventory gui = Bukkit.createInventory(null, 36, "Completed Trades");
 
         // Back Button
         ItemStack backButton;
@@ -467,58 +477,58 @@ public class StoreManager {
         backButtonMeta.setDisplayName("Back");
         backButtonMeta.setLocalizedName("ViewCompletedTradesScreen");
         backButton.setItemMeta(backButtonMeta);
-        gui.setItem(0, backButton);
+        gui.setItem(31, backButton);
 
-        // Dividers
-        ItemStack divider = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta dividerMeta = divider.getItemMeta();
+        // Prev Page Button
+        ItemStack prevPage;
+        ItemMeta prevPageMeta;
 
-        dividerMeta.setDisplayName("\u200E ");
-        dividerMeta.setLocalizedName("Divider");
-        divider.setItemMeta(dividerMeta);
-        gui.setItem(1, divider);
-        gui.setItem(10, divider);
-        gui.setItem(19, divider);
+        if (PageUtils.isPageValid(getAllCompletedTradesItems(player), page - 1, 27)) {
+            prevPage = new ItemStack(Material.ARROW);
+            prevPageMeta = prevPage.getItemMeta();
+            prevPageMeta.setDisplayName(ChatColor.RED + "Previous Page");
+        } else {
+            prevPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            prevPageMeta = prevPage.getItemMeta();
+            prevPageMeta.setDisplayName(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "Previous Page");
+        }
+        prevPageMeta.setLocalizedName(page + "");
+        prevPage.setItemMeta(prevPageMeta);
+        gui.setItem(29, prevPage);
+
+        // Next Page Button
+        ItemStack nextPage;
+        ItemMeta nextPageMeta;
+
+        if (PageUtils.isPageValid(getAllCompletedTradesItems(player), page + 1, 27)) {
+            nextPage = new ItemStack(Material.ARROW);
+            nextPageMeta = nextPage.getItemMeta();
+            nextPageMeta.setDisplayName(ChatColor.RED + "Next Page");
+        } else {
+            nextPage = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            nextPageMeta = nextPage.getItemMeta();
+            nextPageMeta.setDisplayName(ChatColor.RED + "" + ChatColor.STRIKETHROUGH + "Next Page");
+        }
+        nextPage.setItemMeta(nextPageMeta);
+        gui.setItem(33, nextPage);
 
         //Todo: Populate remaining slots w/ completed trades posted by player
         // This may have to be pageable to fit rewards on multiple pages
         // Also there should also probably be an expire time on the rewards
-        ArrayList<Pickup> pickups = new ArrayList<>();
-        try {
 
-            PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("SELECT * FROM pickups WHERE player_uuid = ? AND collected = ?;");
-            ps.setString(1, String.valueOf(player.getUniqueId()));
-            ps.setBoolean(2, false);
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                pickups.add(new Pickup(Bukkit.getPlayer(UUID.fromString(rs.getString("player_uuid"))),
-                        ItemStack.deserializeBytes(rs.getBytes("pickup_item")),
-                        rs.getInt("trade_id"), rs.getBoolean("collected"),
-                        rs.getLong("time_collected"))
-                );
-            }
-
-            rs.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-
-        int count = 0;
-
-        for (Pickup p : pickups) {
-            ItemStack item = p.getItem();
-            ItemMeta itemMeta = item.getItemMeta();
-            itemMeta.setLocalizedName(String.valueOf(p.getTradeID()));
-            item.setItemMeta(itemMeta);
-
-            gui.setItem((count % 9) + 2, item);
-            count++;
+        for (ItemStack item: PageUtils.getPageItems(getAllCompletedTradesItems(player), page, 27)) {
+            gui.addItem(item);
         }
 
         player.openInventory(gui);
+    }
+
+    public void nextCompletedTradesPage(Player player, int currentPage) {
+        viewCompletedTrades(player, currentPage + 1);
+    }
+
+    public void prevCompletedTradesPage(Player player, int currentPage) {
+        viewCompletedTrades(player, currentPage - 1);
     }
 
     /**
@@ -774,6 +784,76 @@ public class StoreManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    public List<ItemStack> getAllCurrentTradesDisplayItems(Player player) {
+        List<ItemStack> items = new ArrayList<>();
+
+        ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE status = ? AND seller_uuid = ?;",
+                new Object[]{TradeStatus.OPEN.ordinal(), player.getUniqueId()},
+                new int[]{Types.INTEGER, Types.VARCHAR});
+
+        try {
+            while (rs.next()) {
+                // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
+                OfflinePlayer buyer = null;
+                String buyerUUID = rs.getString("buyer_uuid");
+                if (!rs.wasNull()) {
+                    buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
+                }
+
+                items.add(new Trade(rs.getInt("trade_id"),
+                        TradeStatus.values()[rs.getInt("status")],
+                        Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
+                        buyer,
+                        ItemStack.deserializeBytes(rs.getBytes("for_sale")),
+                        ItemStack.deserializeBytes(rs.getBytes("in_return")),
+                        rs.getLong("time_listed"),
+                        rs.getLong("time_completed")
+                ).generateCurrentTradeDisplayItem());
+            }
+
+            rs.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return items;
+    }
+
+    public List<ItemStack> getAllCompletedTradesItems(Player player) {
+        ArrayList<ItemStack> pickups = new ArrayList<>();
+
+        ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM pickups WHERE player_uuid = ? AND collected = ?;",
+                new Object[]{player.getUniqueId(), false},
+                new int[]{Types.VARCHAR, Types.BOOLEAN});
+
+        try {
+            while (rs.next()) {
+
+                Pickup p = new Pickup(Bukkit.getPlayer(UUID.fromString(rs.getString("player_uuid"))),
+                        ItemStack.deserializeBytes(rs.getBytes("pickup_item")),
+                        rs.getInt("trade_id"), rs.getBoolean("collected"),
+                        rs.getLong("time_collected")
+                );
+
+                ItemStack item = p.getItem();
+                ItemMeta itemMeta = item.getItemMeta();
+                itemMeta.setLocalizedName(String.valueOf(p.getTradeID()));
+                item.setItemMeta(itemMeta);
+
+                pickups.add(item);
+            }
+
+            rs.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return pickups;
     }
 
     // endregion
