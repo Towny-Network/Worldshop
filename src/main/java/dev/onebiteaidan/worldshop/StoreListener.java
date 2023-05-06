@@ -429,10 +429,11 @@ public class StoreListener implements Listener {
 
                    // Update the database
                    try {
-                       PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ?;");
+                       PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ? AND player_uuid = ?;");
                        ps.setBoolean(1, true);
                        ps.setLong(2, System.currentTimeMillis());
                        ps.setInt(3, Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()));
+                       ps.setString(4, ((Player) e.getWhoClicked()).getUniqueId().toString());
 
                        ps.executeUpdate();
 

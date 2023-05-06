@@ -49,6 +49,58 @@ public class StoreManager {
                 new Object[]{sellerPickup.getPlayer().getUniqueId(), sellerPickup.getItem(), sellerPickup.getTradeID(), sellerPickup.isWithdrawn(), sellerPickup.getTimeWithdrawn()},
                 new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
         );
+
+        //Todo: Add something here to update all players with the store currently open.
+        // Also a one size fits all gui creator would be really sweet.
+        updateAllPlayers();
+
+    }
+
+    public void updateAllPlayers() {
+        for (Player player : playersWithStoreOpen) {
+            switch (player.getOpenInventory().getTopInventory().getSize()) {
+                case 54:
+                    // Main shop screen
+
+                case 36:
+                    // Current listings screen
+                    // Completed trades screen
+
+                case 27:
+                    // Sell item screen
+                    // View trade screen
+                    // Manage trades screen (doesn't need updating)
+
+                case 18:
+                    // Remove trade
+
+                case 9:
+                    // Buy item
+                    // Buy item
+            }
+        }
+    }
+
+    public void openSorryItUpdatedScreen(Player player) {
+        Inventory gui = Bukkit.createInventory(null, 27, "Oh no...");
+
+        // Home Menu Button
+        ItemStack homeMenuButton;
+        ItemMeta homeMenuButtonMeta;
+
+        homeMenuButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        homeMenuButtonMeta = homeMenuButton.getItemMeta();
+
+        homeMenuButtonMeta.setDisplayName("Oh No!");
+        ArrayList<String> lore = new ArrayList<>();
+        lore.add("The item you were viewing is no longer available!");
+        lore.add("Click here to go back to the home screen.");
+        homeMenuButtonMeta.setLore(lore);
+        homeMenuButtonMeta.setLocalizedName("SorryItUpdatedScreen");
+        homeMenuButton.setItemMeta(homeMenuButtonMeta);
+        gui.setItem(13, homeMenuButton);
+
+        player.openInventory(gui);
     }
 
     public void expireTrade(int tradeID) {
