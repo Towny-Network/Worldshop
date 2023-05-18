@@ -52,31 +52,72 @@ public class StoreManager {
 
         //Todo: Add something here to update all players with the store currently open.
         // Also a one size fits all gui creator would be really sweet.
-        updateAllPlayers();
+        updateAllPlayers(buyer);
 
     }
 
-    public void updateAllPlayers() {
-        for (Player player : playersWithStoreOpen) {
+    /**
+     * Update the store pages of all players to prevent accidental duplication
+     * @param ignorePlayer The player who just completed a trade and doesn't need to have their stuff updated
+     */
+    public void updateAllPlayers(Player ignorePlayer) {
+        for (Player player : new ArrayList<>(playersWithStoreOpen)) {
+            if (player.equals(ignorePlayer)) {
+                continue;
+            }
+
+            Inventory i =  player.getOpenInventory().getTopInventory();
             switch (player.getOpenInventory().getTopInventory().getSize()) {
                 case 54:
                     // Main shop screen
+                    if (i.getItem(49) != null && i.getItem(49).getItemMeta().hasLocalizedName() && i.getItem(49).getItemMeta().getLocalizedName().equals("WorldShopHomeScreen")) {
+                        // Get players current shop page
+                        int currentShopPage = Integer.parseInt(i.getItem(45).getItemMeta().getLocalizedName());
+                        openShop(player, currentShopPage);
+                    }
+
+                    break;
 
                 case 36:
                     // Current listings screen
+                    if (i.getItem(31) != null && i.getItem(31).getItemMeta().hasLocalizedName() && i.getItem(31).getItemMeta().getLocalizedName().equals("ViewCurrentListingsScreen")) {
+                        // Get player's current open listings page
+                        int currentListingsPage = Integer.parseInt(i.getItem(29).getItemMeta().getLocalizedName());
+                        viewCurrentListings(player, currentListingsPage);
+                    }
+
                     // Completed trades screen
+                    if (i.getItem(31) != null && i.getItem(31).getItemMeta().hasLocalizedName() && i.getItem(31).getItemMeta().getLocalizedName().equals("ViewCompletedTradesScreen"))  {
+                        // Get player's current completed trades page
+                        int currentTradesPage = Integer.parseInt(player.getOpenInventory().getTopInventory().getItem(29).getItemMeta().getLocalizedName());
+                        viewCompletedTrades(player, currentTradesPage);
+                    }
+
+                    break;
 
                 case 27:
-                    // Sell item screen
                     // View trade screen
-                    // Manage trades screen (doesn't need updating)
+                    if (i.getItem(22) != null && i.getItem(22).getItemMeta().hasLocalizedName() && i.getItem(22).getItemMeta().getLocalizedName().equals("ViewTradeScreen")) {
+                        openSorryItUpdatedScreen(player);
+                    }
+
+                    break;
 
                 case 18:
                     // Remove trade
+                    if (i.getItem(11).getItemMeta().hasLocalizedName() && i.getItem(11).getItemMeta().getLocalizedName().equals("RemoveTradeScreen")) {
+                        openSorryItUpdatedScreen(player);
+                    }
+
+                    break;
 
                 case 9:
                     // Buy item
-                    // Buy item
+                    if (i.getItem(0) != null && i.getItem(0).getItemMeta().hasLocalizedName() && i.getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
+                        openSorryItUpdatedScreen(player);
+                    }
+
+                    break;
             }
         }
     }

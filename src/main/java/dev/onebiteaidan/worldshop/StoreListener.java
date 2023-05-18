@@ -81,7 +81,7 @@ public class StoreListener implements Listener {
      * @param e event
      */
     @EventHandler
-    public void onSellScreenClick(InventoryClickEvent e) {
+    public void onSellScreenClick(InventoryClickEvent e) { //FIXME: needs localized name
         InventoryView v = e.getView();
         if (e.getInventory().getSize() == 27 && v.getItem(18) != null && v.getItem(18).getItemMeta().hasDisplayName() && v.getItem(18).getItemMeta().getLocalizedName().equals("SellItemScreen") && e.getCurrentItem() != null) {
 
