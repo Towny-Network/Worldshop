@@ -454,6 +454,14 @@ public class StoreListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onSorryItUpdatedScreenClick(InventoryClickEvent e) {
+        if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 && e.getView().getItem(13) != null && e.getView().getItem(13).getItemMeta().hasLocalizedName() && e.getView().getItem(13).getItemMeta().getLocalizedName().equals("SorryItUpdatedScreen")) {
+            Player player = (Player) e.getWhoClicked();
+            WorldShop.getStoreManager().openShop(player, 1);
+        }
+    }
+
 
 
     /**

@@ -70,6 +70,7 @@ public class StoreManager {
             switch (player.getOpenInventory().getTopInventory().getSize()) {
                 case 54:
                     // Main shop screen
+                    System.out.println("HIT");
                     if (i.getItem(49) != null && i.getItem(49).getItemMeta().hasLocalizedName() && i.getItem(49).getItemMeta().getLocalizedName().equals("WorldShopHomeScreen")) {
                         // Get players current shop page
                         int currentShopPage = Integer.parseInt(i.getItem(45).getItemMeta().getLocalizedName());
@@ -106,6 +107,7 @@ public class StoreManager {
                 case 18:
                     // Remove trade
                     if (i.getItem(11).getItemMeta().hasLocalizedName() && i.getItem(11).getItemMeta().getLocalizedName().equals("RemoveTradeScreen")) {
+                        System.out.println("HIT2");
                         openSorryItUpdatedScreen(player);
                     }
 
@@ -114,6 +116,7 @@ public class StoreManager {
                 case 9:
                     // Buy item
                     if (i.getItem(0) != null && i.getItem(0).getItemMeta().hasLocalizedName() && i.getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
+                        System.out.println("HIT3");
                         openSorryItUpdatedScreen(player);
                     }
 
@@ -480,6 +483,7 @@ public class StoreManager {
     }
 
     public void viewTrade(Trade trade, Player player) {
+        playersWithStoreOpen.add(player);
         Inventory gui = Bukkit.createInventory(null, 27, "Trade Viewer");
 
         // Item Being Sold
@@ -528,6 +532,7 @@ public class StoreManager {
     }
 
     public void removeTradeScreen(Trade trade, Player player) {
+        playersWithStoreOpen.add(player);
         Inventory gui = Bukkit.createInventory(null, 18, "Delete This Trade?");
 
         // Yes Delete Button
