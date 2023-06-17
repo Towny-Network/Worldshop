@@ -5,6 +5,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Objects;
+
+import static it.unimi.dsi.fastutil.io.FastBufferedOutputStream.DEFAULT_BUFFER_SIZE;
 
 public class Config {
     protected final boolean createIfNotExist, resource;
@@ -27,11 +33,32 @@ public class Config {
         this.name = name + ".yml";
         this.createIfNotExist = createIfNotExist;
         this.resource = resource;
-        create();
+
+        file = new File(path.getAbsolutePath() + File.separator + this.name);
+
+        if (!file.exists()) {
+            try {
+                copyInputStreamToFile(Objects.requireNonNull(plugin.getResource(this.name)), file);
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        config = YamlConfiguration.loadConfiguration(file);
     }
 
-    public Config(Plugin instance, String path, String name, boolean createIfNotExist, boolean resource) {
-        this(instance, new File(path), name, createIfNotExist, resource);
+    // Grabbed this function from: https://mkyong.com/java/how-to-convert-inputstream-to-file-in-java/
+    private static void copyInputStreamToFile(InputStream inputStream, File file)
+            throws IOException {
+
+        // append = false
+        try (FileOutputStream outputStream = new FileOutputStream(file, false)) {
+            int read;
+            byte[] bytes = new byte[DEFAULT_BUFFER_SIZE];
+            while ((read = inputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, read);
+            }
+        }
     }
 
     public FileConfiguration getConfig() {
@@ -41,55 +68,14 @@ public class Config {
 
     //region Getters, variables and constructors
 
-    public void save() {
-        try {
-            config.save(file);
-        } catch (Exception exc) {
-            exc.printStackTrace();
-        }
-    }
-
-    public File reloadFile() {
-        file = new File(path, name);
-        return file;
-    }
-
     public FileConfiguration reloadConfig() {
         config = YamlConfiguration.loadConfiguration(file);
         return config;
-    }
-
-    public void reload() {
-        reloadFile();
-        reloadConfig();
-    }
-
-    public void create() {
-        if (file == null) {
-            reload();
-        }
-        if (!createIfNotExist || file.exists()) {
-            return;
-        }
-        file.getParentFile().mkdirs();
-        if (resource) {
-            plugin.saveResource(name, false);
-        } else {
-            try {
-                file.createNewFile();
-            } catch (Exception exc) {
-                exc.printStackTrace();
-            }
-        }
-        if (config == null) {
-            reloadConfig();
-        }
     }
     //endregion
 
 
     // Methods to grab values from the config file
-
     //region Database methods
     public static String getDatabaseType() {
         return config.getString("Database.Type");
