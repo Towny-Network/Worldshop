@@ -49,6 +49,102 @@ public class StoreManager {
                 new Object[]{sellerPickup.getPlayer().getUniqueId(), sellerPickup.getItem(), sellerPickup.getTradeID(), sellerPickup.isWithdrawn(), sellerPickup.getTimeWithdrawn()},
                 new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
         );
+
+        //Todo: Add something here to update all players with the store currently open.
+        // Also a one size fits all gui creator would be really sweet.
+        updateAllPlayers(buyer);
+
+    }
+
+    /**
+     * Update the store pages of all players to prevent accidental duplication
+     * @param ignorePlayer The player who just completed a trade and doesn't need to have their stuff updated
+     */
+    public void updateAllPlayers(Player ignorePlayer) {
+        for (Player player : new ArrayList<>(playersWithStoreOpen)) {
+            if (player.equals(ignorePlayer)) {
+                continue;
+            }
+
+            Inventory i =  player.getOpenInventory().getTopInventory();
+            switch (player.getOpenInventory().getTopInventory().getSize()) {
+                case 54:
+                    // Main shop screen
+                    System.out.println("HIT");
+                    if (i.getItem(49) != null && i.getItem(49).getItemMeta().hasLocalizedName() && i.getItem(49).getItemMeta().getLocalizedName().equals("WorldShopHomeScreen")) {
+                        // Get players current shop page
+                        int currentShopPage = Integer.parseInt(i.getItem(45).getItemMeta().getLocalizedName());
+                        openShop(player, currentShopPage);
+                    }
+
+                    break;
+
+                case 36:
+                    // Current listings screen
+                    if (i.getItem(31) != null && i.getItem(31).getItemMeta().hasLocalizedName() && i.getItem(31).getItemMeta().getLocalizedName().equals("ViewCurrentListingsScreen")) {
+                        // Get player's current open listings page
+                        int currentListingsPage = Integer.parseInt(i.getItem(29).getItemMeta().getLocalizedName());
+                        viewCurrentListings(player, currentListingsPage);
+                    }
+
+                    // Completed trades screen
+                    if (i.getItem(31) != null && i.getItem(31).getItemMeta().hasLocalizedName() && i.getItem(31).getItemMeta().getLocalizedName().equals("ViewCompletedTradesScreen"))  {
+                        // Get player's current completed trades page
+                        int currentTradesPage = Integer.parseInt(player.getOpenInventory().getTopInventory().getItem(29).getItemMeta().getLocalizedName());
+                        viewCompletedTrades(player, currentTradesPage);
+                    }
+
+                    break;
+
+                case 27:
+                    // View trade screen
+                    if (i.getItem(22) != null && i.getItem(22).getItemMeta().hasLocalizedName() && i.getItem(22).getItemMeta().getLocalizedName().equals("ViewTradeScreen")) {
+                        openSorryItUpdatedScreen(player);
+                    }
+
+                    break;
+
+                case 18:
+                    // Remove trade
+                    if (i.getItem(11).getItemMeta().hasLocalizedName() && i.getItem(11).getItemMeta().getLocalizedName().equals("RemoveTradeScreen")) {
+                        System.out.println("HIT2");
+                        openSorryItUpdatedScreen(player);
+                    }
+
+                    break;
+
+                case 9:
+                    // Buy item
+                    if (i.getItem(0) != null && i.getItem(0).getItemMeta().hasLocalizedName() && i.getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
+                        System.out.println("HIT3");
+                        openSorryItUpdatedScreen(player);
+                    }
+
+                    break;
+            }
+        }
+    }
+
+    public void openSorryItUpdatedScreen(Player player) {
+        Inventory gui = Bukkit.createInventory(null, 27, "Oh no...");
+
+        // Home Menu Button
+        ItemStack homeMenuButton;
+        ItemMeta homeMenuButtonMeta;
+
+        homeMenuButton = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        homeMenuButtonMeta = homeMenuButton.getItemMeta();
+
+        homeMenuButtonMeta.setDisplayName("Oh No!");
+        ArrayList<String> lore = new ArrayList<>();
+        lore.add("The item you were viewing is no longer available!");
+        lore.add("Click here to go back to the home screen.");
+        homeMenuButtonMeta.setLore(lore);
+        homeMenuButtonMeta.setLocalizedName("SorryItUpdatedScreen");
+        homeMenuButton.setItemMeta(homeMenuButtonMeta);
+        gui.setItem(13, homeMenuButton);
+
+        player.openInventory(gui);
     }
 
     public void expireTrade(int tradeID) {
@@ -387,6 +483,7 @@ public class StoreManager {
     }
 
     public void viewTrade(Trade trade, Player player) {
+        playersWithStoreOpen.add(player);
         Inventory gui = Bukkit.createInventory(null, 27, "Trade Viewer");
 
         // Item Being Sold
@@ -435,6 +532,7 @@ public class StoreManager {
     }
 
     public void removeTradeScreen(Trade trade, Player player) {
+        playersWithStoreOpen.add(player);
         Inventory gui = Bukkit.createInventory(null, 18, "Delete This Trade?");
 
         // Yes Delete Button

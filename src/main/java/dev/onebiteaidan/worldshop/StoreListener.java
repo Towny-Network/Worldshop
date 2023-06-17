@@ -81,7 +81,7 @@ public class StoreListener implements Listener {
      * @param e event
      */
     @EventHandler
-    public void onSellScreenClick(InventoryClickEvent e) {
+    public void onSellScreenClick(InventoryClickEvent e) { //FIXME: needs localized name
         InventoryView v = e.getView();
         if (e.getInventory().getSize() == 27 && v.getItem(18) != null && v.getItem(18).getItemMeta().hasDisplayName() && v.getItem(18).getItemMeta().getLocalizedName().equals("SellItemScreen") && e.getCurrentItem() != null) {
 
@@ -429,10 +429,11 @@ public class StoreListener implements Listener {
 
                    // Update the database
                    try {
-                       PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ?;");
+                       PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ? AND player_uuid = ?;");
                        ps.setBoolean(1, true);
                        ps.setLong(2, System.currentTimeMillis());
                        ps.setInt(3, Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()));
+                       ps.setString(4, ((Player) e.getWhoClicked()).getUniqueId().toString());
 
                        ps.executeUpdate();
 
@@ -450,6 +451,14 @@ public class StoreListener implements Listener {
                    p.sendMessage(ChatColor.RED + "There is not enough space in your inventory to collect the item! Please make some space!");
                }
            }
+        }
+    }
+
+    @EventHandler
+    public void onSorryItUpdatedScreenClick(InventoryClickEvent e) {
+        if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 && e.getView().getItem(13) != null && e.getView().getItem(13).getItemMeta().hasLocalizedName() && e.getView().getItem(13).getItemMeta().getLocalizedName().equals("SorryItUpdatedScreen")) {
+            Player player = (Player) e.getWhoClicked();
+            WorldShop.getStoreManager().openShop(player, 1);
         }
     }
 
