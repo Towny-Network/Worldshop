@@ -1,10 +1,11 @@
 # Worldshop
 
 Features to do before release:
-- Build shop GUIs
+~~- Build shop GUIs~~
 ~~- Build core trading functionality~~
-- Implement ability to use ~~MySQL~~ and SQLite
-- Prevent items from being duped by being sold twice (sell detection)
+~~- Implement ability to use ~~MySQL~~ and SQLite~~
+~~- Prevent items from being duped by being sold twice (sell detection)~~
+- Test to make sure the MySQL implementation works correctly
 - Refactoring
 
 Features to add in the future
