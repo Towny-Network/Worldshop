@@ -28,6 +28,7 @@ public class MySQL implements Database {
         config.setJdbcUrl("jdbc:mysql://" + HOST + ":" + PORT);
         config.setUsername(USERNAME);
         config.setPassword(PASSWORD);
+        config.setMaximumPoolSize(1000);
         // Other configuration options like maximumPoolSize, connectionTimeout, etc.
 
         hikari = new HikariDataSource(config);
@@ -153,7 +154,6 @@ public class MySQL implements Database {
 
     @Override
     public void createTradesTable() {
-        this.run("USE " + DATABASE + ";");
         this.run(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
                 "CREATE TABLE IF NOT EXISTS trades" +
                         "(" +

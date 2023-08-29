@@ -26,7 +26,7 @@ public class StoreManager {
 
     public void createTrade(Trade t) {
         WorldShop.getDatabase().update("INSERT INTO trades (seller_uuid, buyer_uuid, for_sale, in_return, status, time_listed, time_completed) VALUES (?,?,?,?,?,?,?);",
-                new Object[]{t.getSeller().getUniqueId(), null, t.getForSale(), t.getInReturn(), t.getStatus().ordinal(), t.getTimeListed(), 0L},
+                new Object[]{t.getSeller().getUniqueId().toString(), null, t.getForSale(), t.getInReturn(), t.getStatus().ordinal(), t.getTimeListed(), 0L},
                 new int[]{Types.VARCHAR, Types.NULL, Types.BLOB, Types.BLOB, Types.INTEGER, Types.BIGINT, Types.BIGINT}
         );
     }
@@ -41,12 +41,12 @@ public class StoreManager {
         Pickup sellerPickup = new Pickup(t.getSeller(), t.getInReturn(), tradeID, false, 0L);
 
         WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
-                new Object[]{buyerPickup.getPlayer().getUniqueId(), buyerPickup.getItem(), buyerPickup.getTradeID(), buyerPickup.isWithdrawn(), buyerPickup.getTimeWithdrawn()},
+                new Object[]{buyerPickup.getPlayer().getUniqueId().toString(), buyerPickup.getItem(), buyerPickup.getTradeID(), buyerPickup.isWithdrawn(), buyerPickup.getTimeWithdrawn()},
                 new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
         );
 
         WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
-                new Object[]{sellerPickup.getPlayer().getUniqueId(), sellerPickup.getItem(), sellerPickup.getTradeID(), sellerPickup.isWithdrawn(), sellerPickup.getTimeWithdrawn()},
+                new Object[]{sellerPickup.getPlayer().getUniqueId().toString(), sellerPickup.getItem(), sellerPickup.getTradeID(), sellerPickup.isWithdrawn(), sellerPickup.getTimeWithdrawn()},
                 new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
         );
 
@@ -155,7 +155,7 @@ public class StoreManager {
         Pickup forSalePickup = new Pickup(t.getSeller(), t.getForSale(), tradeID, false, 0L);
 
         WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
-                new Object[]{forSalePickup.getPlayer().getUniqueId(), forSalePickup.getItem(), forSalePickup.getTradeID(), forSalePickup.isWithdrawn(), forSalePickup.getTimeWithdrawn()},
+                new Object[]{forSalePickup.getPlayer().getUniqueId().toString(), forSalePickup.getItem(), forSalePickup.getTradeID(), forSalePickup.isWithdrawn(), forSalePickup.getTimeWithdrawn()},
                 new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
         );
     }
@@ -168,7 +168,7 @@ public class StoreManager {
         Pickup forSalePickup = new Pickup(t.getSeller(), t.getForSale(), tradeID, false, 0L);
 
         WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
-                new Object[]{forSalePickup.getPlayer().getUniqueId(), forSalePickup.getItem(), forSalePickup.getTradeID(), forSalePickup.isWithdrawn(), forSalePickup.getTimeWithdrawn()},
+                new Object[]{forSalePickup.getPlayer().getUniqueId().toString(), forSalePickup.getItem(), forSalePickup.getTradeID(), forSalePickup.isWithdrawn(), forSalePickup.getTimeWithdrawn()},
                 new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
         );
     }
@@ -728,7 +728,7 @@ public class StoreManager {
         List<ItemStack> items = new ArrayList<>();
 
         ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE status = ? AND seller_uuid <> ?;",
-                new Object[]{TradeStatus.OPEN.ordinal(), player.getUniqueId()},
+                new Object[]{TradeStatus.OPEN.ordinal(), player.getUniqueId().toString()},
                 new int[]{Types.INTEGER, Types.VARCHAR});
 
         try {
@@ -889,7 +889,7 @@ public class StoreManager {
         List<ItemStack> items = new ArrayList<>();
 
         ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE status = ? AND seller_uuid = ?;",
-                new Object[]{TradeStatus.OPEN.ordinal(), player.getUniqueId()},
+                new Object[]{TradeStatus.OPEN.ordinal(), player.getUniqueId().toString()},
                 new int[]{Types.INTEGER, Types.VARCHAR});
 
         try {
@@ -925,7 +925,7 @@ public class StoreManager {
         ArrayList<ItemStack> pickups = new ArrayList<>();
 
         ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM pickups WHERE player_uuid = ? AND collected = ?;",
-                new Object[]{player.getUniqueId(), false},
+                new Object[]{player.getUniqueId().toString(), false},
                 new int[]{Types.VARCHAR, Types.BOOLEAN});
 
         try {
