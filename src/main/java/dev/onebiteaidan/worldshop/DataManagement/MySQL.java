@@ -32,12 +32,16 @@ public class MySQL implements Database {
 
         hikari = new HikariDataSource(config);
 
-
-        //FIXME: Database creates database if non-existent but will not use it
-
         if (this.isConnected()) {
+            // First, create the database if it doesn't exist
             this.run("CREATE DATABASE IF NOT EXISTS " + DATABASE + ";");
-            this.run("USE " + DATABASE + ";");
+
+            // Then, close the existing connection to create a new one to the specific database
+            hikari.close();
+
+            // Reconfigure HikariCP to connect to the specific database
+            config.setJdbcUrl("jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE);
+            hikari = new HikariDataSource(config);
         }
     }
 
