@@ -16,22 +16,29 @@ public class MySQL implements Database {
     private final String DATABASE = Config.getDatabase();
     private final String USERNAME = Config.getUsername();
     private final String PASSWORD = Config.getPassword();
-    private String databaseName;
 
     private HikariDataSource hikari;
 
-    public MySQL(String databaseName) {
-        this.databaseName = databaseName;
+    public MySQL() {
+
     }
 
     public void connect() {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE);
+        config.setJdbcUrl("jdbc:mysql://" + HOST + ":" + PORT);
         config.setUsername(USERNAME);
         config.setPassword(PASSWORD);
         // Other configuration options like maximumPoolSize, connectionTimeout, etc.
 
         hikari = new HikariDataSource(config);
+
+
+
+
+        if (this.isConnected()) {
+            this.run("CREATE DATABASE IF NOT EXISTS " + DATABASE + ";");
+            this.run("USE " + DATABASE + ";");
+        }
     }
 
     public boolean isConnected() {
@@ -136,12 +143,13 @@ public class MySQL implements Database {
     }
 
     public void createDatabase(String name) {
-        this.run("CREATE DATABASE IF NOT EXISTS " + name);
-        this.run("USE " + name);
+        this.run("CREATE DATABASE IF NOT EXISTS " + name + ";");
+        this.run("USE " + name + ";");
     }
 
     @Override
     public void createTradesTable() {
+        this.run("USE " + DATABASE + ";");
         this.run(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
                 "CREATE TABLE IF NOT EXISTS trades" +
                         "(" +

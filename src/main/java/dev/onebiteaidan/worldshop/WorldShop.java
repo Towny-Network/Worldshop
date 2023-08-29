@@ -37,7 +37,7 @@ public final class WorldShop extends JavaPlugin {
                 break;
 
             case "MySQL":
-                database = new MySQL("worldshop");
+                database = new MySQL();
                 break;
 
             default: // Disables the plugin if the database cannot be initialized.
