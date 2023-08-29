@@ -33,11 +33,11 @@ public final class WorldShop extends JavaPlugin {
         //Setting up database
         switch(Config.getDatabaseType()) {
             case "SQLite":
-                database = new SQLite("shop.db");
+                database = new SQLite("worldshop.db");
                 break;
 
             case "MySQL":
-                database = new MySQL();
+                database = new MySQL("worldshop");
                 break;
 
             default: // Disables the plugin if the database cannot be initialized.
@@ -47,11 +47,12 @@ public final class WorldShop extends JavaPlugin {
 
         try {
             database.connect();
-        } catch (SQLException e) { // Disabled the plugin if the database throws exception while trying to connect.
+        } catch (Exception e) { // Disable the plugin if the database throws exception while trying to connect.
             e.printStackTrace();
             this.getLogger().severe("ERROR THROWN WHILE CONNECTING TO THE DATABASE!");
             this.onDisable();
         }
+
 
         if (database.isConnected()) {
             this.getLogger().info("Connected to its database successfully!");

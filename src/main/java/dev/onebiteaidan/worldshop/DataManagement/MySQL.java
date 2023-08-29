@@ -1,7 +1,9 @@
 package dev.onebiteaidan.worldshop.DataManagement;
 
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import dev.onebiteaidan.worldshop.StoreDataTypes.TradeStatus;
+import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,21 +16,33 @@ public class MySQL implements Database {
     private final String DATABASE = Config.getDatabase();
     private final String USERNAME = Config.getUsername();
     private final String PASSWORD = Config.getPassword();
+    private String databaseName;
 
     private HikariDataSource hikari;
 
+    public MySQL(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
     public void connect() {
-        hikari = new HikariDataSource();
-        hikari.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
-        hikari.addDataSourceProperty("serverName", HOST);
-        hikari.addDataSourceProperty("port", PORT);
-        hikari.addDataSourceProperty("databaseName", DATABASE);
-        hikari.addDataSourceProperty("user", USERNAME);
-        hikari.addDataSourceProperty("password", PASSWORD);
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE);
+        config.setUsername(USERNAME);
+        config.setPassword(PASSWORD);
+        // Other configuration options like maximumPoolSize, connectionTimeout, etc.
+
+        hikari = new HikariDataSource(config);
     }
 
     public boolean isConnected() {
-        return hikari != null;
+        if (hikari != null) {
+            try {
+                return hikari.getConnection() != null;
+            } catch(SQLException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     public void disconnect() {
@@ -121,6 +135,11 @@ public class MySQL implements Database {
         }
     }
 
+    public void createDatabase(String name) {
+        this.run("CREATE DATABASE IF NOT EXISTS " + name);
+        this.run("USE " + name);
+    }
+
     @Override
     public void createTradesTable() {
         this.run(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
@@ -158,8 +177,8 @@ public class MySQL implements Database {
                 "CREATE TABLE IF NOT EXISTS players" +
                         "(" +
                         "uuid varchar(36) UNIQUE," + // The length of a UUID will never be longer than 36 characters and will always be unique
-                        "purchases int SET DEFAULT 0," + // Number of purchases
-                        "sales int SET DEFAULT 0," + // Number of sales
+                        "purchases int DEFAULT 0," + // Number of purchases
+                        "sales int DEFAULT 0" + // Number of sales
                         ");"
         );
     }
