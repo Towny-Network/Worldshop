@@ -117,6 +117,7 @@ public class SQLite implements Database {
                         break;
                     case Types.NULL:
                         ps.setNull(i + 1, Types.NULL);
+                        //todo: does this need a break statement?
                     case Types.BLOB:
                         ps.setBytes(i + 1, ((ItemStack) arguments[i]).serializeAsBytes());
                         break;

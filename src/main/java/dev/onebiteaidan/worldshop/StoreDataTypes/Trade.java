@@ -186,7 +186,7 @@ public class Trade {
 
     public void setBuyer(Player buyer) {
         WorldShop.getDatabase().update("UPDATE trades SET buyer_uuid = ? WHERE trade_id = ?;",
-                new Object[]{buyer.getUniqueId(), this.tradeID},
+                new Object[]{buyer.getUniqueId().toString(), this.tradeID},
                 new int[]{Types.VARCHAR, Types.INTEGER}
         );
 
