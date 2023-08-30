@@ -88,6 +88,9 @@ public class MySQL implements Database {
                     case Types.BIGINT:
                         ps.setLong(i + 1, (long) arguments[i]);
                         break;
+                    case Types.NULL:
+                        ps.setNull(i + 1, Types.NULL);
+                        break;
                     case Types.BLOB:
                         ps.setBytes(i + 1, ((ItemStack) arguments[i]).serializeAsBytes());
                         break;
@@ -121,6 +124,9 @@ public class MySQL implements Database {
                     case Types.BIGINT:
                         ps.setLong(i + 1, (long) arguments[i]);
                         break;
+                    case Types.NULL:
+                        ps.setNull(i + 1, Types.NULL);
+                        break;
                     case Types.BLOB:
                         ps.setBytes(i + 1, ((ItemStack) arguments[i]).serializeAsBytes());
                         break;
@@ -131,6 +137,8 @@ public class MySQL implements Database {
                         break;
                 }
             }
+
+            ps.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -145,11 +153,6 @@ public class MySQL implements Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public void createDatabase(String name) {
-        this.run("CREATE DATABASE IF NOT EXISTS " + name + ";");
-        this.run("USE " + name + ";");
     }
 
     @Override
