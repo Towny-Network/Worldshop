@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 public class StoreListener implements Listener {
 
@@ -428,19 +429,23 @@ public class StoreListener implements Listener {
                if (p.getInventory().firstEmpty() != -1) {
 
                    // Update the database
-                   try {
-                       PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ? AND player_uuid = ?;");
-                       ps.setBoolean(1, true);
-                       ps.setLong(2, System.currentTimeMillis());
-                       ps.setInt(3, Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()));
-                       ps.setString(4, ((Player) e.getWhoClicked()).getUniqueId().toString());
-
-                       ps.executeUpdate();
-
-
-                   } catch (SQLException ev) {
-                       ev.printStackTrace();
-                   }
+                   WorldShop.getDatabase().update("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ? AND player_uuid = ?;",
+                           new Object[]{true, System.currentTimeMillis(), Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()), p.getUniqueId().toString()},
+                           new int[]{Types.BOOLEAN, Types.BIGINT, Types.INTEGER, Types.VARCHAR}
+                   );
+//                   try {
+//                       PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ? AND player_uuid = ?;");
+//                       ps.setBoolean(1, true);
+//                       ps.setLong(2, System.currentTimeMillis());
+//                       ps.setInt(3, Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()));
+//                       ps.setString(4, ((Player) e.getWhoClicked()).getUniqueId().toString());
+//
+//                       ps.executeUpdate();
+//
+//
+//                   } catch (SQLException ev) {
+//                       ev.printStackTrace();
+//                   }
 
                    e.getCurrentItem().setItemMeta(null);
 

@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -25,10 +26,11 @@ public class PlayerManager {
     public PlayerManager() {}
 
     public PlayerProfile getPlayerStats(Player player) {
+        Connection connection = WorldShop.getDatabase().getConnection();
         try {
             ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM players WHERE uuid = ?;",
                     new Object[]{player.getUniqueId()},
-                    new int[]{Types.VARCHAR});
+                    new int[]{Types.VARCHAR}, connection);
 
             rs.next();
 
@@ -39,6 +41,7 @@ public class PlayerManager {
             );
 
             rs.close();
+            connection.close();
 
             return pp;
 

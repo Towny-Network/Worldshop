@@ -4,9 +4,11 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import dev.onebiteaidan.worldshop.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.WorldShop;
+import jdk.internal.net.http.common.Pair;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
+import javax.xml.transform.Result;
 import java.sql.*;
 
 public class MySQL implements Database {
@@ -74,9 +76,12 @@ public class MySQL implements Database {
     // THIS QUERY FUNCTION IS MADE SPECIFICALLY FOR WORLDSHOP.
     // THIS WILL NOT WORK OUT OF THE BOX IN OTHER JAVA PROJECTS.
     @Override
-    public ResultSet query(String query, Object[] arguments, int[] types) {
+    public ResultSet query(String query, Object[] arguments, int[] types, Connection connection) {
+//        if (!this.isConnected()) {
+//            this.connect();
+//        }
         try {
-            PreparedStatement ps = getConnection().prepareStatement(query);
+            PreparedStatement ps = connection.prepareStatement(query);
             for (int i = 0; i < arguments.length; i++) {
                 switch (types[i]) {
                     case Types.INTEGER:
@@ -111,8 +116,11 @@ public class MySQL implements Database {
 
     @Override
     public void update(String update, Object[] arguments, int[] types) {
-        try {
-            PreparedStatement ps = getConnection().prepareStatement(update);
+//        if (!this.isConnected()) {
+//            this.connect();
+//        }
+        try (Connection connection = hikari.getConnection()) {
+            PreparedStatement ps = connection.prepareStatement(update);
             for (int i = 0; i < arguments.length; i++) {
                 switch (types[i]) {
                     case Types.INTEGER:
@@ -147,8 +155,11 @@ public class MySQL implements Database {
 
     @Override
     public void run(String command) {
-        try (Connection connection = hikari.getConnection();
-             PreparedStatement statement = connection.prepareStatement(command)) {
+//        if (!this.isConnected()) {
+//            this.connect();
+//        }
+        try (Connection connection = hikari.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(command);
             statement.execute();
         } catch (SQLException e) {
             e.printStackTrace();

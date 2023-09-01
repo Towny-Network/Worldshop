@@ -684,11 +684,12 @@ public class StoreManager {
      * @return returns and arraylist of the display itemstacks
      */
     private List<ItemStack> getAllDisplayItems() {
+        Connection connection = WorldShop.getDatabase().getConnection();
         List<ItemStack> items = new ArrayList<>();
 
         ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE status = ?;",
                 new Object[]{TradeStatus.OPEN.ordinal()},
-                new int[]{Types.INTEGER});
+                new int[]{Types.INTEGER}, connection);
 
         try {
             while (rs.next()) {
@@ -711,6 +712,7 @@ public class StoreManager {
             }
 
             rs.close();
+            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -725,11 +727,12 @@ public class StoreManager {
      * @return returns and arraylist of the display itemstacks
      */
     private List<ItemStack> getAllDisplayItems(Player player) {
+        Connection connection = WorldShop.getDatabase().getConnection();
         List<ItemStack> items = new ArrayList<>();
 
         ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE status = ? AND seller_uuid <> ?;",
                 new Object[]{TradeStatus.OPEN.ordinal(), player.getUniqueId().toString()},
-                new int[]{Types.INTEGER, Types.VARCHAR});
+                new int[]{Types.INTEGER, Types.VARCHAR}, connection);
 
         try {
             while (rs.next()) {
@@ -752,6 +755,7 @@ public class StoreManager {
             }
 
             rs.close();
+            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -767,11 +771,12 @@ public class StoreManager {
      */
     public Trade getTradeFromDisplayItem(ItemStack displayItem) {
         if (displayItem.getItemMeta().hasLocalizedName()) {
+            Connection connection = WorldShop.getDatabase().getConnection();
             String id = displayItem.getItemMeta().getLocalizedName();
 
             ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE trade_id = ?;",
                     new Object[]{Integer.parseInt(id)},
-                    new int[]{Types.INTEGER});
+                    new int[]{Types.INTEGER}, connection);
 
             try {
                 rs.next();
@@ -794,6 +799,7 @@ public class StoreManager {
                 );
 
                 rs.close();
+                connection.close();
 
                 return t;
 
@@ -810,9 +816,10 @@ public class StoreManager {
      * @return returns thr trade associated w/ the ID. Returns null if no trade is found
      */
     public Trade getTradeFromTradeID(String id) {
+        Connection connection = WorldShop.getDatabase().getConnection();
         ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE trade_id = ?;",
                 new Object[]{Integer.parseInt(id)},
-                new int[]{Types.INTEGER});
+                new int[]{Types.INTEGER}, connection);
 
         try {
             rs.next();
@@ -835,6 +842,7 @@ public class StoreManager {
             );
 
             rs.close();
+            connection.close();
 
             return t;
 
@@ -850,9 +858,10 @@ public class StoreManager {
      * @return returns the trade associated w/ the ID. Returns null of no trade is found
      */
     public Trade getTradeFromTradeID(int id) {
+        Connection connection = WorldShop.getDatabase().getConnection();
         ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE trade_id = ?;",
                 new Object[]{id},
-                new int[]{Types.INTEGER});
+                new int[]{Types.INTEGER}, connection);
 
         try {
             rs.next();
@@ -875,6 +884,7 @@ public class StoreManager {
             );
 
             rs.close();
+            connection.close();
 
             return t;
 
@@ -886,11 +896,12 @@ public class StoreManager {
 
 
     public List<ItemStack> getAllCurrentTradesDisplayItems(Player player) {
+        Connection connection = WorldShop.getDatabase().getConnection();
         List<ItemStack> items = new ArrayList<>();
 
         ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE status = ? AND seller_uuid = ?;",
                 new Object[]{TradeStatus.OPEN.ordinal(), player.getUniqueId().toString()},
-                new int[]{Types.INTEGER, Types.VARCHAR});
+                new int[]{Types.INTEGER, Types.VARCHAR}, connection);
 
         try {
             while (rs.next()) {
@@ -913,6 +924,7 @@ public class StoreManager {
             }
 
             rs.close();
+            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -922,11 +934,12 @@ public class StoreManager {
     }
 
     public List<ItemStack> getAllCompletedTradesItems(Player player) {
+        Connection connection = WorldShop.getDatabase().getConnection();
         ArrayList<ItemStack> pickups = new ArrayList<>();
 
         ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM pickups WHERE player_uuid = ? AND collected = ?;",
                 new Object[]{player.getUniqueId().toString(), false},
-                new int[]{Types.VARCHAR, Types.BOOLEAN});
+                new int[]{Types.VARCHAR, Types.BOOLEAN}, connection);
 
         try {
             while (rs.next()) {
@@ -946,6 +959,7 @@ public class StoreManager {
             }
 
             rs.close();
+            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
