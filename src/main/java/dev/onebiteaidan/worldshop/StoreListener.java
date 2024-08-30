@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 
 public class StoreListener implements Listener {
 
@@ -28,7 +29,11 @@ public class StoreListener implements Listener {
      */
     @EventHandler
     public void onWorldShopScreenClick(InventoryClickEvent e) {
-        if (e.getInventory().getSize() == 54 && e.getCurrentItem() != null && e.getView().getItem(49) != null && e.getView().getItem(49).getItemMeta().hasLocalizedName() && e.getView().getItem(49).getItemMeta().getLocalizedName().equals("WorldShopHomeScreen")) {
+        if (e.getInventory().getSize() == 54 &&
+                e.getCurrentItem() != null &&
+                e.getView().getItem(49) != null &&
+                e.getView().getItem(49).getItemMeta().hasLocalizedName() &&
+                e.getView().getItem(49).getItemMeta().getLocalizedName().equals("WorldShopHomeScreen")) {
 
             e.setCancelled(true);
 
@@ -83,8 +88,11 @@ public class StoreListener implements Listener {
      */
     @EventHandler
     public void onSellScreenClick(InventoryClickEvent e) { //FIXME: needs localized name
-        InventoryView v = e.getView();
-        if (e.getInventory().getSize() == 27 && v.getItem(18) != null && v.getItem(18).getItemMeta().hasDisplayName() && v.getItem(18).getItemMeta().getLocalizedName().equals("SellItemScreen") && e.getCurrentItem() != null) {
+        if (e.getInventory().getSize() == 27 &&
+                e.getView().getItem(18) != null &&
+                e.getView().getItem(18).getItemMeta().hasDisplayName() &&
+                e.getView().getItem(18).getItemMeta().getLocalizedName().equals("SellItemScreen") &&
+                e.getCurrentItem() != null) {
 
             
             e.setCancelled(true);
@@ -216,7 +224,11 @@ public class StoreListener implements Listener {
      */
     @EventHandler
     public void onOpenBuyScreen(InventoryOpenEvent e) {
-        if (e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
+        if (e.getView().getItem(0) != null &&
+                e.getView().getItem(0).hasItemMeta() &&
+                e.getView().getItem(0).getItemMeta().hasLocalizedName() &&
+                e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
+
             // Check if player has the required items to buy the item
             if (Utils.getNumOfItems((Player) e.getPlayer(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
 
@@ -237,7 +249,11 @@ public class StoreListener implements Listener {
      */
     @EventHandler
     public void onBuyScreenClick(InventoryClickEvent e) {
-        if (e.getInventory().getSize() == 9 && e.getCurrentItem() != null && e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
+        if (e.getInventory().getSize() == 9 &&
+                e.getCurrentItem() != null &&
+                e.getView().getItem(0) != null &&
+                e.getView().getItem(0).getItemMeta().hasLocalizedName() &&
+                e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
 
             e.setCancelled(true);
 
@@ -297,7 +313,11 @@ public class StoreListener implements Listener {
      */
     @EventHandler
     public void onCurrentTradesScreenClick(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 && e.getView().getItem(22) != null && e.getView().getItem(22).getItemMeta().hasLocalizedName() && e.getView().getItem(22).getItemMeta().getLocalizedName().equals("ViewCurrentTradesScreen")) {
+        if (e.getCurrentItem() != null &&
+                e.getInventory().getSize() == 27 &&
+                e.getView().getItem(22) != null &&
+                e.getView().getItem(22).getItemMeta().hasLocalizedName() &&
+                e.getView().getItem(22).getItemMeta().getLocalizedName().equals("ViewCurrentTradesScreen")) {
 
             e.setCancelled(true);
 
@@ -318,7 +338,11 @@ public class StoreListener implements Listener {
 
     @EventHandler
     public void onCurrentListingsScreenClick(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null && e.getInventory().getSize() == 36 && e.getView().getItem(31) != null && e.getView().getItem(31).getItemMeta().hasLocalizedName() && e.getView().getItem(31).getItemMeta().getLocalizedName().equals("ViewCurrentListingsScreen")) {
+        if (e.getCurrentItem() != null &&
+                e.getInventory().getSize() == 36 &&
+                e.getView().getItem(31) != null &&
+                e.getView().getItem(31).getItemMeta().hasLocalizedName() &&
+                e.getView().getItem(31).getItemMeta().getLocalizedName().equals("ViewCurrentListingsScreen")) {
 
             int currentPage = Integer.parseInt(e.getView().getItem(29).getItemMeta().getLocalizedName());
 
@@ -356,7 +380,11 @@ public class StoreListener implements Listener {
     }
 
     @EventHandler public void onViewTradeScreen(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 &&e.getView().getItem(22) != null && e.getView().getItem(22).getItemMeta().hasLocalizedName() && e.getView().getItem(22).getItemMeta().getLocalizedName().equals("ViewTradeScreen")) {
+        if (e.getCurrentItem() != null &&
+                e.getInventory().getSize() == 27 &&
+                e.getView().getItem(22) != null &&
+                e.getView().getItem(22).getItemMeta().hasLocalizedName() &&
+                e.getView().getItem(22).getItemMeta().getLocalizedName().equals("ViewTradeScreen")) {
 
             e.setCancelled(true);
 
@@ -373,7 +401,10 @@ public class StoreListener implements Listener {
     }
 
     @EventHandler public void onDeleteTradeScreen(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null && e.getInventory().getSize() == 18 && e.getView().getItem(11).getItemMeta().hasLocalizedName() && e.getView().getItem(11).getItemMeta().getLocalizedName().equals("RemoveTradeScreen")) {
+        if (e.getCurrentItem() != null &&
+                e.getInventory().getSize() == 18 &&
+                e.getView().getItem(11).getItemMeta().hasLocalizedName() &&
+                e.getView().getItem(11).getItemMeta().getLocalizedName().equals("RemoveTradeScreen")) {
 
             e.setCancelled(true);
 
@@ -396,7 +427,11 @@ public class StoreListener implements Listener {
 
     @EventHandler
     public void onCompletedTradesScreenClick(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null && e.getInventory().getSize() == 36 && e.getView().getItem(31) != null && e.getView().getItem(31).getItemMeta().hasLocalizedName() && e.getView().getItem(31).getItemMeta().getLocalizedName().equals("ViewCompletedTradesScreen")) {
+        if (e.getCurrentItem() != null &&
+                e.getInventory().getSize() == 36 &&
+                e.getView().getItem(31) != null &&
+                e.getView().getItem(31).getItemMeta().hasLocalizedName() &&
+                e.getView().getItem(31).getItemMeta().getLocalizedName().equals("ViewCompletedTradesScreen")) {
 
             int currentPage = Integer.parseInt(e.getView().getItem(29).getItemMeta().getLocalizedName());
 
@@ -461,12 +496,16 @@ public class StoreListener implements Listener {
 
     @EventHandler
     public void onSorryItUpdatedScreenClick(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null && e.getInventory().getSize() == 27 && e.getView().getItem(13) != null && e.getView().getItem(13).getItemMeta().hasLocalizedName() && e.getView().getItem(13).getItemMeta().getLocalizedName().equals("SorryItUpdatedScreen")) {
+        if (e.getCurrentItem() != null &&
+                e.getInventory().getSize() == 27 &&
+                e.getView().getItem(13) != null &&
+                e.getView().getItem(13).getItemMeta().hasLocalizedName() &&
+                e.getView().getItem(13).getItemMeta().getLocalizedName().equals("SorryItUpdatedScreen")) {
+
             Player player = (Player) e.getWhoClicked();
             WorldShop.getStoreManager().openShop(player, 1);
         }
     }
-
 
 
     /**
@@ -476,6 +515,8 @@ public class StoreListener implements Listener {
      */
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
-        WorldShop.getStoreManager().playersWithStoreOpen.remove(e.getPlayer());
+        if (WorldShop.getStoreManager().playersWithStoreOpen.contains(e.getPlayer())) {
+            WorldShop.getStoreManager().playersWithStoreOpen.remove(e.getPlayer());
+        }
     }
 }
