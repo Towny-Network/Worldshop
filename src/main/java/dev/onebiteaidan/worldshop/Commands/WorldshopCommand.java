@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class TestCommand implements CommandExecutor {
+public class WorldshopCommand implements CommandExecutor {
 
     //Fixme: THIS COMMAND WILL EVENTUALLY BE REMOVED AND REPLACED WITH THE NATION SHOP SYSTEM
 

@@ -1,14 +1,12 @@
 package dev.onebiteaidan.worldshop;
 
-import dev.onebiteaidan.worldshop.Commands.TestCommand;
+import dev.onebiteaidan.worldshop.Commands.WorldshopCommand;
 import dev.onebiteaidan.worldshop.DataManagement.Config;
 import dev.onebiteaidan.worldshop.DataManagement.Database;
 import dev.onebiteaidan.worldshop.DataManagement.MySQL;
 import dev.onebiteaidan.worldshop.DataManagement.SQLite;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.sql.SQLException;
 
 public final class WorldShop extends JavaPlugin {
 
@@ -87,7 +85,7 @@ public final class WorldShop extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new StoreListener(), this);
 
         // Setting up commands
-        getCommand("test").setExecutor(new TestCommand());
+        getCommand("worldshop").setExecutor(new WorldshopCommand());
 
     }
 
