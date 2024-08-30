@@ -216,17 +216,23 @@ public class StoreListener implements Listener {
      */
     @EventHandler
     public void onOpenBuyScreen(InventoryOpenEvent e) {
-        if (e.getView().getItem(0) != null && e.getView().getItem(0).getItemMeta().hasLocalizedName() && e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
-            // Check if player has the required items to buy the item
-            if (Utils.getNumOfItems((Player) e.getPlayer(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
+        if (e.getView().getItem(0) != null) {
+            if (e.getView().getItem(0).hasItemMeta()) {
+                if (e.getView().getItem(0).getItemMeta().hasLocalizedName()) {
+                    if (e.getView().getItem(0).getItemMeta().getLocalizedName().equals("BuyItemScreen")) {
+                        // Check if player has the required items to buy the item
+                        if (Utils.getNumOfItems((Player) e.getPlayer(), e.getInventory().getItem(6)) >= e.getInventory().getItem(6).getAmount()) {
 
-                // Change confirm button to Yellow Check
-                ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");
-                ItemMeta halfConfirmMeta = halfConfirm.getItemMeta();
-                halfConfirmMeta.setDisplayName("Click to Confirm!");
-                halfConfirm.setItemMeta(halfConfirmMeta);
-                e.getInventory().setItem(5, halfConfirm);
+                            // Change confirm button to Yellow Check
+                            ItemStack halfConfirm = Utils.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=");
+                            ItemMeta halfConfirmMeta = halfConfirm.getItemMeta();
+                            halfConfirmMeta.setDisplayName("Click to Confirm!");
+                            halfConfirm.setItemMeta(halfConfirmMeta);
+                            e.getInventory().setItem(5, halfConfirm);
 
+                        }
+                    }
+                }
             }
         }
     }
