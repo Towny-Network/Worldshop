@@ -1,0 +1,40 @@
+WorldShop License
+
+Version 1.0
+
+1. Definitions
+
+    “Software”: Refers to WorldShop, including all files and source code, distributed under this license.
+    “You”: Refers to the individual or entity using or distributing the Software.
+    “Non-Commercial”: Refers to any use or distribution of the Software that is not intended for or directed toward commercial advantage or monetary compensation.
+    “Commercial Use”: Refers to any use or distribution of the Software that is intended for or directed toward commercial advantage or monetary compensation.
+
+2. Grant of License
+
+    You are granted a non-exclusive, non-transferable license to use, modify, and distribute the Software for Non-Commercial purposes only, subject to the conditions outlined in this license.
+    You are not permitted to use, distribute, or sell the Software or any derivative works for Commercial Use without the express written permission of OneBiteAidan.
+
+3. Restrictions
+
+    You may not distribute, sublicense, sell, or otherwise make the Software available for Commercial Use, including but not limited to selling, renting, leasing, or lending the compiled JARs, without a separate commercial license from OneBiteAidan.
+    You may not remove or alter any proprietary notices or labels on the Software.
+
+4. Permitted Uses
+
+    You may use the Software for personal, educational, research, or other Non-Commercial purposes.
+    You may distribute unmodified copies of the Software for Non-Commercial purposes, provided that this license is included with all copies.
+    You may create derivative works based on the Software for Non-Commercial purposes only, and you must distribute these derivative works under the same terms as this license.
+
+5. Disclaimer of Warranty
+
+    The Software is provided "as is," without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the Software or the use or other dealings in the Software.
+
+6. Commercial Use
+
+    To use, distribute, or otherwise make the Software available for Commercial Use, you must obtain a separate commercial license from OneBiteAidan.
+
+7. Termination
+
+    This license is effective until terminated. Your rights under this license will terminate automatically without notice if you fail to comply with any term(s) of this license. Upon termination, you must destroy all copies of the Software in your possession or control.
+
+By using or distributing the Software, you accept the terms and conditions of this license.

@@ -24,7 +24,8 @@ The use of JetBrains IntellJ IDEA is recommended for development of this plugin 
 
 ## Usage
 
-//TODO Instructions on how to use the project and any relevant examples.
+### Commands:
+- **/worldshop** - Opens the worldshop GUI
 
 ## Contributing
 
@@ -33,18 +34,10 @@ The use of JetBrains IntellJ IDEA is recommended for development of this plugin 
 - **Branching Strategy**: Create development branches from issues. Each branch should be named after the corresponding issue for clarity and organization.
 - **Issue Weighting**: Weight issues using Fibonacci story points (1, 2, 3, 5, 8, 13, 21, etc.) to estimate their complexity and effort required.
 
-### Testing
-
-**//TODO: Temporary guidelines for testing. Testing not implemented yet**
-
-
-- Run tests with: `npm test`
-- Add new tests for any new features or bug fixes.
-
 ### Pull Request Process
 
 1. Ensure all tests pass.
-1. Submit a pull request from your feature branch to the main branch.
+1. Submit a pull request from your feature branch to the develop branch.
 1. Include a detailed description of the changes and link to the relevant issue.
 1. Request a review from at least one team member.
 
@@ -55,7 +48,7 @@ The use of JetBrains IntellJ IDEA is recommended for development of this plugin 
 
 ### Reporting Issues
 
-- Use GitLab to report bugs or suggest features. Mark with appropriate flair/tag.
+- Use GitHub to report bugs or suggest features. Mark with appropriate flair/tag.
 - Provide detailed information and steps to reproduce the issue.
 
 ### Documentation
@@ -65,21 +58,8 @@ The use of JetBrains IntellJ IDEA is recommended for development of this plugin 
 
 ## License
 
+This software is licensed under the WorldShop License.
 
+You are free to use, modify, and distribute this software for **non-commercial purposes**. However, for **commercial use** or distribution, you must obtain a separate commercial license from OneBiteAidan.
 
-
-
-Features to add in the future
-- Make nation options like front page nation items 
-- Some customizable options (inventory texture, thank you messages, etc).
-- Simple database lookup website for staff to use to confirm trades n such
-- A discord bot that does the same as above ^^
-
-
-## Error Codes
-
-> All WorldShop Error Codes are Prefixed with "WS". (i.e. WS0000)
-
-- 0001: While buying an item, the player did not have enough items to proceed w/ purchase even though it was previously checked that they did.
-- 0002: Player attempted to sell an item without it being in their inventory.
-- 0003: No trade was found while searching w/ display item.
+To view the full license, see the [LICENSE](./LICENSE) file included in this repository.
