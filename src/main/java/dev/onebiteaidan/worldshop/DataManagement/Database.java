@@ -12,9 +12,6 @@ public interface Database {
    void disconnect();
    Connection getConnection();
    // Queries need to have the connection passed in because a ResultSet cannot be accessed after the database connection is closed.
-   ResultSet query(String query, Object[] arguments, int[] types, Connection connection);
-   void update(String update, Object[] arguments, int[] types);
-   void run (String command);
    void createTradesTable();
    void createPickupsTable();
    void createPlayersTable();

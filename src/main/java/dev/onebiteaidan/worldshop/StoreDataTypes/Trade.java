@@ -1,5 +1,7 @@
 package dev.onebiteaidan.worldshop.StoreDataTypes;
 
+import dev.onebiteaidan.worldshop.DataManagement.Database;
+import dev.onebiteaidan.worldshop.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -8,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.management.MemoryType;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 
@@ -168,10 +171,20 @@ public class Trade {
     }
 
     public void setStatus(TradeStatus status) {
-        WorldShop.getDatabase().update("UPDATE trades SET status = ? WHERE trade_id = ?;",
-                new Object[]{status.ordinal(), this.tradeID},
-                new int[]{Types.INTEGER, Types.INTEGER}
-        );
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        try {
+            qb.update("trades")
+                    .set("status = ?")
+                    .where("trade_id = ?")
+                    .addParameter(status.ordinal())
+                    .addParameter(this.tradeID)
+                    .executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         this.status = status;
     }
@@ -185,10 +198,20 @@ public class Trade {
     }
 
     public void setBuyer(Player buyer) {
-        WorldShop.getDatabase().update("UPDATE trades SET buyer_uuid = ? WHERE trade_id = ?;",
-                new Object[]{buyer.getUniqueId().toString(), this.tradeID},
-                new int[]{Types.VARCHAR, Types.INTEGER}
-        );
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        try {
+            qb.update("trades")
+                    .set("buyer_uuid = ?")
+                    .where("trade_id = ?")
+                    .addParameter(buyer.getUniqueId().toString())
+                    .addParameter(this.tradeID)
+                    .executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         this.buyer = buyer;
     }
@@ -202,9 +225,20 @@ public class Trade {
     }
 
     public void setTimeCompleted(long timeCompleted) {
-        WorldShop.getDatabase().update("UPDATE trades SET time_completed = ? WHERE trade_id = ?;",
-                new Object[]{timeCompleted, this.tradeID},
-                new int[]{Types.BIGINT, Types.INTEGER});
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        try {
+            qb.update("trades")
+                    .set("time_completed = ?")
+                    .where("trade_id = ?")
+                    .addParameter(timeCompleted)
+                    .addParameter(this.tradeID)
+                    .executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public long getTimeCompleted() {

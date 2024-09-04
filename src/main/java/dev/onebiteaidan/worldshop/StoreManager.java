@@ -1,5 +1,7 @@
 package dev.onebiteaidan.worldshop;
 
+import dev.onebiteaidan.worldshop.DataManagement.Database;
+import dev.onebiteaidan.worldshop.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.StoreDataTypes.TradeStatus;
@@ -14,6 +16,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import javax.management.Query;
+import java.awt.image.DataBuffer;
 import java.sql.*;
 import java.util.*;
 
@@ -25,10 +29,24 @@ public class StoreManager {
     }
 
     public void createTrade(Trade t) {
-        WorldShop.getDatabase().update("INSERT INTO trades (seller_uuid, buyer_uuid, for_sale, in_return, status, time_listed, time_completed) VALUES (?,?,?,?,?,?,?);",
-                new Object[]{t.getSeller().getUniqueId().toString(), null, t.getForSale(), t.getInReturn(), t.getStatus().ordinal(), t.getTimeListed(), 0L},
-                new int[]{Types.VARCHAR, Types.NULL, Types.BLOB, Types.BLOB, Types.INTEGER, Types.BIGINT, Types.BIGINT}
-        );
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        try {
+            qb.insertInto("trades", "seller_uuid, buyer_uuid, for_sale, in_return, status, time_listed, time_completed")
+                    .values("?,?,?,?,?,?,?")
+                    .addParameter(t.getSeller().getUniqueId().toString())
+                    .addParameter(null)
+                    .addParameter(t.getForSale())
+                    .addParameter(t.getInReturn())
+                    .addParameter(t.getStatus().ordinal())
+                    .addParameter(t.getTimeListed())
+                    .addParameter(0L)
+                    .executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void completeTrade(Player buyer, int tradeID) {
@@ -40,20 +58,40 @@ public class StoreManager {
         Pickup buyerPickup = new Pickup(buyer, t.getForSale(), tradeID, false, 0L);
         Pickup sellerPickup = new Pickup(t.getSeller(), t.getInReturn(), tradeID, false, 0L);
 
-        WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
-                new Object[]{buyerPickup.getPlayer().getUniqueId().toString(), buyerPickup.getItem(), buyerPickup.getTradeID(), buyerPickup.isWithdrawn(), buyerPickup.getTimeWithdrawn()},
-                new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
-        );
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
 
-        WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
-                new Object[]{sellerPickup.getPlayer().getUniqueId().toString(), sellerPickup.getItem(), sellerPickup.getTradeID(), sellerPickup.isWithdrawn(), sellerPickup.getTimeWithdrawn()},
-                new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
-        );
+        try {
+            qb.insertInto("pickups", "player_uuid, pickup_item, trade_id, collected, time_collected")
+                    .values("?,?,?,?,?")
+                    .addParameter(buyerPickup.getPlayer().getUniqueId().toString())
+                    .addParameter(buyerPickup.getItem())
+                    .addParameter(buyerPickup.getTradeID())
+                    .addParameter(buyerPickup.isWithdrawn())
+                    .addParameter(buyerPickup.getTimeWithdrawn())
+                    .executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            qb.insertInto("pickups", "player_uuid, pickup_item, trade_id, collected, time_collected")
+                    .values("?,?,?,?,?")
+                    .addParameter(sellerPickup.getPlayer().getUniqueId().toString())
+                    .addParameter(sellerPickup.getItem())
+                    .addParameter(sellerPickup.getTradeID())
+                    .addParameter(sellerPickup.isWithdrawn())
+                    .addParameter(sellerPickup.getTimeWithdrawn())
+                    .executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         //Todo: Add something here to update all players with the store currently open.
         // Also a one size fits all gui creator would be really sweet.
         updateAllPlayers(buyer);
-
     }
 
     /**
@@ -154,10 +192,22 @@ public class StoreManager {
 
         Pickup forSalePickup = new Pickup(t.getSeller(), t.getForSale(), tradeID, false, 0L);
 
-        WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
-                new Object[]{forSalePickup.getPlayer().getUniqueId().toString(), forSalePickup.getItem(), forSalePickup.getTradeID(), forSalePickup.isWithdrawn(), forSalePickup.getTimeWithdrawn()},
-                new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
-        );
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        try {
+            qb.insertInto("pickups", "player_uuid, pickup_item, trade_id, collected, time_collected")
+                    .values("?,?,?,?,?")
+                    .addParameter(forSalePickup.getPlayer().getUniqueId().toString())
+                    .addParameter(forSalePickup.getItem())
+                    .addParameter(forSalePickup.getTradeID())
+                    .addParameter(forSalePickup.isWithdrawn())
+                    .addParameter(forSalePickup.getTimeWithdrawn())
+                    .executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteTrade(int tradeID) {
@@ -167,10 +217,22 @@ public class StoreManager {
 
         Pickup forSalePickup = new Pickup(t.getSeller(), t.getForSale(), tradeID, false, 0L);
 
-        WorldShop.getDatabase().update("INSERT INTO pickups (player_uuid, pickup_item, trade_id, collected, time_collected) VALUES (?,?,?,?,?);",
-                new Object[]{forSalePickup.getPlayer().getUniqueId().toString(), forSalePickup.getItem(), forSalePickup.getTradeID(), forSalePickup.isWithdrawn(), forSalePickup.getTimeWithdrawn()},
-                new int[]{Types.VARCHAR, Types.BLOB, Types.INTEGER, Types.BOOLEAN, Types.BIGINT}
-        );
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        try {
+            qb.insertInto("pickups", "player_uuid, pickup_item, trade_id, collected, time_collected")
+                    .values("?,?,?,?,?")
+                    .addParameter(forSalePickup.getPlayer().getUniqueId().toString())
+                    .addParameter(forSalePickup.getItem())
+                    .addParameter(forSalePickup.getTradeID())
+                    .addParameter(forSalePickup.isWithdrawn())
+                    .addParameter(forSalePickup.getTimeWithdrawn())
+                    .executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     //region Shop GUIS
@@ -684,14 +746,17 @@ public class StoreManager {
      * @return returns and arraylist of the display itemstacks
      */
     private List<ItemStack> getAllDisplayItems() {
-        Connection connection = WorldShop.getDatabase().getConnection();
         List<ItemStack> items = new ArrayList<>();
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
 
-        ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE status = ?;",
-                new Object[]{TradeStatus.OPEN.ordinal()},
-                new int[]{Types.INTEGER}, connection);
+        try (ResultSet rs = qb
+                .select("*")
+                .from("trades")
+                .where("status = ?")
+                .addParameter(TradeStatus.OPEN.ordinal())
+                .executeQuery()) {
 
-        try {
             while (rs.next()) {
                 // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
                 OfflinePlayer buyer = null;
@@ -710,9 +775,6 @@ public class StoreManager {
                         rs.getLong("time_completed")
                 ).generateDisplayItem());
             }
-
-            rs.close();
-            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -727,14 +789,18 @@ public class StoreManager {
      * @return returns and arraylist of the display itemstacks
      */
     private List<ItemStack> getAllDisplayItems(Player player) {
-        Connection connection = WorldShop.getDatabase().getConnection();
         List<ItemStack> items = new ArrayList<>();
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
 
-        ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE status = ? AND seller_uuid <> ?;",
-                new Object[]{TradeStatus.OPEN.ordinal(), player.getUniqueId().toString()},
-                new int[]{Types.INTEGER, Types.VARCHAR}, connection);
+        try (ResultSet rs = qb
+                .select("*")
+                .from("trades")
+                .where("status = ? AND seller_uuid <> ?")
+                .addParameter(TradeStatus.OPEN.ordinal())
+                .addParameter(player.getUniqueId().toString())
+                .executeQuery()) {
 
-        try {
             while (rs.next()) {
                 // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
                 OfflinePlayer buyer = null;
@@ -753,9 +819,6 @@ public class StoreManager {
                         rs.getLong("time_completed")
                 ).generateDisplayItem());
             }
-
-            rs.close();
-            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -771,83 +834,10 @@ public class StoreManager {
      */
     public Trade getTradeFromDisplayItem(ItemStack displayItem) {
         if (displayItem.getItemMeta().hasLocalizedName()) {
-            Connection connection = WorldShop.getDatabase().getConnection();
-            String id = displayItem.getItemMeta().getLocalizedName();
+            Database db = WorldShop.getDatabase();
+            QueryBuilder qb = new QueryBuilder(db);
 
-            ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE trade_id = ?;",
-                    new Object[]{Integer.parseInt(id)},
-                    new int[]{Types.INTEGER}, connection);
-
-            try {
-                rs.next();
-
-                // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
-                OfflinePlayer buyer = null;
-                String buyerUUID = rs.getString("buyer_uuid");
-                if (!rs.wasNull()) {
-                    buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
-                }
-
-                Trade t = new Trade(rs.getInt("trade_id"),
-                        TradeStatus.values()[rs.getInt("status")],
-                        Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
-                        buyer,
-                        ItemStack.deserializeBytes(rs.getBytes("for_sale")),
-                        ItemStack.deserializeBytes(rs.getBytes("in_return")),
-                        rs.getLong("time_listed"),
-                        rs.getLong("time_completed")
-                );
-
-                rs.close();
-                connection.close();
-
-                return t;
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get the trade from the associated trade ID
-     * @param id ID associated with the trade to pass in.
-     * @return returns thr trade associated w/ the ID. Returns null if no trade is found
-     */
-    public Trade getTradeFromTradeID(String id) {
-        Connection connection = WorldShop.getDatabase().getConnection();
-        ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE trade_id = ?;",
-                new Object[]{Integer.parseInt(id)},
-                new int[]{Types.INTEGER}, connection);
-
-        try {
-            rs.next();
-
-            // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
-            OfflinePlayer buyer = null;
-            String buyerUUID = rs.getString("buyer_uuid");
-            if (!rs.wasNull()) {
-                buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
-            }
-
-            Trade t = new Trade(rs.getInt("trade_id"),
-                    TradeStatus.values()[rs.getInt("status")],
-                    Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
-                    buyer,
-                    ItemStack.deserializeBytes(rs.getBytes("for_sale")),
-                    ItemStack.deserializeBytes(rs.getBytes("in_return")),
-                    rs.getLong("time_listed"),
-                    rs.getLong("time_completed")
-            );
-
-            rs.close();
-            connection.close();
-
-            return t;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return getTradeFromTradeID(Integer.parseInt(displayItem.getItemMeta().getLocalizedName()));
         }
         return null;
     }
@@ -858,12 +848,16 @@ public class StoreManager {
      * @return returns the trade associated w/ the ID. Returns null of no trade is found
      */
     public Trade getTradeFromTradeID(int id) {
-        Connection connection = WorldShop.getDatabase().getConnection();
-        ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE trade_id = ?;",
-                new Object[]{id},
-                new int[]{Types.INTEGER}, connection);
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
 
-        try {
+        try (ResultSet rs = qb
+                .select("*")
+                .from("trades")
+                .where("trade_id = ?")
+                .addParameter(id)
+                .executeQuery()) {
+
             rs.next();
 
             // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
@@ -873,7 +867,7 @@ public class StoreManager {
                 buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
             }
 
-            Trade t = new Trade(rs.getInt("trade_id"),
+            Trade trade = new Trade(rs.getInt("trade_id"),
                     TradeStatus.values()[rs.getInt("status")],
                     Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
                     buyer,
@@ -883,27 +877,29 @@ public class StoreManager {
                     rs.getLong("time_completed")
             );
 
-            rs.close();
-            connection.close();
-
-            return t;
+            return trade;
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
 
     public List<ItemStack> getAllCurrentTradesDisplayItems(Player player) {
-        Connection connection = WorldShop.getDatabase().getConnection();
         List<ItemStack> items = new ArrayList<>();
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
 
-        ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM trades WHERE status = ? AND seller_uuid = ?;",
-                new Object[]{TradeStatus.OPEN.ordinal(), player.getUniqueId().toString()},
-                new int[]{Types.INTEGER, Types.VARCHAR}, connection);
+        try (ResultSet rs = qb
+                    .select("*")
+                    .from("trades")
+                    .where("status = ? AND seller_uuid = ?")
+                    .addParameter(TradeStatus.OPEN.ordinal())
+                    .addParameter(player.getUniqueId().toString())
+                    .executeQuery()) {
 
-        try {
             while (rs.next()) {
                 // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
                 OfflinePlayer buyer = null;
@@ -923,9 +919,6 @@ public class StoreManager {
                 ).generateCurrentTradeDisplayItem());
             }
 
-            rs.close();
-            connection.close();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -934,14 +927,18 @@ public class StoreManager {
     }
 
     public List<ItemStack> getAllCompletedTradesItems(Player player) {
-        Connection connection = WorldShop.getDatabase().getConnection();
         ArrayList<ItemStack> pickups = new ArrayList<>();
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
 
-        ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM pickups WHERE player_uuid = ? AND collected = ?;",
-                new Object[]{player.getUniqueId().toString(), false},
-                new int[]{Types.VARCHAR, Types.BOOLEAN}, connection);
+        try (ResultSet rs = qb
+                    .select("*")
+                    .from("pickups")
+                    .where("player_uuid = ? AND collected = ?")
+                    .addParameter(player.getUniqueId().toString())
+                    .addParameter(false)
+                    .executeQuery()) {
 
-        try {
             while (rs.next()) {
 
                 Pickup p = new Pickup(Bukkit.getPlayer(UUID.fromString(rs.getString("player_uuid"))),
@@ -957,9 +954,6 @@ public class StoreManager {
 
                 pickups.add(item);
             }
-
-            rs.close();
-            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();

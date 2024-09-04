@@ -75,7 +75,7 @@ public class MySQL implements Database {
 
     // THIS QUERY FUNCTION IS MADE SPECIFICALLY FOR WORLDSHOP.
     // THIS WILL NOT WORK OUT OF THE BOX IN OTHER JAVA PROJECTS.
-    @Override
+
     public ResultSet query(String query, Object[] arguments, int[] types, Connection connection) {
 //        if (!this.isConnected()) {
 //            this.connect();
@@ -114,7 +114,7 @@ public class MySQL implements Database {
         return null;
     }
 
-    @Override
+
     public void update(String update, Object[] arguments, int[] types) {
 //        if (!this.isConnected()) {
 //            this.connect();
@@ -153,7 +153,7 @@ public class MySQL implements Database {
         }
     }
 
-    @Override
+
     public void run(String command) {
 //        if (!this.isConnected()) {
 //            this.connect();

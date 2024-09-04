@@ -1,5 +1,7 @@
 package dev.onebiteaidan.worldshop;
 
+import dev.onebiteaidan.worldshop.DataManagement.Database;
+import dev.onebiteaidan.worldshop.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.Utils;
@@ -463,24 +465,22 @@ public class StoreListener implements Listener {
                Player p = (Player) e.getWhoClicked();
                if (p.getInventory().firstEmpty() != -1) {
 
-                   // Update the database
-                   WorldShop.getDatabase().update("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ? AND player_uuid = ?;",
-                           new Object[]{true, System.currentTimeMillis(), Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()), p.getUniqueId().toString()},
-                           new int[]{Types.BOOLEAN, Types.BIGINT, Types.INTEGER, Types.VARCHAR}
-                   );
-//                   try {
-//                       PreparedStatement ps = WorldShop.getDatabase().getConnection().prepareStatement("UPDATE pickups SET collected = ?, time_collected = ? WHERE trade_id = ? AND player_uuid = ?;");
-//                       ps.setBoolean(1, true);
-//                       ps.setLong(2, System.currentTimeMillis());
-//                       ps.setInt(3, Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()));
-//                       ps.setString(4, ((Player) e.getWhoClicked()).getUniqueId().toString());
-//
-//                       ps.executeUpdate();
-//
-//
-//                   } catch (SQLException ev) {
-//                       ev.printStackTrace();
-//                   }
+                   Database db = WorldShop.getDatabase();
+                   QueryBuilder qb = new QueryBuilder(db);
+
+                   try {
+                       qb.update("pickups")
+                               .set("collected = ?, time_collected = ?")
+                               .where("trade_id = ? AND player_uuid = ?")
+                               .addParameter(true)
+                               .addParameter(System.currentTimeMillis())
+                               .addParameter(Integer.parseInt(e.getCurrentItem().getItemMeta().getLocalizedName()))
+                               .addParameter(p.getUniqueId().toString())
+                               .executeUpdate();
+
+                   } catch (SQLException err) {
+                       err.printStackTrace();
+                   }
 
                    e.getCurrentItem().setItemMeta(null);
 

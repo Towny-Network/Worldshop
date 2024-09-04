@@ -61,7 +61,7 @@ public class SQLite implements Database {
 
     // THIS QUERY FUNCTION IS MADE SPECIFICALLY FOR WORLDSHOP.
     // THIS WILL NOT WORK OUT OF THE BOX IN OTHER JAVA PROJECTS.
-    @Override
+
     public ResultSet query(String query, Object[] arguments, int[] types, Connection connection) {
         try {
             PreparedStatement ps = connection.prepareStatement(query);
@@ -96,7 +96,6 @@ public class SQLite implements Database {
     }
 
 
-    @Override
     public void update(String update, Object[] arguments, int[] types) {
         try (PreparedStatement ps = connection.prepareStatement(update)) {
             for (int i = 0; i < arguments.length; i++) {
@@ -135,7 +134,7 @@ public class SQLite implements Database {
         }
     }
 
-    @Override
+
     public void run(String command) {
         try {
             PreparedStatement ps = connection.prepareStatement(command);

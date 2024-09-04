@@ -1,5 +1,7 @@
 package dev.onebiteaidan.worldshop;
 
+import dev.onebiteaidan.worldshop.DataManagement.Database;
+import dev.onebiteaidan.worldshop.DataManagement.QueryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -26,11 +28,15 @@ public class PlayerManager {
     public PlayerManager() {}
 
     public PlayerProfile getPlayerStats(Player player) {
-        Connection connection = WorldShop.getDatabase().getConnection();
-        try {
-            ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM players WHERE uuid = ?;",
-                    new Object[]{player.getUniqueId()},
-                    new int[]{Types.VARCHAR}, connection);
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        try (ResultSet rs = qb
+                .select("*")
+                .from("players")
+                .where("uuid = ?")
+                .addParameter(player.getUniqueId().toString())
+                .executeQuery()) {
 
             rs.next();
 
@@ -40,26 +46,48 @@ public class PlayerManager {
                     rs.getInt("sales")
             );
 
-            rs.close();
-            connection.close();
-
             return pp;
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
     public void incrementPlayerPurchases(Player player) {
-        WorldShop.getDatabase().update("UPDATE players SET purchases = purchases + ? WHERE uuid = ?;",
-                new Object[]{1, player.getUniqueId()},
-                new int[]{Types.INTEGER, Types.VARCHAR});
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        try {
+
+            qb.update("players")
+                    .set("purchases = purchases + ?")
+                    .where("uuid = ?")
+                    .addParameter(1)
+                    .addParameter(player.getUniqueId().toString())
+                    .executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void incrementPlayerSales(Player player) {
-        WorldShop.getDatabase().update("UPDATE players SET sales = sales + ? WHERE uuid = ?;",
-                new Object[]{1, player.getUniqueId()},
-                new int[]{Types.INTEGER, Types.VARCHAR});
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        try {
+
+            qb.update("players")
+                    .set("sales = sales + ?")
+                    .where("uuid = ?")
+                    .addParameter(1)
+                    .addParameter(player.getUniqueId().toString())
+                    .executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
