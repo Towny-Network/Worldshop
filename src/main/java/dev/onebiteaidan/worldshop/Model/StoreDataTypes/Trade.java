@@ -1,18 +1,22 @@
-package dev.onebiteaidan.worldshop.StoreDataTypes;
+package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
-import dev.onebiteaidan.worldshop.DataManagement.Database;
-import dev.onebiteaidan.worldshop.DataManagement.QueryBuilder;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
-import java.lang.management.MemoryType;
+import java.awt.*;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Objects;
+
+import static net.kyori.adventure.text.Component.text;
 
 
 public class Trade {
@@ -64,26 +68,15 @@ public class Trade {
         this.timeCompleted = timeCompleted;
     }
 
+
     public ItemStack generateDisplayItem() {
         ItemStack displayItem = new ItemStack(forSale.getType(), forSale.getAmount());
         ItemMeta displayItemMeta = displayItem.getItemMeta();
 
-        // Items that have displaynames are items that have been renamed to something other than their original title.
-        // Therefore, we have to implement this shit system
-        if (forSale.getItemMeta().hasDisplayName()) {
-            displayItemMeta.setDisplayName(ChatColor.YELLOW + forSale.getItemMeta().getDisplayName() + " x" + this.forSale.getAmount());
-        } else {
-            String s = forSale.getType().toString();
-            String[] parts = s.split("_");
-            for (int i = 0; i < parts.length; i++) {
-                parts[i] = parts[i].toLowerCase();
-                parts[i] = parts[i].substring(0, 1).toUpperCase() + parts[i].substring(1);
-            }
+        displayItemMeta.displayName(Objects.requireNonNull(forSale.getItemMeta().displayName()).append(text(" x" + this.forSale.getAmount())));
 
-            displayItemMeta.setDisplayName(ChatColor.YELLOW + String.join(" ", parts) + " x" + this.forSale.getAmount());
-        }
-
-        ArrayList<String> lore = new ArrayList<>();
+        ArrayList<TextComponent> lore = new ArrayList<>();
+        lore.add(text("Being Sold By: " + this.seller.getName()));
         lore.add(ChatColor.GRAY + "Being Sold By: " + this.seller.getName());
 
         if (forSale.getItemMeta().hasLore()) {
@@ -152,7 +145,7 @@ public class Trade {
 
         displayItemMeta.setLore(lore);
         // Adding in trade ID for indentification later on
-        displayItemMeta.setLocalizedName(String.valueOf(tradeID));
+        displayItemMeta.getPersistentDataContainer().set(new NamespacedKey(WorldShop.getPlugin(WorldShop.class), "tradeID"), PersistentDataType.INTEGER, tradeID);
         displayItem.setItemMeta(displayItemMeta);
 
         return displayItem;

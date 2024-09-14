@@ -1,4 +1,4 @@
-package dev.onebiteaidan.worldshop.DataManagement;
+package dev.onebiteaidan.worldshop.Model.DataManagement;
 
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.inventory.ItemStack;
@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
 
 public class SQLite implements Database {
 

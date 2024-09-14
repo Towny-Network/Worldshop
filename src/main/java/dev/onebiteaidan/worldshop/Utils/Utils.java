@@ -2,18 +2,22 @@ package dev.onebiteaidan.worldshop.Utils;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import dev.onebiteaidan.worldshop.WorldShop;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.minecraft.nbt.NBTCompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import javax.annotation.Nullable;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -89,5 +93,47 @@ public class Utils {
             }
         }
         return amount;
+    }
+
+
+    // TODO: Method should probably be moved to the Screen class.
+    public static ItemStack createButtonItem(Material material, TextComponent displayName, @Nullable List<TextComponent> lore) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta != null) {
+            meta.displayName(displayName);
+            if (lore != null) {
+                meta.lore(lore);
+            }
+        }
+
+        item.setItemMeta(meta);
+
+        return item;
+    }
+
+    // TODO: Method should probably be moved to the Screen class.
+    public static ItemStack createButtonItem(ItemStack item, @Nullable TextComponent displayName, @Nullable List<TextComponent> lore) {
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta != null) {
+            meta.displayName(displayName);
+            meta.lore(lore);
+        }
+
+        item.setItemMeta(meta);
+
+        return item;
+    }
+
+    /**
+     * Redirects the output of e.printStackTrace into the PaperMC logs.
+     * @param exception to be redirected.
+     */
+    public static void logStacktrace(Exception exception) {
+        StringWriter sw = new StringWriter();
+        exception.printStackTrace(new PrintWriter(sw));
+        WorldShop.getPlugin(WorldShop.class).getLogger().severe(sw.toString());
     }
 }

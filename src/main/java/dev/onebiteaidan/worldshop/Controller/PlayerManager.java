@@ -1,15 +1,14 @@
-package dev.onebiteaidan.worldshop;
+package dev.onebiteaidan.worldshop.Controller;
 
-import dev.onebiteaidan.worldshop.DataManagement.Database;
-import dev.onebiteaidan.worldshop.DataManagement.QueryBuilder;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
+import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 
 public class PlayerManager {
 

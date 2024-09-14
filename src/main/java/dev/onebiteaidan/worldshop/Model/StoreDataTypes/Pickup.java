@@ -1,4 +1,4 @@
-package dev.onebiteaidan.worldshop.StoreDataTypes;
+package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

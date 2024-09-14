@@ -1,4 +1,4 @@
-package dev.onebiteaidan.worldshop.DataManagement;
+package dev.onebiteaidan.worldshop.Model.DataManagement;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

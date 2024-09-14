@@ -1,4 +1,4 @@
-package dev.onebiteaidan.worldshop.Commands;
+package dev.onebiteaidan.worldshop.Controller.Commands;
 
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.command.Command;

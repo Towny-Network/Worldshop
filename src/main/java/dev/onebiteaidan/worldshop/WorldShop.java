@@ -1,19 +1,21 @@
 package dev.onebiteaidan.worldshop;
 
-import dev.onebiteaidan.worldshop.Commands.WorldshopCommand;
-import dev.onebiteaidan.worldshop.DataManagement.Config;
-import dev.onebiteaidan.worldshop.DataManagement.Database;
-import dev.onebiteaidan.worldshop.DataManagement.MySQL;
-import dev.onebiteaidan.worldshop.DataManagement.SQLite;
-import org.bukkit.Bukkit;
+import dev.onebiteaidan.worldshop.Controller.Commands.WorldshopCommand;
+import dev.onebiteaidan.worldshop.Controller.PlayerManager;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.MySQL;
+import dev.onebiteaidan.worldshop.Model.DataManagement.SQLite;
+import dev.onebiteaidan.worldshop.Utils.Utils;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Objects;
 
 public final class WorldShop extends JavaPlugin {
 
     private static Config config;
     private static Database database;
     private static PlayerManager playerManager;
-    private static StoreManager storeManager;
 
 
     @Override
@@ -45,8 +47,8 @@ public final class WorldShop extends JavaPlugin {
 
         try {
             database.connect();
-        } catch (Exception e) { // Disable the plugin if the database throws exception while trying to connect.
-            e.printStackTrace();
+        } catch (Exception exception) { // Disable the plugin if the database throws exception while trying to connect.
+            Utils.logStacktrace(exception);
             this.getLogger().severe("ERROR THROWN WHILE CONNECTING TO THE DATABASE!");
             this.onDisable();
         }
@@ -78,15 +80,16 @@ public final class WorldShop extends JavaPlugin {
         // Initializing the player manager
         playerManager = new PlayerManager();
 
-        // Initializing the store manager
-        storeManager = new StoreManager();
-
         // Setting up listeners
-        Bukkit.getPluginManager().registerEvents(new StoreListener(), this);
+        // All GUIs handle their own listener creation
 
         // Setting up commands
-        getCommand("worldshop").setExecutor(new WorldshopCommand());
+        try {
+            Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand());
 
+        } catch (NullPointerException exception) {
+            Utils.logStacktrace(exception);
+        }
     }
 
     // Config accessor
@@ -102,11 +105,6 @@ public final class WorldShop extends JavaPlugin {
     // Player Manager accessor
     public static PlayerManager getPlayerManager() {
         return playerManager;
-    }
-
-    // Store Manager accessor
-    public static StoreManager getStoreManager() {
-        return storeManager;
     }
 
     @Override

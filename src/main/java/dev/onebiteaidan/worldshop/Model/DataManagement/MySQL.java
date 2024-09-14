@@ -1,14 +1,9 @@
-package dev.onebiteaidan.worldshop.DataManagement;
+package dev.onebiteaidan.worldshop.Model.DataManagement;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import dev.onebiteaidan.worldshop.StoreDataTypes.TradeStatus;
-import dev.onebiteaidan.worldshop.WorldShop;
-import jdk.internal.net.http.common.Pair;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 
 public class MySQL implements Database {
