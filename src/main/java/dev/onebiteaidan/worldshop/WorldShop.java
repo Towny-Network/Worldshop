@@ -1,12 +1,15 @@
 package dev.onebiteaidan.worldshop;
 
 import dev.onebiteaidan.worldshop.Controller.Commands.WorldshopCommand;
+import dev.onebiteaidan.worldshop.Controller.Listeners.TradeListener;
 import dev.onebiteaidan.worldshop.Controller.PlayerManager;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
 import dev.onebiteaidan.worldshop.Model.DataManagement.MySQL;
 import dev.onebiteaidan.worldshop.Model.DataManagement.SQLite;
+import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
@@ -48,7 +51,7 @@ public final class WorldShop extends JavaPlugin {
         try {
             database.connect();
         } catch (Exception exception) { // Disable the plugin if the database throws exception while trying to connect.
-            Utils.logStacktrace(exception);
+            Logger.logStacktrace(exception);
             this.getLogger().severe("ERROR THROWN WHILE CONNECTING TO THE DATABASE!");
             this.onDisable();
         }
@@ -82,13 +85,14 @@ public final class WorldShop extends JavaPlugin {
 
         // Setting up listeners
         // All GUIs handle their own listener creation
+        Bukkit.getPluginManager().registerEvents(new TradeListener(), this);
 
         // Setting up commands
         try {
             Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand());
 
         } catch (NullPointerException exception) {
-            Utils.logStacktrace(exception);
+            Logger.logStacktrace(exception);
         }
     }
 

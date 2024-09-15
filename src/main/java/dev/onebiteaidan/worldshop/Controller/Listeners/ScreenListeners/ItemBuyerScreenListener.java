@@ -1,5 +1,6 @@
-package dev.onebiteaidan.worldshop.Controller.Listeners;
+package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
+import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.ItemBuyerScreen;
@@ -48,7 +49,7 @@ public class ItemBuyerScreenListener extends ScreenListener {
                     // TODO: Im wondering if the update method will have to be called on the inventory after setting the item from the holder and not the event.
                 }
             } catch (NullPointerException exception) {
-                Utils.logStacktrace(exception);
+                Logger.logStacktrace(exception);
             }
         }
     }
@@ -102,7 +103,7 @@ public class ItemBuyerScreenListener extends ScreenListener {
                         }
                         break;
                     } catch (NullPointerException exception) {
-                        Utils.logStacktrace(exception);
+                        Logger.logStacktrace(exception);
                     }
             }
         }

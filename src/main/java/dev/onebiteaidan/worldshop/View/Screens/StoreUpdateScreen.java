@@ -1,7 +1,7 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.Controller.Listeners.StoreUpdateScreenListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.StoreUpdateScreenListener;
 import dev.onebiteaidan.worldshop.View.Screen;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;

@@ -127,13 +127,5 @@ public class Utils {
         return item;
     }
 
-    /**
-     * Redirects the output of e.printStackTrace into the PaperMC logs.
-     * @param exception to be redirected.
-     */
-    public static void logStacktrace(Exception exception) {
-        StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
-        WorldShop.getPlugin(WorldShop.class).getLogger().severe(sw.toString());
-    }
+
 }

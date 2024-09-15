@@ -4,9 +4,10 @@ import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
 import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
+import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.Controller.Listeners.MainShopScreenListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.MainShopScreenListener;
 import dev.onebiteaidan.worldshop.View.PageableScreen;
 import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.Component;
@@ -209,7 +210,7 @@ public class MainShopScreen extends PageableScreen {
             }
 
         } catch (SQLException e) {
-            Utils.logStacktrace(e);
+            Logger.logStacktrace(e);
         }
 
         return items;

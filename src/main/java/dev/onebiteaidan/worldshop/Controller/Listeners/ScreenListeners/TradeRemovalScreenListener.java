@@ -1,4 +1,4 @@
-package dev.onebiteaidan.worldshop.Controller.Listeners;
+package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.View.ScreenListener;

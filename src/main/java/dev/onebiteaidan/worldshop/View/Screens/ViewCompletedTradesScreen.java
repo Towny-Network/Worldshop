@@ -3,7 +3,7 @@ package dev.onebiteaidan.worldshop.View.Screens;
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.Controller.Listeners.ViewCompletedTradesScreenListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.ViewCompletedTradesScreenListener;
 import dev.onebiteaidan.worldshop.View.PageableScreen;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;

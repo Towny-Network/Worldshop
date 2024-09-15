@@ -1,6 +1,7 @@
-package dev.onebiteaidan.worldshop.Controller.Listeners;
+package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
+import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.ItemSellerScreen;
@@ -67,7 +68,7 @@ public class ItemSellerScreenListener extends ScreenListener {
                                 break;
                         }
                     } catch (NullPointerException exception) {
-                        Utils.logStacktrace(exception);
+                        Logger.logStacktrace(exception);
                     }
 
                     break;

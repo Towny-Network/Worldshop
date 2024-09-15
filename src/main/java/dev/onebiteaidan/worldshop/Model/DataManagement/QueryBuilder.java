@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueryBuilder {
-    private StringBuilder query;
-    private Database database;
-    private List<Object> parameters = new ArrayList<>();
+    private final StringBuilder query;
+    private final Database database;
+    private final List<Object> parameters = new ArrayList<>();
 
     public QueryBuilder(Database database) {
         this.database = database;
@@ -78,8 +78,35 @@ public class QueryBuilder {
         return preparedStatement.executeQuery();
     }
 
+    public int executeUpdateWithGeneratedKeys(ResultSetHandler resultSetHandler) throws SQLException {
+        PreparedStatement preparedStatement = database.getConnection().prepareStatement(query.toString(), PreparedStatement.RETURN_GENERATED_KEYS);
+
+        // Set all parameters safely
+        for (int i = 0; i < parameters.size(); i++) {
+            preparedStatement.setObject(i + 1, parameters.get(i));
+        }
+
+        // Execute the update
+        int updateCount = preparedStatement.executeUpdate();
+
+        // Retrieve generated keys if available
+        try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+            if (generatedKeys != null) {
+                resultSetHandler.handle(generatedKeys);
+            }
+        }
+
+        return updateCount;
+    }
+
     public int executeUpdate() throws SQLException {
         PreparedStatement preparedStatement = prepareStatement();
         return preparedStatement.executeUpdate();
+    }
+
+    // Functional interface to handle ResultSet from generated keys
+    @FunctionalInterface
+    public interface ResultSetHandler {
+        void handle(ResultSet rs) throws SQLException;
     }
 }

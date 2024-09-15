@@ -1,6 +1,6 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
-import dev.onebiteaidan.worldshop.Controller.Listeners.ViewCurrentListingsScreenListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.ViewCurrentListingsScreenListener;
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.PageUtils;
 import dev.onebiteaidan.worldshop.Utils.Utils;

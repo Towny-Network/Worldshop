@@ -1,19 +1,20 @@
 package dev.onebiteaidan.worldshop.Controller;
 
+import dev.onebiteaidan.worldshop.Controller.Events.TradeCompletionEvent;
+import dev.onebiteaidan.worldshop.Controller.Events.TradeCreationEvent;
+import dev.onebiteaidan.worldshop.Controller.Events.TradeDeletionEvent;
+import dev.onebiteaidan.worldshop.Controller.Events.TradeExpirationEvent;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
 import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
-import dev.onebiteaidan.worldshop.Utils.Utils;
+import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.View.Screen;
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -26,9 +27,14 @@ public class StoreManager {
 
     private final ArrayList<Player> playerUpdateList;
 
+    private final ArrayList<Trade> trades;
+    private final ArrayList<Pickup> pickups;
+
 
     private StoreManager() {
         playerUpdateList = new ArrayList<>();
+        trades = new ArrayList<>();
+        pickups = new ArrayList<>();
     }
 
     public static StoreManager getInstance() {
@@ -39,101 +45,61 @@ public class StoreManager {
         return instance;
     }
 
+    public void createTrade(Trade trade) {
+        // Send TradeCreationEvent
+        Bukkit.getPluginManager().callEvent(new TradeCreationEvent(trade));
+    }
 
-    public void createTrade(Trade t) {
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
+    public void completeTrade(Trade trade, Player buyer) {
+        trade.setTradeStatus(TradeStatus.COMPLETE);
+        trade.setBuyer(buyer);
+        trade.setCompletionTimestamp(System.currentTimeMillis());
 
-        try {
-            qb.insertInto("trades", "seller_uuid, buyer_uuid, for_sale, in_return, status, time_listed, time_completed")
-                    .values("?,?,?,?,?,?,?")
-                    .addParameter(t.getSeller().getUniqueId().toString())
-                    .addParameter(null)
-                    .addParameter(t.getForSale())
-                    .addParameter(t.getInReturn())
-                    .addParameter(t.getStatus().ordinal())
-                    .addParameter(t.getTimeListed())
-                    .addParameter(0L)
-                    .executeUpdate();
+        // Create two new pickups
+        Pickup buyerPickup = new Pickup(buyer, trade.getItemOffered(), trade.getTradeID(), false, 0L);
+        Pickup sellerPickup = new Pickup(trade.getSeller(), trade.getItemRequested(), trade.getTradeID(), false, 0L);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
+        pickups.add(buyerPickup);
+        pickups.add(sellerPickup);
+
+        // Update the views of all players
+        updateAllScreens();
+
+        // Send TradeCompletionEvent
+        Bukkit.getPluginManager().callEvent(new TradeCompletionEvent(trade));
+    }
+
+    public void deleteTrade(Trade trade) {
+        // Send TradeDeletionEvent
+        Bukkit.getPluginManager().callEvent(new TradeDeletionEvent(trade));
+    }
+
+    public void expireTrade(Trade trade) {
+        // Send TradeExpirationEvent
+        Bukkit.getPluginManager().callEvent(new TradeExpirationEvent(trade));
+    }
+
+    public void syncTradesToDatabase() {
+        for (Trade trade : this.trades) {
+            if (trade.isDirty()) {
+                trade.syncToDatabase();
+            }
         }
     }
 
-    public void completeTrade(Player buyer, int tradeID) {
-        Trade t = getTradeFromTradeID(tradeID);
-        t.setStatus(TradeStatus.COMPLETE);
-        t.setBuyer(buyer);
-        t.setTimeCompleted(System.currentTimeMillis());
-
-        Pickup buyerPickup = new Pickup(buyer, t.getForSale(), tradeID, false, 0L);
-        Pickup sellerPickup = new Pickup(t.getSeller(), t.getInReturn(), tradeID, false, 0L);
-
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        try {
-            qb.insertInto("pickups", "player_uuid, pickup_item, trade_id, collected, time_collected")
-                    .values("?,?,?,?,?")
-                    .addParameter(buyerPickup.getPlayer().getUniqueId().toString())
-                    .addParameter(buyerPickup.getItem())
-                    .addParameter(buyerPickup.getTradeID())
-                    .addParameter(buyerPickup.isWithdrawn())
-                    .addParameter(buyerPickup.getTimeWithdrawn())
-                    .executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void updateAllScreens() {
+        for (Player player : playerUpdateList) {
+            if (player.getOpenInventory().getTopInventory().getHolder() instanceof Screen) {
+                ((Screen) player.getOpenInventory().getTopInventory().getHolder()).update();
+            } else {
+                Logger.severe("Attempted to update an InventoryView that was not an instanceof Screen");
+            }
         }
-
-        try {
-            qb.insertInto("pickups", "player_uuid, pickup_item, trade_id, collected, time_collected")
-                    .values("?,?,?,?,?")
-                    .addParameter(sellerPickup.getPlayer().getUniqueId().toString())
-                    .addParameter(sellerPickup.getItem())
-                    .addParameter(sellerPickup.getTradeID())
-                    .addParameter(sellerPickup.isWithdrawn())
-                    .addParameter(sellerPickup.getTimeWithdrawn())
-                    .executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        //Todo: Add something here to update all players with the store currently open.
-        // Also a one size fits all gui creator would be really sweet.
-        updateAllPlayers(buyer);
     }
 
-    public void pickupCompletedTrade(Player collector, Trade trade) {
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        try {
-            qb.update("pickups")
-                    .set("collected = ?, time_collected = ?")
-                    .where("trade_id = ? AND player_uuid = ?")
-                    .addParameter(true)
-                    .addParameter(System.currentTimeMillis())
-                    .addParameter(trade.getTradeID())
-                    .addParameter(collector.getUniqueId().toString())
-                    .executeUpdate();
-
-        } catch (SQLException exception) {
-            Utils.logStacktrace(exception);
-        }
-
-
-        collector.getInventory().addItem(trade.get
-
-
-        p.getInventory().addItem(e.getCurrentItem());
-        e.getInventory().removeItem(e.getCurrentItem());
-    }
-
-    public void pickupCompletedTrade(Player collector, int tradeID) {
-        pickupCompletedTrade(collector, getTradeFromTradeID(tradeID));
+    public void pickupCompleted(Pickup pickup) {
+        pickup.setWithdrawn(true);
+        pickup.setWithdrawnTimestamp(System.currentTimeMillis());
     }
 
     public void addToUpdateList(Player p) {
@@ -142,73 +108,6 @@ public class StoreManager {
 
     public void removeFromUpdateList(Player p) {
         this.playerUpdateList.remove(p);
-    }
-
-    /**
-     * Update the store pages of all players to prevent accidental duplication
-     * @param ignorePlayer The player who just completed a trade and doesn't need to have their stuff updated
-     */
-    public void updateAllPlayers(Player ignorePlayer) {
-        for (Player player : playerUpdateList) {
-            if (player.equals(ignorePlayer)) {
-                continue;
-            }
-
-            InventoryHolder holder = player.getOpenInventory().getTopInventory().getHolder();
-            if (holder instanceof Screen) {
-                ((Screen) holder).update();
-            }
-        }
-    }
-
-    public void expireTrade(int tradeID) {
-        Trade t = getTradeFromTradeID(tradeID);
-        t.setStatus(TradeStatus.EXPIRED);
-        t.setTimeCompleted(System.currentTimeMillis());
-
-        Pickup forSalePickup = new Pickup(t.getSeller(), t.getForSale(), tradeID, false, 0L);
-
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        try {
-            qb.insertInto("pickups", "player_uuid, pickup_item, trade_id, collected, time_collected")
-                    .values("?,?,?,?,?")
-                    .addParameter(forSalePickup.getPlayer().getUniqueId().toString())
-                    .addParameter(forSalePickup.getItem())
-                    .addParameter(forSalePickup.getTradeID())
-                    .addParameter(forSalePickup.isWithdrawn())
-                    .addParameter(forSalePickup.getTimeWithdrawn())
-                    .executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteTrade(int tradeID) {
-        Trade t = getTradeFromTradeID(tradeID);
-        t.setStatus(TradeStatus.REMOVED);
-        t.setTimeCompleted(System.currentTimeMillis());
-
-        Pickup forSalePickup = new Pickup(t.getSeller(), t.getForSale(), tradeID, false, 0L);
-
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        try {
-            qb.insertInto("pickups", "player_uuid, pickup_item, trade_id, collected, time_collected")
-                    .values("?,?,?,?,?")
-                    .addParameter(forSalePickup.getPlayer().getUniqueId().toString())
-                    .addParameter(forSalePickup.getItem())
-                    .addParameter(forSalePickup.getTradeID())
-                    .addParameter(forSalePickup.isWithdrawn())
-                    .addParameter(forSalePickup.getTimeWithdrawn())
-                    .executeUpdate();
-
-        } catch (SQLException exception) {
-            Utils.logStacktrace(exception);
-        }
     }
 
 
@@ -301,7 +200,7 @@ public class StoreManager {
                         ItemStack.deserializeBytes(rs.getBytes("in_return")),
                         rs.getLong("time_listed"),
                         rs.getLong("time_completed")
-                ).generateCurrentTradeDisplayItem());
+                ).generateDisplayItem());
             }
 
         } catch (SQLException e) {
@@ -341,11 +240,14 @@ public class StoreManager {
             }
 
         } catch (SQLException e) {
-            Utils.logStacktrace(e);
+            Logger.logStacktrace(e);
         }
 
         return pickups;
     }
 
     // endregion
+
+
+
 }

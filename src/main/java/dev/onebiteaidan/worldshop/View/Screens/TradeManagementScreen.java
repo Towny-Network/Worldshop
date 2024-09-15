@@ -1,7 +1,7 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.Controller.Listeners.TradeManagementScreenListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.TradeManagementScreenListener;
 import dev.onebiteaidan.worldshop.View.Screen;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
