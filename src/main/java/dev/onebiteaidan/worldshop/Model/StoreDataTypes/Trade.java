@@ -26,7 +26,7 @@ public class Trade {
     long listingTimestamp;
     long completionTimestamp;
 
-    private boolean isDirty;
+    private boolean isDirty; // Dirty bit for database synchronization
 
 
     /**
@@ -195,17 +195,9 @@ public class Trade {
         return isDirty;
     }
 
-    public ItemStack generateDisplayItem() {
+    public DisplayItem generateDisplayItem() {
         ItemStack displayItem = itemOffered.clone();
-        ItemMeta displayItemMeta = displayItem.getItemMeta();
-
-        // Adding in trade ID for identification later on
-        NamespacedKey key = new NamespacedKey(WorldShop.getPlugin(WorldShop.class), "tradeID");
-
-        displayItemMeta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, tradeID);
-        displayItem.setItemMeta(displayItemMeta);
-
-        return displayItem;
+        return new DisplayItem(displayItem, tradeID);
     }
 
     @Override

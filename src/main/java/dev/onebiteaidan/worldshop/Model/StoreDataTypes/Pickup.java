@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.sql.SQLException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Pickup {
     OfflinePlayer player;
@@ -18,7 +17,7 @@ public class Pickup {
     boolean withdrawn;
     long withdrawnTimestamp;
 
-    private boolean isDirty;
+    private boolean isDirty; // Dirty bit for database synchronization
 
     public Pickup(OfflinePlayer player, ItemStack item, int tradeID, boolean withdrawn, long withdrawnTimestamp) {
         this.player = player;
@@ -58,7 +57,6 @@ public class Pickup {
 
         return false;
     }
-
 
 
     public OfflinePlayer getPlayer() {
@@ -108,5 +106,21 @@ public class Pickup {
 
     public boolean isDirty() {
         return this.isDirty;
+    }
+
+    public DisplayItem generateDisplayItem() {
+        ItemStack displayItem = item.clone();
+        return new DisplayItem(displayItem, tradeID);
+    }
+
+    @Override
+    public String toString() {
+        return "Pickup {" +
+                "playerUUID=" + player.getUniqueId() + "( " + player.getName() + " )" +
+                ", item=" + (item != null ? item.getType() : "None") +
+                ", tradeID=" + tradeID +
+                ", withdrawn=" + withdrawn +
+                ", withdrawnTimestamp=" + withdrawnTimestamp +
+                "}";
     }
 }

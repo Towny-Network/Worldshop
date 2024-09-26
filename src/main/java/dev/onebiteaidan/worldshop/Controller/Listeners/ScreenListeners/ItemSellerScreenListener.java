@@ -1,5 +1,6 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
+import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
@@ -61,7 +62,7 @@ public class ItemSellerScreenListener extends ScreenListener {
                                     break;
                                 }
 
-                                WorldShop.getStoreManager().createTrade(new Trade(holder.getPlayer(), forSale, inReturn));
+                                StoreManager.getInstance().createTrade(new Trade(holder.getPlayer(), forSale, inReturn));
 
                                 // Brings the player back to the main page of the store.
                                 new MainShopScreen(holder.getPlayer()).openScreen(1);

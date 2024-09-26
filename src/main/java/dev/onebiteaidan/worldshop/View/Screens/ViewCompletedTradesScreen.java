@@ -1,7 +1,8 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
-import dev.onebiteaidan.worldshop.Utils.PageUtils;
+import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
+import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.ViewCompletedTradesScreenListener;
 import dev.onebiteaidan.worldshop.View.PageableScreen;
@@ -9,8 +10,12 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -27,6 +32,13 @@ public class ViewCompletedTradesScreen extends PageableScreen {
     }
 
     @Override
+    public void openScreen(int page) {
+        setCurrentPage(page);
+        initializeScreen();
+        player.openInventory(getInventory());
+    }
+
+    @Override
     protected void initializeScreen() {
         // Back Button
         TextComponent backButtonTitle = text("Go back")
@@ -40,7 +52,7 @@ public class ViewCompletedTradesScreen extends PageableScreen {
         TextComponent prevPageTitle = text("Previous Page")
                 .color(NamedTextColor.RED);
 
-        if (isPageValid(StoreManager.getInstance().getAllCompletedTradesItems(getPlayer()), getCurrentPage() - 1, 27)) {
+        if (isPageValid(getPickupDisplayItems(player, getCurrentPage(), 27), getCurrentPage() - 1, 27)) {
             // Add Strikethrough to prevPageTitle if there is no previous page to go to.
             prevPageTitle = prevPageTitle.decorate(TextDecoration.STRIKETHROUGH);
         }
@@ -53,7 +65,7 @@ public class ViewCompletedTradesScreen extends PageableScreen {
         TextComponent nextPageTitle = text("Next Page")
                 .color(NamedTextColor.RED);
 
-        if (isPageValid(StoreManager.getInstance().getAllCompletedTradesItems(getPlayer()), getCurrentPage() + 1, 27)) {
+        if (isPageValid(getPickupDisplayItems(player, getCurrentPage(), 27), getCurrentPage() + 1, 27)) {
             // Add Strikethrough to nextPageTitle if there is no next page to go to.
             nextPageTitle = nextPageTitle.decorate(TextDecoration.STRIKETHROUGH);
         }
@@ -63,15 +75,26 @@ public class ViewCompletedTradesScreen extends PageableScreen {
 
 
         // Populate remaining slots w/ completed trades posted by player
-        for (ItemStack item: PageUtils.getPageItems(StoreManager.getInstance().getAllCompletedTradesItems(player), getCurrentPage(), 27)) {
+        for (ItemStack item: getPageItems(getPickupDisplayItems(player, getCurrentPage(), 27), getCurrentPage(), 27)) {
             getInventory().addItem(item);
         }
     }
 
-    @Override
-    public void openScreen(int page) {
-        setCurrentPage(page);
-        initializeScreen();
-        player.openInventory(getInventory());
+    private List<DisplayItem> getPickupDisplayItems(Player player, int page, int spaces) {
+        // Get all pickups
+        List<Pickup> pickups = StoreManager.getInstance().getPickups();
+
+        // Filter trades by seller and withdrawn status
+        pickups = pickups.stream()
+                .filter(pickup -> pickup.getPlayer().equals((OfflinePlayer) player) && !pickup.isWithdrawn())
+                .collect(Collectors.toList());
+
+        // Map each Pickup to a DisplayItem
+        List<DisplayItem> displayItems = pickups.stream()
+                .map(Pickup::generateDisplayItem)
+                .collect(Collectors.toList());
+
+        // Return page display items.
+        return getPageItems(displayItems, page, spaces);
     }
 }

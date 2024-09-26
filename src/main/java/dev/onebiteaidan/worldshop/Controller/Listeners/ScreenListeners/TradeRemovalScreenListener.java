@@ -16,7 +16,7 @@ public class TradeRemovalScreenListener extends ScreenListener {
 
             switch(e.getRawSlot()) {
                 case 11:
-                    StoreManager.getInstance().deleteTrade(holder.getTrade().getTradeID());
+                    StoreManager.getInstance().deleteTrade(holder.getTrade());
 
                     // Put the player back on page 1 of current listings
                     new ViewCurrentListingsScreen(holder.getPlayer()).openScreen(1);

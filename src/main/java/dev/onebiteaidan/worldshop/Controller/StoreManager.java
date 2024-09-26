@@ -1,25 +1,21 @@
 package dev.onebiteaidan.worldshop.Controller;
 
-import dev.onebiteaidan.worldshop.Controller.Events.TradeCompletionEvent;
-import dev.onebiteaidan.worldshop.Controller.Events.TradeCreationEvent;
-import dev.onebiteaidan.worldshop.Controller.Events.TradeDeletionEvent;
-import dev.onebiteaidan.worldshop.Controller.Events.TradeExpirationEvent;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
-import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
+import dev.onebiteaidan.worldshop.Controller.Events.PickupEvents.PickupCreationEvent;
+import dev.onebiteaidan.worldshop.Controller.Events.PickupEvents.PickupWithdrawalEvent;
+import dev.onebiteaidan.worldshop.Controller.Events.TradeEvents.TradeCompletionEvent;
+import dev.onebiteaidan.worldshop.Controller.Events.TradeEvents.TradeCreationEvent;
+import dev.onebiteaidan.worldshop.Controller.Events.TradeEvents.TradeDeletionEvent;
+import dev.onebiteaidan.worldshop.Controller.Events.TradeEvents.TradeExpirationEvent;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.View.Screen;
-import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class StoreManager {
 
@@ -45,7 +41,32 @@ public class StoreManager {
         return instance;
     }
 
+    /**
+     * Find a trade from a given tradeID
+     * @param tradeID for corresponding trade
+     * @return Trade object with matching ID if found, otherwise return null
+     */
+    public Trade getTrade(int tradeID) {
+        for (Trade trade : trades) {
+            if (trade.getTradeID() == tradeID) {
+                return trade;
+            }
+        }
+
+        return null;
+    }
+
+    public List<Trade> getTrades() {
+        return trades;
+    }
+
+    public List<Pickup> getPickups() {
+        return pickups;
+    }
+
     public void createTrade(Trade trade) {
+        trades.add(trade);
+
         // Send TradeCreationEvent
         Bukkit.getPluginManager().callEvent(new TradeCreationEvent(trade));
     }
@@ -59,8 +80,8 @@ public class StoreManager {
         Pickup buyerPickup = new Pickup(buyer, trade.getItemOffered(), trade.getTradeID(), false, 0L);
         Pickup sellerPickup = new Pickup(trade.getSeller(), trade.getItemRequested(), trade.getTradeID(), false, 0L);
 
-        pickups.add(buyerPickup);
-        pickups.add(sellerPickup);
+        createPickup(buyerPickup);
+        createPickup(sellerPickup);
 
         // Update the views of all players
         updateAllScreens();
@@ -70,6 +91,7 @@ public class StoreManager {
     }
 
     public void deleteTrade(Trade trade) {
+
         // Send TradeDeletionEvent
         Bukkit.getPluginManager().callEvent(new TradeDeletionEvent(trade));
     }
@@ -79,10 +101,47 @@ public class StoreManager {
         Bukkit.getPluginManager().callEvent(new TradeExpirationEvent(trade));
     }
 
+    public void createPickup(Pickup pickup) {
+        pickups.add(pickup);
+
+        // Send PickupCreationEvent
+        Bukkit.getPluginManager().callEvent(new PickupCreationEvent(pickup));
+    }
+
+    public void withdrawPickup(Pickup pickup) {
+        pickup.setWithdrawn(true);
+        pickup.setWithdrawnTimestamp(System.currentTimeMillis());
+
+        // Send PickupWithdrawalEvent
+        Bukkit.getPluginManager().callEvent(new PickupWithdrawalEvent(pickup));
+    }
+
+    public void withdrawPickup(int tradeId, Player player) {
+        // Get pickup object from tradeId
+        for (Pickup pickup : pickups) {
+            if (pickup.getTradeID() == tradeId && pickup.getPlayer().equals(player)) {
+                // Pass pickup object into withdrawPickup
+                withdrawPickup(pickup);
+            }
+        }
+
+        // No matching pickups found
+        Logger.severe("NO PICKUPS MATCHED TRADE ID OR PLAYER DURING PICKUP WITHDRAWAL!");
+        Logger.severe("PLAYER: " + player.getName() + ", TRADE ID: " + tradeId);
+    }
+
     public void syncTradesToDatabase() {
         for (Trade trade : this.trades) {
             if (trade.isDirty()) {
                 trade.syncToDatabase();
+            }
+        }
+    }
+
+    public void syncPickupsToDatabase() {
+        for (Pickup pickup : this.pickups) {
+            if (pickup.isDirty()) {
+                pickup.syncToDatabase();
             }
         }
     }
@@ -97,11 +156,6 @@ public class StoreManager {
         }
     }
 
-    public void pickupCompleted(Pickup pickup) {
-        pickup.setWithdrawn(true);
-        pickup.setWithdrawnTimestamp(System.currentTimeMillis());
-    }
-
     public void addToUpdateList(Player p) {
         this.playerUpdateList.add(p);
     }
@@ -109,145 +163,4 @@ public class StoreManager {
     public void removeFromUpdateList(Player p) {
         this.playerUpdateList.remove(p);
     }
-
-
-    /**
-     * Gets the trade from the passed in display item.
-     * @param displayItem item to find trade of.
-     * @return returns the itemstack that has the same trade. Returns NULL of no matching itemstack is found
-     */
-    public Trade getTradeFromDisplayItem(ItemStack displayItem) {
-        if (displayItem.getItemMeta().hasLocalizedName()) {
-            Database db = WorldShop.getDatabase();
-            QueryBuilder qb = new QueryBuilder(db);
-
-            return getTradeFromTradeID(Integer.parseInt(displayItem.getItemMeta().getLocalizedName()));
-        }
-        return null;
-    }
-
-    /**
-     * Get the trade from the associated integer trade ID
-     * @param id integer ID associated with the trade.
-     * @return returns the trade associated w/ the ID. Returns null of no trade is found
-     */
-    public Trade getTradeFromTradeID(int id) {
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        try (ResultSet rs = qb
-                .select("*")
-                .from("trades")
-                .where("trade_id = ?")
-                .addParameter(id)
-                .executeQuery()) {
-
-            rs.next();
-
-            // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
-            OfflinePlayer buyer = null;
-            String buyerUUID = rs.getString("buyer_uuid");
-            if (!rs.wasNull()) {
-                buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
-            }
-
-            Trade trade = new Trade(rs.getInt("trade_id"),
-                    TradeStatus.values()[rs.getInt("status")],
-                    Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
-                    buyer,
-                    ItemStack.deserializeBytes(rs.getBytes("for_sale")),
-                    ItemStack.deserializeBytes(rs.getBytes("in_return")),
-                    rs.getLong("time_listed"),
-                    rs.getLong("time_completed")
-            );
-
-            return trade;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-
-    public List<ItemStack> getAllCurrentTradesDisplayItems(Player player) {
-        List<ItemStack> items = new ArrayList<>();
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        try (ResultSet rs = qb
-                    .select("*")
-                    .from("trades")
-                    .where("status = ? AND seller_uuid = ?")
-                    .addParameter(TradeStatus.OPEN.ordinal())
-                    .addParameter(player.getUniqueId().toString())
-                    .executeQuery()) {
-
-            while (rs.next()) {
-                // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
-                OfflinePlayer buyer = null;
-                String buyerUUID = rs.getString("buyer_uuid");
-                if (!rs.wasNull()) {
-                    buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
-                }
-
-                items.add(new Trade(rs.getInt("trade_id"),
-                        TradeStatus.values()[rs.getInt("status")],
-                        Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
-                        buyer,
-                        ItemStack.deserializeBytes(rs.getBytes("for_sale")),
-                        ItemStack.deserializeBytes(rs.getBytes("in_return")),
-                        rs.getLong("time_listed"),
-                        rs.getLong("time_completed")
-                ).generateDisplayItem());
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return items;
-    }
-
-    public List<ItemStack> getAllCompletedTradesItems(Player player) {
-        ArrayList<ItemStack> pickups = new ArrayList<>();
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        try (ResultSet rs = qb
-                    .select("*")
-                    .from("pickups")
-                    .where("player_uuid = ? AND collected = ?")
-                    .addParameter(player.getUniqueId().toString())
-                    .addParameter(false)
-                    .executeQuery()) {
-
-            while (rs.next()) {
-
-                Pickup p = new Pickup(Bukkit.getPlayer(UUID.fromString(rs.getString("player_uuid"))),
-                        ItemStack.deserializeBytes(rs.getBytes("pickup_item")),
-                        rs.getInt("trade_id"), rs.getBoolean("collected"),
-                        rs.getLong("time_collected")
-                );
-
-                ItemStack item = p.getItem();
-                ItemMeta itemMeta = item.getItemMeta();
-                itemMeta.setLocalizedName(String.valueOf(p.getTradeID()));
-                item.setItemMeta(itemMeta);
-
-                pickups.add(item);
-            }
-
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
-        }
-
-        return pickups;
-    }
-
-    // endregion
-
-
-
 }

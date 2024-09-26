@@ -1,4 +1,4 @@
-package dev.onebiteaidan.worldshop.Controller.Events;
+package dev.onebiteaidan.worldshop.Controller.Events.TradeEvents;
 
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 

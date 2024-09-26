@@ -1,6 +1,6 @@
 package dev.onebiteaidan.worldshop.Controller.Commands;
 
-import dev.onebiteaidan.worldshop.WorldShop;
+import dev.onebiteaidan.worldshop.View.Screens.MainShopScreen;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ public class WorldshopCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            WorldShop.getStoreManager().openShop(player, 1);
+            new MainShopScreen(player);
         }
         return false;
     }

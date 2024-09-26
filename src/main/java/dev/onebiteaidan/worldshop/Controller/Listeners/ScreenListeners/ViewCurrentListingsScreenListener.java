@@ -2,7 +2,6 @@ package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
-import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.TradeManagementScreen;
 import dev.onebiteaidan.worldshop.View.Screens.TradeRemovalScreen;
@@ -54,14 +53,14 @@ public class ViewCurrentListingsScreenListener extends ScreenListener {
                     Integer tradeID = meta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
 
                     if (tradeID == null) {
-                        WorldShop.getPlugin(WorldShop.class).getLogger().severe("UNABLE TO GET TRADEID FROM PERSISTENT DATA CONTAINER");
+                        WorldShop.getPlugin(WorldShop.class).getLogger().severe("UNABLE TO GET TRADE ID FROM PERSISTENT DATA CONTAINER");
                         return;
                     }
 
                     if (event.getClick().isLeftClick()) {
-                        new TradeViewerScreen(holder.getPlayer(), StoreManager.getInstance().getTradeFromTradeID(tradeID));
+                        new TradeViewerScreen(holder.getPlayer(), StoreManager.getInstance().getTrade(tradeID));
                     } else if (event.getClick().isRightClick()) {
-                        new TradeRemovalScreen(holder.getPlayer(), StoreManager.getInstance().getTradeFromTradeID(tradeID));
+                        new TradeRemovalScreen(holder.getPlayer(), StoreManager.getInstance().getTrade(tradeID));
                     }
 
                 } catch (NullPointerException e) {

@@ -1,7 +1,9 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
+import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
+import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.View.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -50,12 +52,18 @@ public class MainShopScreenListener extends ScreenListener {
 
                     // Open the buy screen
                     if (e.getCurrentItem() != null) {
-                        Trade trade = StoreManager.getInstance().getTradeFromDisplayItem(e.getCurrentItem());
-                        new ItemBuyerScreen(holder.getPlayer(), trade).openScreen();
+                        if (e.getCurrentItem() instanceof DisplayItem) {
+                            DisplayItem displayItem = (DisplayItem) e.getCurrentItem();
+                            Trade trade = StoreManager.getInstance().getTrade(displayItem.getTradeID());
+
+                            if (trade != null) {
+                                new ItemBuyerScreen(holder.getPlayer(), trade).openScreen();
+                            } else {
+                                Logger.severe("TRADE WAS NULL WHEN OPENING THE BUY SCREEN. PLAYER: " + e.getWhoClicked().getName());
+                            }
+                        }
                     }
-
                     break;
-
             }
         }
     }

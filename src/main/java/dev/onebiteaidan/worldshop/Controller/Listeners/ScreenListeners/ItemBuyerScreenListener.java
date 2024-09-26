@@ -1,20 +1,18 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
+import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.ItemBuyerScreen;
 import dev.onebiteaidan.worldshop.View.Screens.MainShopScreen;
-import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.TextComponent;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Objects;
 
@@ -96,7 +94,9 @@ public class ItemBuyerScreenListener extends ScreenListener {
                                 // Remove pay items from the players inventory
                                 event.getWhoClicked().getInventory().removeItem(wanted);
 
-                                WorldShop.getStoreManager().completeTrade((Player) event.getWhoClicked(), holder.getTrade().getTradeID());
+                                // Complete the trade
+                                StoreManager.getInstance().completeTrade(holder.getTrade(), (Player) event.getWhoClicked());
+
                                 // Put the player back on page 1 of the shop
                                 new MainShopScreen(holder.getPlayer()).openScreen(1);
                                 break;

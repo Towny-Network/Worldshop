@@ -2,7 +2,6 @@ package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
-import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.TradeManagementScreen;
 import dev.onebiteaidan.worldshop.View.Screens.ViewCompletedTradesScreen;
@@ -59,12 +58,11 @@ public class ViewCompletedTradesScreenListener extends ScreenListener {
                             return;
                         }
 
-                        StoreManager.getInstance().pickupCompletedTrade(holder.getPlayer(), tradeID);
+                        StoreManager.getInstance().withdrawPickup(tradeID, holder.getPlayer());
+
                     } catch (NullPointerException e) {
                         Logger.logStacktrace(e);
                     }
-
-
 
                 } else {
                     holder.getPlayer().sendMessage(text("There is not enough space in your inventory to collect the item! Please make some space!").color(NamedTextColor.RED));

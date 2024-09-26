@@ -56,11 +56,11 @@ public abstract class PageableScreen extends Screen {
      * @param spaces to allocate for the items (Starting from 0, and filling in page until spaces bound hit or out of items.)
      * @return items that will be displayed on the page.
      */
-    public List<ItemStack> getPageItems(List<ItemStack> items, int page, int spaces) {
+    public static <T extends ItemStack> List<T> getPageItems(List<T> items, int page, int spaces) {
         int upperBound = page * spaces;
         int lowerBound = upperBound - spaces;
 
-        List<ItemStack> newItems = new ArrayList<>();
+        List<T> newItems = new ArrayList<>();
         for (int i = lowerBound; i < upperBound; i++) {
             try {
                 newItems.add(items.get(i));
@@ -79,7 +79,7 @@ public abstract class PageableScreen extends Screen {
      * @param spaces to allocate for the items (Starting from 0, and filling in page until spaces bound hit or out of items.)
      * @return whether page is valid.
      */
-    public boolean isPageValid(List<ItemStack> items, int page, int spaces) {
+    public static <T extends ItemStack> boolean isPageValid(List<T> items, int page, int spaces) {
         if (page <= 0) {
             return false;
         }
