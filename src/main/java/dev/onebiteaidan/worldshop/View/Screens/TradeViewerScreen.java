@@ -34,7 +34,7 @@ public class TradeViewerScreen extends Screen {
     @Override
     protected void initializeScreen() {
         // Item Being Sold
-        ItemStack beingSold = trade.getForSale();
+        ItemStack beingSold = trade.getItemOffered();
         getInventory().setItem(2, beingSold);
 
         // Item Being Sold Marker
@@ -50,7 +50,7 @@ public class TradeViewerScreen extends Screen {
 
 
         // Payment Item
-        ItemStack paymentItem = trade.getInReturn();
+        ItemStack paymentItem = trade.getItemRequested();
         getInventory().setItem(6, paymentItem);
 
         // Payment Item Marker

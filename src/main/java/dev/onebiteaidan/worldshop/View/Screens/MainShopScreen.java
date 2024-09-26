@@ -110,7 +110,7 @@ public class MainShopScreen extends PageableScreen {
 
 
         // Add stored trades for the first page
-        List<ItemStack> items = PageUtils.getPageItems(getAllDisplayItems(player), getCurrentPage(), 45);
+        List<ItemStack> items = getPageItems(getAllDisplayItems(player), getCurrentPage(), 45);
         for (int i = 0; i < items.size(); i++) {
             // Cannot use gui.addItem(item) here because it combines identical listings
             getInventory().setItem(i, items.get(i));
