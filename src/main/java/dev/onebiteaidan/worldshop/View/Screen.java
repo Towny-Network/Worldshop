@@ -1,7 +1,9 @@
 package dev.onebiteaidan.worldshop.View;
 
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -15,17 +17,17 @@ public abstract class Screen implements InventoryHolder {
     protected Inventory inventory;
 
     /**
-     * Initialize a listener for the Screen.
-     */
-    protected void registerListener(ScreenListener screenListener) {
-        Bukkit.getPluginManager().registerEvents(screenListener, WorldShop.getPlugin(WorldShop.class));
-    }
-
-    /**
      * Initialize Screen's inventory with items.
      */
     protected abstract void initializeScreen();
 
+    /**
+     * Initialize a listener for the Screen.
+     * @param screenListener to register.
+     */
+    protected void registerListener(ScreenListener screenListener) {
+        Bukkit.getPluginManager().registerEvents(screenListener, WorldShop.getPlugin(WorldShop.class));
+    }
 
     /**
      * Opens the corresponding screen for this class's player.

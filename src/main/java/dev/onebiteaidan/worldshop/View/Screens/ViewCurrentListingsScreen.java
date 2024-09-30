@@ -28,8 +28,8 @@ public class ViewCurrentListingsScreen extends PageableScreen {
                 .color(NamedTextColor.DARK_GRAY);
 
         setInventory(plugin.getServer().createInventory(this, 36, title));
-        initializeScreen();
         registerListener(new ViewCurrentListingsScreenListener());
+        initializeScreen();
     }
 
     @Override

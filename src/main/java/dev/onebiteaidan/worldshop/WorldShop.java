@@ -1,6 +1,9 @@
 package dev.onebiteaidan.worldshop;
 
 import dev.onebiteaidan.worldshop.Controller.Commands.WorldshopCommand;
+import dev.onebiteaidan.worldshop.Controller.Events.TradeEvents.TradeCompletionEvent;
+import dev.onebiteaidan.worldshop.Controller.Listeners.PickupListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.*;
 import dev.onebiteaidan.worldshop.Controller.Listeners.TradeListener;
 import dev.onebiteaidan.worldshop.Controller.PlayerManager;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
@@ -84,12 +87,13 @@ public final class WorldShop extends JavaPlugin {
         playerManager = new PlayerManager();
 
         // Setting up listeners
-        // All GUIs handle their own listener creation
+        // GUIs handle their own event registration
         Bukkit.getPluginManager().registerEvents(new TradeListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PickupListener(), this);
 
         // Setting up commands
-        try {
-            Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand());
+        try {  Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand());
+
 
         } catch (NullPointerException exception) {
             Logger.logStacktrace(exception);

@@ -3,7 +3,7 @@ package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.View.ScreenListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.ItemBuyerScreen;
 import dev.onebiteaidan.worldshop.View.Screens.MainShopScreen;
 import net.kyori.adventure.text.TextComponent;
@@ -25,6 +25,7 @@ public class ItemBuyerScreenListener extends ScreenListener {
      * This updater runs to set the initial status of the checkbox based on if the player has enough of the price item
      * @param event called on Inventory Open
      */
+    @Override
     @EventHandler
     public void onOpen(InventoryOpenEvent event) {
         if (event.getInventory().getHolder() instanceof ItemBuyerScreen) {
@@ -53,6 +54,7 @@ public class ItemBuyerScreenListener extends ScreenListener {
     }
 
     @Override
+    @EventHandler
     public void onClick(InventoryClickEvent event) {
         if (event.getInventory().getHolder() instanceof ItemBuyerScreen) {
             ItemBuyerScreen holder = (ItemBuyerScreen) event.getInventory().getHolder();

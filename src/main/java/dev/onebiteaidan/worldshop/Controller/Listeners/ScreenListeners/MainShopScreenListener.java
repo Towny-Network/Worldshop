@@ -4,13 +4,15 @@ import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
-import dev.onebiteaidan.worldshop.View.ScreenListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.*;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class MainShopScreenListener extends ScreenListener {
 
     @Override
+    @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() instanceof MainShopScreen) {
             MainShopScreen holder = (MainShopScreen) e.getInventory().getHolder();

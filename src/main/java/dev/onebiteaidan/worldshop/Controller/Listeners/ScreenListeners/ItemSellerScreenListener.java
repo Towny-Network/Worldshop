@@ -4,13 +4,14 @@ import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.View.ScreenListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.ItemSellerScreen;
 import dev.onebiteaidan.worldshop.View.Screens.MainShopScreen;
 import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -21,6 +22,7 @@ import static net.kyori.adventure.text.Component.text;
 
 public class ItemSellerScreenListener extends ScreenListener {
     @Override
+    @EventHandler
     public void onClick(InventoryClickEvent event) {
         if (event.getInventory().getHolder() instanceof ItemSellerScreen) {
             ItemSellerScreen holder = (ItemSellerScreen) event.getInventory().getHolder();

@@ -20,8 +20,8 @@ public class StoreUpdateScreen extends Screen {
         TextComponent title = text("Oh No!");
 
         setInventory(plugin.getServer().createInventory(this, 27, title));
-        initializeScreen();
         registerListener(new StoreUpdateScreenListener());
+        initializeScreen();
     }
 
     @Override

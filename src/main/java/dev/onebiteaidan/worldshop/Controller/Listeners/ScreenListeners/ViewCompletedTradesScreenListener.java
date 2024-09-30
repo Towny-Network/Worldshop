@@ -2,12 +2,13 @@ package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
-import dev.onebiteaidan.worldshop.View.ScreenListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.TradeManagementScreen;
 import dev.onebiteaidan.worldshop.View.Screens.ViewCompletedTradesScreen;
 import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -19,6 +20,7 @@ import static net.kyori.adventure.text.Component.text;
 public class ViewCompletedTradesScreenListener extends ScreenListener {
 
     @Override
+    @EventHandler
     public void onClick(InventoryClickEvent event) {
         if (event.getInventory().getHolder() instanceof ViewCompletedTradesScreen) {
             ViewCompletedTradesScreen holder = (ViewCompletedTradesScreen) event.getInventory().getHolder();

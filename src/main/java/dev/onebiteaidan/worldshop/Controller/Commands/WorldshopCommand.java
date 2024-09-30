@@ -1,11 +1,16 @@
 package dev.onebiteaidan.worldshop.Controller.Commands;
 
 import dev.onebiteaidan.worldshop.View.Screens.MainShopScreen;
+import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 public class WorldshopCommand implements CommandExecutor {
 
@@ -16,7 +21,16 @@ public class WorldshopCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            new MainShopScreen(player);
+            new MainShopScreen(player).openScreen(1);
+
+
+
+        } else {
+            ArrayList<RegisteredListener> rls = InventoryClickEvent.getHandlerList().getRegisteredListeners(WorldShop.getPlugin(WorldShop.class));
+
+            for (RegisteredListener rl: rls) {
+                System.out.println(rl.getListener().toString());
+            }
         }
         return false;
     }

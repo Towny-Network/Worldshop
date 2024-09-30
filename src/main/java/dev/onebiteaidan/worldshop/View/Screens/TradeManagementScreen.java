@@ -21,8 +21,8 @@ public class TradeManagementScreen extends Screen {
         TextComponent title = text("Trades");
 
         setInventory(plugin.getServer().createInventory(this, 27, title));
-        initializeScreen();
         registerListener(new TradeManagementScreenListener());
+        initializeScreen();
     }
 
     @Override

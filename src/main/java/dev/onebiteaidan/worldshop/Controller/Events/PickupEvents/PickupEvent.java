@@ -15,6 +15,10 @@ public abstract class PickupEvent extends Event {
         return HANDLERS;
     }
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     protected void setPickup(Pickup pickup) {
         this.pickup = pickup;
     }

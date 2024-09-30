@@ -1,13 +1,15 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
-import dev.onebiteaidan.worldshop.View.ScreenListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.TradeRemovalScreen;
 import dev.onebiteaidan.worldshop.View.Screens.ViewCurrentListingsScreen;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class TradeRemovalScreenListener extends ScreenListener {
     @Override
+    @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (e.getInventory().getHolder() instanceof TradeRemovalScreen) {
             TradeRemovalScreen holder = (TradeRemovalScreen) e.getInventory().getHolder();

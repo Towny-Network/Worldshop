@@ -15,6 +15,10 @@ public abstract class TradeEvent extends Event {
         return HANDLERS;
     }
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     protected void setTrade(Trade trade) {
         this.trade = trade;
     }

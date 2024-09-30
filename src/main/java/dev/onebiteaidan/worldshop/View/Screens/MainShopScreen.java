@@ -37,8 +37,8 @@ public class MainShopScreen extends PageableScreen {
                 .color(NamedTextColor.DARK_GRAY);
 
         setInventory(plugin.getServer().createInventory(this, 54, title)); //Todo: make the title of the store change based on nation it's in
-        initializeScreen();
         registerListener(new MainShopScreenListener());
+        initializeScreen();
     }
 
     @Override
@@ -120,6 +120,7 @@ public class MainShopScreen extends PageableScreen {
     public void openScreen(int page) {
         setCurrentPage(page);
         initializeScreen();
+
         player.openInventory(getInventory());
     }
 

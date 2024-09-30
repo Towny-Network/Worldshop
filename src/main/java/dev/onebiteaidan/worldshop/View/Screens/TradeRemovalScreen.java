@@ -21,8 +21,8 @@ public class TradeRemovalScreen extends Screen {
         TextComponent title = text("Delete this trade?");
 
         setInventory(plugin.getServer().createInventory(this, 18, title));
-        initializeScreen();
         registerListener(new TradeRemovalScreenListener());
+        initializeScreen();
     }
 
     @Override
