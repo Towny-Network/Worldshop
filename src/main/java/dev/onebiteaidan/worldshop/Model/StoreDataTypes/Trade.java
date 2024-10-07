@@ -83,11 +83,18 @@ public class Trade {
         AtomicInteger generatedTradeID = new AtomicInteger(-1);
 
         try {
-            updateStatus = qb.insertInto("trades", "seller_uuid, buyer_uuid, item_offered, item_requested, tradeStatus, listing_timestamp, completion_timestamp")
+            qb.insertInto("trades", "seller_uuid, buyer_uuid, item_offered, item_requested, trade_status, listing_timestamp, completion_timestamp")
                     .values("?,?,?,?,?,?,?")
-                    .addParameter(this.seller.getUniqueId().toString())
-                    .addParameter(this.buyer.getUniqueId().toString())
-                    .addParameter(this.itemOffered)
+                    .addParameter(this.seller.getUniqueId().toString());
+
+            // If buyer is null, don't call OfflinePlayer::getUniqueId()
+            if (this.buyer == null) {
+                qb.addParameter(null);
+            } else {
+                qb.addParameter(this.buyer.getUniqueId().toString());
+            }
+
+            qb.addParameter(this.itemOffered)
                     .addParameter(this.itemRequested)
                     .addParameter(this.tradeStatus.ordinal())
                     .addParameter(this.listingTimestamp)

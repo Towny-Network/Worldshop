@@ -31,7 +31,7 @@ public class Utils {
         // Convert the Bukkit ItemStack to an NMS one and use the NMS ItemStack to save the data in NBT
         CraftItemStack.asNMSCopy(stack).save(tag);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        // Now save the data into a ByteArrayOutputStream to be able to convert it to an byte array
+        // Now save the data into a ByteArrayOutputStream to be able to convert it to a byte array
         // You can wrap a GZipOutputStream around if you also want to compress that data
         NBTCompressedStreamTools.a(tag, output);
         return output.toByteArray();
@@ -51,7 +51,7 @@ public class Utils {
         if (url.isEmpty()) return head;
 
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+        GameProfile profile = new GameProfile(UUID.randomUUID(), "player");
 
         profile.getProperties().put("textures", new Property("textures", url));
 

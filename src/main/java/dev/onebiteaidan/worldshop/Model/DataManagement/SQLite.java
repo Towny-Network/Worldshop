@@ -150,12 +150,12 @@ public class SQLite implements Database {
                         "(" +
                         "trade_id INTEGER PRIMARY KEY," +
                         "seller_uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
-                        "for_sale BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
-                        "in_return BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
-                        "status int," + // ENUM statuses include: OPEN, COMPLETE, EXPIRED, REMOVED
                         "buyer_uuid varchar(36)," +
-                        "time_listed BIGINT," +
-                        "time_completed BIGINT" +
+                        "item_offered BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
+                        "item_requested BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
+                        "trade_status int," + // ENUM statuses include: OPEN, COMPLETE, EXPIRED, REMOVED
+                        "listing_timestamp BIGINT," +
+                        "completion_timestamp BIGINT" +
                         ");"
         );
     }

@@ -8,6 +8,8 @@ import java.sql.*;
 
 public class MySQL implements Database {
 
+
+
     private final String HOST = Config.getHost();
     private final int PORT = Config.getPort();
     private final String DATABASE = Config.getDatabase();
@@ -166,14 +168,14 @@ public class MySQL implements Database {
         this.run(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
                 "CREATE TABLE IF NOT EXISTS trades" +
                         "(" +
-                        "trade_id int UNIQUE AUTO_INCREMENT," +
-                        "status int," + // ENUM statuses include: OPEN, COMPLETE, EXPIRED, REMOVED
+                        "trade_id int PRIMARY KEY AUTO_INCREMENT," +
+                        "trade_status status ENUM('OPEN', 'COMPLETE', 'EXPIRED', 'REMOVED') DEFAULT 'OPEN'," +
                         "seller_uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
                         "buyer_uuid varchar(36)," +
                         "for_sale BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
                         "in_return BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
-                        "time_listed BIGINT," +
-                        "time_completed BIGINT" +
+                        "time_listed TIMESTAMP," +
+                        "time_completed TIMESTAMP" +
                         ");"
         );
     }

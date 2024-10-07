@@ -79,25 +79,33 @@ public class QueryBuilder {
     }
 
     public int executeUpdateWithGeneratedKeys(ResultSetHandler resultSetHandler) throws SQLException {
-        PreparedStatement preparedStatement = database.getConnection().prepareStatement(query.toString(), PreparedStatement.RETURN_GENERATED_KEYS);
+        // Use try-with-resources to ensure preparedStatement is closed after execution
+        try (PreparedStatement preparedStatement = database.getConnection().prepareStatement(query.toString(), PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-        // Set all parameters safely
-        for (int i = 0; i < parameters.size(); i++) {
-            preparedStatement.setObject(i + 1, parameters.get(i));
-        }
-
-        // Execute the update
-        int updateCount = preparedStatement.executeUpdate();
-
-        // Retrieve generated keys if available
-        try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-            if (generatedKeys != null) {
-                resultSetHandler.handle(generatedKeys);
+            // Set all parameters safely
+            for (int i = 0; i < parameters.size(); i++) {
+                Object param = parameters.get(i);
+                if (param != null) {
+                    preparedStatement.setObject(i + 1, param);  // Set the non-null parameter
+                } else {
+                    preparedStatement.setNull(i + 1, java.sql.Types.VARCHAR);  // Set null with appropriate SQL type
+                }
             }
-        }
 
-        return updateCount;
+            // Execute the update
+            int updateCount = preparedStatement.executeUpdate();
+
+            // Retrieve generated keys if available
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys != null && generatedKeys.next()) {
+                    resultSetHandler.handle(generatedKeys);  // Process the generated keys
+                }
+            }
+
+            return updateCount;  // Return the count of rows affected
+        }
     }
+
 
     public int executeUpdate() throws SQLException {
         PreparedStatement preparedStatement = prepareStatement();

@@ -132,7 +132,7 @@ public class MainShopScreen extends PageableScreen {
 
     /**
      * Gets all display items from the store manager for display in the main shop page
-     * @return returns and arraylist of the display itemstacks
+     * @return returns and arraylist of the display item stacks
      */
     private List<ItemStack> getAllDisplayItems() {
         List<ItemStack> items = new ArrayList<>();
@@ -155,13 +155,13 @@ public class MainShopScreen extends PageableScreen {
                 }
 
                 items.add(new Trade(rs.getInt("trade_id"),
-                        TradeStatus.values()[rs.getInt("status")],
+                        TradeStatus.values()[rs.getInt("trade_status")],
                         Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
                         buyer,
-                        ItemStack.deserializeBytes(rs.getBytes("for_sale")),
-                        ItemStack.deserializeBytes(rs.getBytes("in_return")),
-                        rs.getLong("time_listed"),
-                        rs.getLong("time_completed")
+                        ItemStack.deserializeBytes(rs.getBytes("item_offered")),
+                        ItemStack.deserializeBytes(rs.getBytes("item_requested")),
+                        rs.getLong("listing_timestamp"),
+                        rs.getLong("completion_timestamp")
                 ).generateDisplayItem());
             }
 
@@ -175,7 +175,7 @@ public class MainShopScreen extends PageableScreen {
     /**
      * Gets all display items from the store manager for display in the main shop page
      * @param player Removes any trades with this player as the seller
-     * @return returns and arraylist of the display itemstacks
+     * @return returns and arraylist of the display item stacks
      */
     private List<ItemStack> getAllDisplayItems(Player player) {
         List<ItemStack> items = new ArrayList<>();
@@ -185,7 +185,7 @@ public class MainShopScreen extends PageableScreen {
         try (ResultSet rs = qb
                 .select("*")
                 .from("trades")
-                .where("status = ? AND seller_uuid <> ?")
+                .where("trade_status = ? AND seller_uuid <> ?")
                 .addParameter(TradeStatus.OPEN.ordinal())
                 .addParameter(player.getUniqueId().toString())
                 .executeQuery()) {
@@ -202,10 +202,10 @@ public class MainShopScreen extends PageableScreen {
                         TradeStatus.values()[rs.getInt("status")],
                         Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
                         buyer,
-                        ItemStack.deserializeBytes(rs.getBytes("for_sale")),
-                        ItemStack.deserializeBytes(rs.getBytes("in_return")),
-                        rs.getLong("time_listed"),
-                        rs.getLong("time_completed")
+                        ItemStack.deserializeBytes(rs.getBytes("item_offered")),
+                        ItemStack.deserializeBytes(rs.getBytes("item_requested")),
+                        rs.getLong("listing_timestamp"),
+                        rs.getLong("completion_timestamp")
                 ).generateDisplayItem());
             }
 
