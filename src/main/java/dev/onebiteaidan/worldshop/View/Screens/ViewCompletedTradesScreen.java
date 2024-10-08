@@ -4,7 +4,6 @@ import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.ViewCompletedTradesScreenListener;
 import dev.onebiteaidan.worldshop.View.PageableScreen;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,7 +26,6 @@ public class ViewCompletedTradesScreen extends PageableScreen {
         TextComponent title = text("Completed Trades");
 
         setInventory(plugin.getServer().createInventory(this, 36, title));
-        registerListener(new ViewCompletedTradesScreenListener());
         initializeScreen();
     }
 

@@ -2,7 +2,6 @@ package dev.onebiteaidan.worldshop.View.Screens;
 
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.TradeViewerScreenListener;
 import dev.onebiteaidan.worldshop.View.Screen;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -27,7 +26,6 @@ public class TradeViewerScreen extends Screen {
                 .color(NamedTextColor.DARK_GRAY);
 
         setInventory(plugin.getServer().createInventory(this, 27, title)); //Todo: make the title of the store change based on nation it's in
-        registerListener(new TradeViewerScreenListener());
         initializeScreen();
     }
 

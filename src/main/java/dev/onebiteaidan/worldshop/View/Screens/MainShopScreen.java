@@ -6,7 +6,6 @@ import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.MainShopScreenListener;
 import dev.onebiteaidan.worldshop.View.PageableScreen;
 import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.Component;
@@ -37,7 +36,6 @@ public class MainShopScreen extends PageableScreen {
                 .color(NamedTextColor.DARK_GRAY);
 
         setInventory(plugin.getServer().createInventory(this, 54, title)); //Todo: make the title of the store change based on nation it's in
-        registerListener(new MainShopScreenListener());
         initializeScreen();
     }
 

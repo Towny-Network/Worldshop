@@ -2,7 +2,6 @@ package dev.onebiteaidan.worldshop.View.Screens;
 
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.TradeRemovalScreenListener;
 import dev.onebiteaidan.worldshop.View.Screen;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.Player;
@@ -21,7 +20,6 @@ public class TradeRemovalScreen extends Screen {
         TextComponent title = text("Delete this trade?");
 
         setInventory(plugin.getServer().createInventory(this, 18, title));
-        registerListener(new TradeRemovalScreenListener());
         initializeScreen();
     }
 

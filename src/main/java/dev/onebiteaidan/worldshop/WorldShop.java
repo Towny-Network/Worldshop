@@ -2,6 +2,7 @@ package dev.onebiteaidan.worldshop;
 
 import dev.onebiteaidan.worldshop.Controller.Commands.WorldshopCommand;
 import dev.onebiteaidan.worldshop.Controller.Listeners.PickupListener;
+import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.*;
 import dev.onebiteaidan.worldshop.Controller.Listeners.TradeListener;
 import dev.onebiteaidan.worldshop.Controller.PlayerManager;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
@@ -84,7 +85,18 @@ public final class WorldShop extends JavaPlugin {
         playerManager = new PlayerManager();
 
         // Setting up listeners
-        // GUIs handle their own event registration
+
+        // GUI Listeners
+        Bukkit.getPluginManager().registerEvents(new ItemBuyerScreenListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ItemSellerScreenListener(), this);
+        Bukkit.getPluginManager().registerEvents(new MainShopScreenListener(), this);
+        Bukkit.getPluginManager().registerEvents(new StoreUpdateScreenListener(), this);
+        Bukkit.getPluginManager().registerEvents(new TradeManagementScreenListener(), this);
+        Bukkit.getPluginManager().registerEvents(new TradeRemovalScreenListener(), this);
+        Bukkit.getPluginManager().registerEvents(new TradeViewerScreenListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ViewCompletedTradesScreenListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ViewCurrentListingsScreenListener(), this);
+
         Bukkit.getPluginManager().registerEvents(new TradeListener(), this);
         Bukkit.getPluginManager().registerEvents(new PickupListener(), this);
 

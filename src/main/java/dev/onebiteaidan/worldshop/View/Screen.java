@@ -22,14 +22,6 @@ public abstract class Screen implements InventoryHolder {
     protected abstract void initializeScreen();
 
     /**
-     * Initialize a listener for the Screen.
-     * @param screenListener to register.
-     */
-    protected void registerListener(ScreenListener screenListener) {
-        Bukkit.getPluginManager().registerEvents(screenListener, WorldShop.getPlugin(WorldShop.class));
-    }
-
-    /**
      * Opens the corresponding screen for this class's player.
      */
     public void openScreen() {

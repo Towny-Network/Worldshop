@@ -1,6 +1,5 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
-import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.ViewCurrentListingsScreenListener;
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
@@ -28,7 +27,6 @@ public class ViewCurrentListingsScreen extends PageableScreen {
                 .color(NamedTextColor.DARK_GRAY);
 
         setInventory(plugin.getServer().createInventory(this, 36, title));
-        registerListener(new ViewCurrentListingsScreenListener());
         initializeScreen();
     }
 

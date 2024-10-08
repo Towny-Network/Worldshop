@@ -1,7 +1,6 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.StoreUpdateScreenListener;
 import dev.onebiteaidan.worldshop.View.Screen;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
@@ -20,7 +19,6 @@ public class StoreUpdateScreen extends Screen {
         TextComponent title = text("Oh No!");
 
         setInventory(plugin.getServer().createInventory(this, 27, title));
-        registerListener(new StoreUpdateScreenListener());
         initializeScreen();
     }
 
