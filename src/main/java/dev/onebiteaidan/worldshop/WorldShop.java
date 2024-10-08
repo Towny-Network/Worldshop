@@ -1,17 +1,14 @@
 package dev.onebiteaidan.worldshop;
 
 import dev.onebiteaidan.worldshop.Controller.Commands.WorldshopCommand;
-import dev.onebiteaidan.worldshop.Controller.Events.TradeEvents.TradeCompletionEvent;
 import dev.onebiteaidan.worldshop.Controller.Listeners.PickupListener;
-import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.*;
 import dev.onebiteaidan.worldshop.Controller.Listeners.TradeListener;
 import dev.onebiteaidan.worldshop.Controller.PlayerManager;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
-import dev.onebiteaidan.worldshop.Model.DataManagement.MySQL;
-import dev.onebiteaidan.worldshop.Model.DataManagement.SQLite;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.MySQL;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.SQLite;
 import dev.onebiteaidan.worldshop.Utils.Logger;
-import dev.onebiteaidan.worldshop.Utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 

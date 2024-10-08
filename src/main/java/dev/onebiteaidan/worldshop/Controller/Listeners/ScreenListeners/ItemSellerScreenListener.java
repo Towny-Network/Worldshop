@@ -60,8 +60,6 @@ public class ItemSellerScreenListener extends ScreenListener {
 
                                 StoreManager.getInstance().createTrade(new Trade(holder.getPlayer(), forSale, inReturn));
 
-                                System.out.println("THIS WAS HIT");
-
                                 // Brings the player back to the main page of the store.
                                 new MainShopScreen(holder.getPlayer()).openScreen(1);
                                 break;

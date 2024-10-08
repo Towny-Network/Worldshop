@@ -1,6 +1,6 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
 import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;

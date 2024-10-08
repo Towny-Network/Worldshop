@@ -1,7 +1,9 @@
-package dev.onebiteaidan.worldshop.Model.DataManagement;
+package dev.onebiteaidan.worldshop.Model.DataManagement.Database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
 import org.bukkit.inventory.ItemStack;
 
 import java.sql.*;

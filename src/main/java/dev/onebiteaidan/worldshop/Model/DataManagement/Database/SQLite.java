@@ -1,6 +1,10 @@
-package dev.onebiteaidan.worldshop.Model.DataManagement;
+package dev.onebiteaidan.worldshop.Model.DataManagement.Database;
 
 import dev.onebiteaidan.worldshop.WorldShop;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.Table;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.TradeColumn;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.PlayerColumn;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.PickupColumn;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -146,16 +150,16 @@ public class SQLite implements Database {
     @Override
     public void createTradesTable() {
         this.run(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
-                "CREATE TABLE IF NOT EXISTS trades" +
+                "CREATE TABLE IF NOT EXISTS " + Table.TRADES +
                         "(" +
-                        "trade_id INTEGER PRIMARY KEY," +
-                        "seller_uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
-                        "buyer_uuid varchar(36)," +
-                        "item_offered BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
-                        "item_requested BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
-                        "trade_status int," + // ENUM statuses include: OPEN, COMPLETE, EXPIRED, REMOVED
-                        "listing_timestamp BIGINT," +
-                        "completion_timestamp BIGINT" +
+                        TradeColumn.TRADE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        TradeColumn.SELLER_UUID + " varchar(36)," + // The length of a UUID will never be longer than 36 characters
+                        TradeColumn.BUYER_UUID + " varchar(36)," +
+                        TradeColumn.ITEM_OFFERED + " BLOB," +  // Item stacks can be stored in the BLOB datatype after being converted to byte arrays
+                        TradeColumn.ITEM_REQUESTED + " BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
+                        TradeColumn.TRADE_STATUS + " int," + // ENUM statuses include: OPEN, COMPLETE, EXPIRED, REMOVED
+                        TradeColumn.LISTING_TIMESTAMP + " BIGINT," +
+                        TradeColumn.COMPLETION_TIMESTAMP + " BIGINT" +
                         ");"
         );
     }
@@ -163,13 +167,13 @@ public class SQLite implements Database {
     @Override
     public void createPickupsTable() {
         this.run(
-                "CREATE TABLE IF NOT EXISTS pickups" +
+                "CREATE TABLE IF NOT EXISTS " + Table.PICKUPS +
                         "(" +
-                        "player_uuid varchar(36)," +
-                        "pickup_item BLOB," +
-                        "trade_id int," +
-                        "collected boolean," +
-                        "time_collected BIGINT" +
+                        PickupColumn.PLAYER_UUID + " varchar(36)," +
+                        PickupColumn.PICKUP_ITEM + " BLOB," +
+                        PickupColumn.TRADE_ID + " int," +
+                        PickupColumn.COLLECTED + " boolean," +
+                        PickupColumn.TIME_COLLECTED + " BIGINT" +
                         ");"
         );
     }
@@ -177,11 +181,11 @@ public class SQLite implements Database {
     @Override
     public void createPlayersTable() {
         this.run(
-                "CREATE TABLE IF NOT EXISTS players" +
+                "CREATE TABLE IF NOT EXISTS " + Table.PLAYERS +
                         "(" +
-                        "uuid varchar(36) UNIQUE," + // The length of a UUID will never be longer than 36 characters and will always be unique
-                        "purchases int DEFAULT 0," + // Number of purchases
-                        "sales int DEFAULT 0" + // Number of sales
+                        PlayerColumn.PLAYER_UUID + " varchar(36) UNIQUE," + // The length of a UUID will never be longer than 36 characters and will always be unique
+                        PlayerColumn.PURCHASES + " int DEFAULT 0," + // Number of purchases
+                        PlayerColumn.SALES + " int DEFAULT 0" + // Number of sales
                         ");"
         );
     }

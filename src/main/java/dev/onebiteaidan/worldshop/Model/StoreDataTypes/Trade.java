@@ -1,18 +1,18 @@
 package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.Table;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.TradeColumn;
 import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.WorldShop;
-import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Trade {
@@ -46,10 +46,12 @@ public class Trade {
         this.completionTimestamp = 0L;
         this.isDirty = true;
 
-        boolean success = syncToDatabase();
+        boolean success = addToDatabase();
 
         if (!success) {
             Logger.severe("Trade " + this.tradeID + " had an error occur in the database.");
+        } else {
+            Logger.severe("Trade " + this.tradeID + " was added to the database.");
         }
     }
 
@@ -75,15 +77,14 @@ public class Trade {
         this.completionTimestamp = completionTimestamp;
     }
 
-    public boolean syncToDatabase() {
+    private boolean addToDatabase() {
         Database db = WorldShop.getDatabase();
         QueryBuilder qb = new QueryBuilder(db);
 
         int updateStatus = 0;
-        AtomicInteger generatedTradeID = new AtomicInteger(-1);
 
         try {
-            qb.insertInto("trades", "seller_uuid, buyer_uuid, item_offered, item_requested, trade_status, listing_timestamp, completion_timestamp")
+            qb.insertInto(Table.TRADES, TradeColumn.SELLER_UUID, TradeColumn.BUYER_UUID, TradeColumn.ITEM_OFFERED, TradeColumn.ITEM_REQUESTED, TradeColumn.TRADE_STATUS, TradeColumn.LISTING_TIMESTAMP, TradeColumn.COMPLETION_TIMESTAMP)
                     .values("?,?,?,?,?,?,?")
                     .addParameter(this.seller.getUniqueId().toString());
 
@@ -99,17 +100,16 @@ public class Trade {
                     .addParameter(this.tradeStatus.ordinal())
                     .addParameter(this.listingTimestamp)
                     .addParameter(this.completionTimestamp)
-                    .executeUpdateWithGeneratedKeys(rs -> {
-                        if (rs.next()) {
-                            // Retrieve the generated tradeID
-                            generatedTradeID.set(rs.getInt(1)); // Assuming tradeID is the first column returned
-                        }
-                    });
+                    .executeUpdate();
 
-            if (generatedTradeID.get() > 0) {
-                this.tradeID = generatedTradeID.get();
+            // Get the most recent ID added to the database (should be the max)
+            PreparedStatement ps = db.getConnection().prepareStatement("SELECT MAX(" + TradeColumn.TRADE_ID + ") FROM " + Table.TRADES);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                this.tradeID = rs.getInt(1);
+                updateStatus = 1;
             } else {
-                Logger.severe("TradeID was not obtained from database for a new Trade object. " + this);
+                Logger.severe("TRADE WAS NOT GIVEN AN ID. " + this.toString());
             }
 
         } catch (SQLException e) {
@@ -124,6 +124,55 @@ public class Trade {
         }
 
         return false;
+    }
+
+    public void syncToDatabase() {
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        int updateStatus = 0;
+
+//        @param tradeID         The ID of the trade.
+//     * @param tradeStatus     The status of the trade.
+//     * @param seller          The player offering the item.
+//     * @param buyer           The player who is paying for the item.
+//     * @param itemOffered     The item being offered by the seller.
+//     * @param itemRequested   The item the seller wants in return.
+//     * @param listingTimestamp The time the trade was listed.
+//                * @param completionTimestamp The time the trade was completed.
+
+
+        qb.update(Table.TRADES)
+                .set(TradeColumn.TRADE_STATUS + " = ?, " +
+                        TradeColumn.SELLER_UUID + " = ?, " +
+                        TradeColumn.BUYER_UUID + " = ?, " +
+                        TradeColumn.ITEM_OFFERED + " = ?, " +
+                        TradeColumn.ITEM_REQUESTED + " = ?, " +
+                        TradeColumn.LISTING_TIMESTAMP + " = ?, " +
+                        TradeColumn.COMPLETION_TIMESTAMP + " = ? ")
+                .where(TradeColumn.TRADE_ID + " = ?")
+                .addParameter(this.tradeStatus)
+                .addParameter(this.seller.getUniqueId())
+                .addParameter(this.buyer.getUniqueId())
+                .addParameter(this.itemOffered)
+                .addParameter(this.itemRequested)
+                .addParameter(this.listingTimestamp)
+                .addParameter(completionTimestamp);
+
+//        try (ResultSet rs = qb.executeQuery()) {
+//
+//        } catch(SQLException e) {
+//            Logger.logStacktrace(e);
+//        }
+
+        try {
+            // Execute the update query (since this is an update operation)
+            int rowsAffected = qb.executeUpdate();
+            System.out.println("Rows updated: " + rowsAffected);
+
+        } catch (SQLException e) {
+            Logger.logStacktrace(e);
+        }
     }
 
     public int getTradeID() {

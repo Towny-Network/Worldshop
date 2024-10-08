@@ -1,6 +1,8 @@
 package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.Table;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.PickupColumn;
 import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.WorldShop;
@@ -35,7 +37,7 @@ public class Pickup {
         int updateStatus = 0;
 
         try {
-            updateStatus = qb.insertInto("pickups", "player_uuid, pickup_item, trade_id, collected, time_collected")
+            updateStatus = qb.insertInto(Table.PICKUPS, PickupColumn.PLAYER_UUID, PickupColumn.PICKUP_ITEM, PickupColumn.TRADE_ID, PickupColumn.COLLECTED, PickupColumn.TIME_COLLECTED)
                     .values("?,?,?,?,?")
                     .addParameter(this.player.getUniqueId().toString())
                     .addParameter(this.item)
