@@ -27,7 +27,6 @@ public class TradeViewerScreen extends Screen {
                 .color(NamedTextColor.DARK_GRAY);
 
         setInventory(plugin.getServer().createInventory(this, 27, title)); //Todo: make the title of the store change based on nation it's in
-        registerListener(new TradeViewerScreenListener());
         initializeScreen();
     }
 

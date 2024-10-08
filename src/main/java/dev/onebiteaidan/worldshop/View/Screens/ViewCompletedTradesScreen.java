@@ -27,7 +27,6 @@ public class ViewCompletedTradesScreen extends PageableScreen {
         TextComponent title = text("Completed Trades");
 
         setInventory(plugin.getServer().createInventory(this, 36, title));
-        registerListener(new ViewCompletedTradesScreenListener());
         initializeScreen();
     }
 

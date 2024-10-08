@@ -48,7 +48,6 @@ public class ItemSellerScreen extends Screen {
                 .color(NamedTextColor.DARK_GRAY);
 
         setInventory(WorldShop.getPlugin(WorldShop.class).getServer().createInventory(this, 27, title)); //Todo: make the title of the store change based on nation it's in
-        registerListener(new ItemSellerScreenListener());
 
         // Initialize all non-standard Screen item stacks
         initializeConfirmButtons();
@@ -117,7 +116,7 @@ public class ItemSellerScreen extends Screen {
         getInventory().setItem(12, sellItem);
 
         // Reset item amount to zero
-        this.priceAmount = 0;
+        this.priceAmount = 1;
 
         // Update the confirm button status
         updateStatus();
@@ -131,10 +130,11 @@ public class ItemSellerScreen extends Screen {
 
         // Replace the current priceItem or emptyPriceItem placeholder with new priceItem
         this.priceItem = priceItem;
+        priceItem.setAmount(1);
         getInventory().setItem(15, priceItem);
 
         // Reset item amount to zero
-        this.priceAmount = 0;
+        this.priceAmount = 1;
 
         // Update the confirm button status
         updateStatus();
@@ -149,7 +149,7 @@ public class ItemSellerScreen extends Screen {
         this.getInventory().setItem(12, emptySellItem);
 
         // Reset item amount to zero
-        this.priceAmount = 0;
+        this.priceAmount = 1;
 
         // Update the status of the confirm button
         this.confirmStatus = ConfirmStatus.CANNOT_CONFIRM;
@@ -164,7 +164,7 @@ public class ItemSellerScreen extends Screen {
         this.getInventory().setItem(15, emptyPriceItem);
 
         // Reset item amount to zero
-        this.priceAmount = 0;
+        this.priceAmount = 1;
 
         // Update the status of the confirm button
         this.confirmStatus = ConfirmStatus.CANNOT_CONFIRM;

@@ -28,7 +28,6 @@ public class ItemBuyerScreen extends Screen {
                 .color(NamedTextColor.DARK_GRAY);
 
         setInventory(WorldShop.getPlugin(WorldShop.class).getServer().createInventory(this, 27, title)); //Todo: make the title of the store change based on nation it's in
-        registerListener(new ItemBuyerScreenListener());
         initializeScreen();
     }
 
