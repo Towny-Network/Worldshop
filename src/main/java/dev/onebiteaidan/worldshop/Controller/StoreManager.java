@@ -6,16 +6,24 @@ import dev.onebiteaidan.worldshop.Controller.Events.TradeEvents.TradeCompletionE
 import dev.onebiteaidan.worldshop.Controller.Events.TradeEvents.TradeCreationEvent;
 import dev.onebiteaidan.worldshop.Controller.Events.TradeEvents.TradeDeletionEvent;
 import dev.onebiteaidan.worldshop.Controller.Events.TradeEvents.TradeExpirationEvent;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.TradeColumn;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.PickupColumn;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.PlayerColumn;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.Table;
+import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.View.Screen;
+import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class StoreManager {
 
@@ -31,6 +39,9 @@ public class StoreManager {
         playerUpdateList = new ArrayList<>();
         trades = new ArrayList<>();
         pickups = new ArrayList<>();
+
+        populateTrades();
+//        populatePickups();
     }
 
     public static StoreManager getInstance() {
@@ -163,4 +174,27 @@ public class StoreManager {
     public void removeFromUpdateList(Player p) {
         this.playerUpdateList.remove(p);
     }
+
+    private void populateTrades() {
+        // Populate trades list
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        qb.select(TradeColumn.TRADE_ID)
+                .from(Table.TRADES);
+
+        try (ResultSet rs = qb.executeQuery()) {
+            if (rs.next()) {
+                trades.add(new Trade(rs.getInt(TradeColumn.TRADE_ID + "")));
+            }
+        } catch (SQLException e) {
+            Logger.logStacktrace(e);
+        }
+    }
+
+    private void populatePickups() {
+
+    }
+
+
 }

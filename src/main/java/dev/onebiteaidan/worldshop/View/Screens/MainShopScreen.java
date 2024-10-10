@@ -1,6 +1,9 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
+import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.TradeColumn;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema;
 import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
@@ -134,37 +137,9 @@ public class MainShopScreen extends PageableScreen {
      */
     private List<ItemStack> getAllDisplayItems() {
         List<ItemStack> items = new ArrayList<>();
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
 
-        try (ResultSet rs = qb
-                .select("*")
-                .from("trades")
-                .where("status = ?")
-                .addParameter(TradeStatus.OPEN.ordinal())
-                .executeQuery()) {
-
-            while (rs.next()) {
-                // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
-                OfflinePlayer buyer = null;
-                String buyerUUID = rs.getString("buyer_uuid");
-                if (!rs.wasNull()) {
-                    buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
-                }
-
-                items.add(new Trade(rs.getInt("trade_id"),
-                        TradeStatus.values()[rs.getInt("trade_status")],
-                        Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
-                        buyer,
-                        ItemStack.deserializeBytes(rs.getBytes("item_offered")),
-                        ItemStack.deserializeBytes(rs.getBytes("item_requested")),
-                        rs.getLong("listing_timestamp"),
-                        rs.getLong("completion_timestamp")
-                ).generateDisplayItem());
-            }
-
-        } catch (SQLException e) {
-            WorldShop.getPlugin(WorldShop.class).getLogger().severe(Arrays.toString(e.getStackTrace()));
+        for (Trade trade : StoreManager.getInstance().getTrades()) {
+            items.add(trade.generateDisplayItem());
         }
 
         return items;
@@ -177,38 +152,11 @@ public class MainShopScreen extends PageableScreen {
      */
     private List<ItemStack> getAllDisplayItems(Player player) {
         List<ItemStack> items = new ArrayList<>();
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
 
-        try (ResultSet rs = qb
-                .select("*")
-                .from("trades")
-                .where("trade_status = ? AND seller_uuid <> ?")
-                .addParameter(TradeStatus.OPEN.ordinal())
-                .addParameter(player.getUniqueId().toString())
-                .executeQuery()) {
-
-            while (rs.next()) {
-                // The string to UUID conversion breaks when the value is null, so we have to do a null check here.
-                OfflinePlayer buyer = null;
-                String buyerUUID = rs.getString("buyer_uuid");
-                if (!rs.wasNull()) {
-                    buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUUID));
-                }
-
-                items.add(new Trade(rs.getInt("trade_id"),
-                        TradeStatus.values()[rs.getInt("status")],
-                        Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("seller_uuid"))),
-                        buyer,
-                        ItemStack.deserializeBytes(rs.getBytes("item_offered")),
-                        ItemStack.deserializeBytes(rs.getBytes("item_requested")),
-                        rs.getLong("listing_timestamp"),
-                        rs.getLong("completion_timestamp")
-                ).generateDisplayItem());
+        for (Trade trade : StoreManager.getInstance().getTrades()) {
+            if (!trade.getSeller().equals(player)) {
+                items.add(trade.generateDisplayItem());
             }
-
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
         }
 
         return items;

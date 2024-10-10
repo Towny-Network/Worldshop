@@ -22,6 +22,22 @@ import java.util.UUID;
 
 
 public class Utils {
+    public static byte[] serializeItem(ItemStack itemStack) throws IOException {
+        // Serialize ItemStack to a byte array
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(byteOut);
+        out.writeObject(itemStack);
+        out.flush();
+        return byteOut.toByteArray();
+    }
+
+    public static ItemStack deserializeItem(byte[] itemStackBytes) throws IOException, ClassNotFoundException {
+        // Deserialize byte array back to ItemStack
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(itemStackBytes);
+        ObjectInputStream in = new ObjectInputStream(byteIn);
+        return (ItemStack) in.readObject();
+    }
+
 
     // Next two methods grabbed from https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
 

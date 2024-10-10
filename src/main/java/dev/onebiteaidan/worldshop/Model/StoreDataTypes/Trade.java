@@ -5,14 +5,18 @@ import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.T
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.TradeColumn;
 import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.Utils.Logger;
+import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.WorldShop;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 
 public class Trade {
@@ -75,6 +79,54 @@ public class Trade {
         this.itemRequested = itemRequested;
         this.listingTimestamp = listingTimestamp;
         this.completionTimestamp = completionTimestamp;
+    }
+
+    /**
+     * Constructor that pulls the data from the database
+     * @param tradeID       The ID of the trade.
+     */
+    public Trade(int tradeID) {
+        Database db = WorldShop.getDatabase();
+        QueryBuilder qb = new QueryBuilder(db);
+
+        qb.select(TradeColumn.ALL)
+                .from(Table.TRADES)
+                .where(TradeColumn.TRADE_ID + " = ?")
+                .addParameter(tradeID);
+
+        try (ResultSet rs = qb.executeQuery()) {
+            if (rs.next()) {
+                // Retrieve tradeStatus
+                this.tradeStatus = TradeStatus.values()[rs.getInt(TradeColumn.TRADE_STATUS + "")];
+
+                // Retrieve seller
+                this.seller = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString(TradeColumn.SELLER_UUID + "")));
+
+                // Check if the buyer UUID is null before processing
+                String buyerUuidString = rs.getString(TradeColumn.BUYER_UUID + "");
+                if (buyerUuidString != null && !buyerUuidString.isEmpty()) {
+                    this.buyer = Bukkit.getOfflinePlayer(UUID.fromString(buyerUuidString));
+                } else {
+                    this.buyer = null;  // Set buyer to null if there is no buyer UUID
+                }
+
+                // Retrieve itemOffered
+                byte[] itemOfferedStackBytes = rs.getBytes(TradeColumn.ITEM_OFFERED + "");
+                this.itemOffered = Utils.deserializeItem(itemOfferedStackBytes);
+
+                // Retrieve itemRequested
+                byte[] itemRequestedStackBytes = rs.getBytes(TradeColumn.ITEM_REQUESTED + "");
+                this.itemRequested = Utils.deserializeItem(itemRequestedStackBytes);
+
+                // Retrieve listingTimestamp
+                this.listingTimestamp = rs.getLong(TradeColumn.LISTING_TIMESTAMP + "");
+
+                // Retrieve completionTimestamp
+                this.completionTimestamp = rs.getLong(TradeColumn.COMPLETION_TIMESTAMP + "");
+            }
+        } catch (IOException | SQLException | ClassNotFoundException e) {
+            Logger.logStacktrace(e);
+        }
     }
 
     private boolean addToDatabase() {
