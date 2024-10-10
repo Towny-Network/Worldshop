@@ -2,22 +2,42 @@ package dev.onebiteaidan.worldshop.Utils;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import dev.onebiteaidan.worldshop.WorldShop;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.minecraft.nbt.NBTCompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import javax.annotation.Nullable;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.UUID;
 
 
 public class Utils {
+    public static byte[] serializeItem(ItemStack itemStack) throws IOException {
+        // Serialize ItemStack to a byte array
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(byteOut);
+        out.writeObject(itemStack);
+        out.flush();
+        return byteOut.toByteArray();
+    }
+
+    public static ItemStack deserializeItem(byte[] itemStackBytes) throws IOException, ClassNotFoundException {
+        // Deserialize byte array back to ItemStack
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(itemStackBytes);
+        ObjectInputStream in = new ObjectInputStream(byteIn);
+        return (ItemStack) in.readObject();
+    }
+
 
     // Next two methods grabbed from https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
 
@@ -27,7 +47,7 @@ public class Utils {
         // Convert the Bukkit ItemStack to an NMS one and use the NMS ItemStack to save the data in NBT
         CraftItemStack.asNMSCopy(stack).save(tag);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        // Now save the data into a ByteArrayOutputStream to be able to convert it to an byte array
+        // Now save the data into a ByteArrayOutputStream to be able to convert it to a byte array
         // You can wrap a GZipOutputStream around if you also want to compress that data
         NBTCompressedStreamTools.a(tag, output);
         return output.toByteArray();
@@ -47,7 +67,7 @@ public class Utils {
         if (url.isEmpty()) return head;
 
         SkullMeta headMeta = (SkullMeta) head.getItemMeta();
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+        GameProfile profile = new GameProfile(UUID.randomUUID(), "player");
 
         profile.getProperties().put("textures", new Property("textures", url));
 
@@ -90,4 +110,38 @@ public class Utils {
         }
         return amount;
     }
+
+
+    // TODO: Method should probably be moved to the Screen class.
+    public static ItemStack createButtonItem(Material material, TextComponent displayName, @Nullable List<TextComponent> lore) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta != null) {
+            meta.displayName(displayName);
+            if (lore != null) {
+                meta.lore(lore);
+            }
+        }
+
+        item.setItemMeta(meta);
+
+        return item;
+    }
+
+    // TODO: Method should probably be moved to the Screen class.
+    public static ItemStack createButtonItem(ItemStack item, @Nullable TextComponent displayName, @Nullable List<TextComponent> lore) {
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta != null) {
+            meta.displayName(displayName);
+            meta.lore(lore);
+        }
+
+        item.setItemMeta(meta);
+
+        return item;
+    }
+
+
 }
