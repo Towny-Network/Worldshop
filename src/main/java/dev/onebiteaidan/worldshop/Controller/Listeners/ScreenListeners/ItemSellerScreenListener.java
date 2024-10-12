@@ -1,6 +1,7 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
+import dev.onebiteaidan.worldshop.Model.StaticItems;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
@@ -21,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
 
+import static dev.onebiteaidan.worldshop.Model.StaticItems.emptyPriceItem;
 import static net.kyori.adventure.text.Component.text;
 
 public class ItemSellerScreenListener extends ScreenListener {
@@ -32,13 +34,7 @@ public class ItemSellerScreenListener extends ScreenListener {
 
             event.setCancelled(true);
 
-            // Define emptySellItem placeholder
-            TextComponent emptySellItemTitle = text("Left click the item in your inventory you want to sell!");
-            ItemStack emptySellItem = Utils.createButtonItem(Material.RED_STAINED_GLASS_PANE, emptySellItemTitle, null);
 
-            // Define emptyPriceItem placeholder
-            TextComponent emptyPriceItemTitle = text("Right click the item in your inventory you want to receive in trade!");
-            ItemStack emptyPriceItem = Utils.createButtonItem(Material.RED_STAINED_GLASS_PANE, emptyPriceItemTitle, null);
 
             switch (event.getRawSlot()) {
                 case 0: // Submit button
