@@ -1,17 +1,16 @@
-package dev.onebiteaidan.worldshop.DataManagement;
+package dev.onebiteaidan.worldshop.Model.DataManagement.Database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import dev.onebiteaidan.worldshop.StoreDataTypes.TradeStatus;
-import dev.onebiteaidan.worldshop.WorldShop;
-import jdk.internal.net.http.common.Pair;
-import org.bukkit.OfflinePlayer;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
 import org.bukkit.inventory.ItemStack;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 
 public class MySQL implements Database {
+
+
 
     private final String HOST = Config.getHost();
     private final int PORT = Config.getPort();
@@ -75,7 +74,7 @@ public class MySQL implements Database {
 
     // THIS QUERY FUNCTION IS MADE SPECIFICALLY FOR WORLDSHOP.
     // THIS WILL NOT WORK OUT OF THE BOX IN OTHER JAVA PROJECTS.
-    @Override
+
     public ResultSet query(String query, Object[] arguments, int[] types, Connection connection) {
 //        if (!this.isConnected()) {
 //            this.connect();
@@ -114,7 +113,7 @@ public class MySQL implements Database {
         return null;
     }
 
-    @Override
+
     public void update(String update, Object[] arguments, int[] types) {
 //        if (!this.isConnected()) {
 //            this.connect();
@@ -153,7 +152,7 @@ public class MySQL implements Database {
         }
     }
 
-    @Override
+
     public void run(String command) {
 //        if (!this.isConnected()) {
 //            this.connect();
@@ -171,14 +170,14 @@ public class MySQL implements Database {
         this.run(  // Storing items in mysql https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
                 "CREATE TABLE IF NOT EXISTS trades" +
                         "(" +
-                        "trade_id int UNIQUE AUTO_INCREMENT," +
-                        "status int," + // ENUM statuses include: OPEN, COMPLETE, EXPIRED, REMOVED
+                        "trade_id int PRIMARY KEY AUTO_INCREMENT," +
+                        "trade_status status ENUM('OPEN', 'COMPLETE', 'EXPIRED', 'REMOVED') DEFAULT 'OPEN'," +
                         "seller_uuid varchar(36)," + // The length of a UUID will never be longer than 36 characters
                         "buyer_uuid varchar(36)," +
                         "for_sale BLOB," +  // Itemstacks can be stored in the BLOB datatype after being converted to byte arrays
                         "in_return BLOB," + // Barter item (the item someone will get in return) will also have to be stored as byte arrays
-                        "time_listed BIGINT," +
-                        "time_completed BIGINT" +
+                        "time_listed TIMESTAMP," +
+                        "time_completed TIMESTAMP" +
                         ");"
         );
     }
