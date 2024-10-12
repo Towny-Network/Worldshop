@@ -32,6 +32,14 @@ public class ItemSellerScreenListener extends ScreenListener {
 
             event.setCancelled(true);
 
+            // Define emptySellItem placeholder
+            TextComponent emptySellItemTitle = text("Left click the item in your inventory you want to sell!");
+            ItemStack emptySellItem = Utils.createButtonItem(Material.RED_STAINED_GLASS_PANE, emptySellItemTitle, null);
+
+            // Define emptyPriceItem placeholder
+            TextComponent emptyPriceItemTitle = text("Right click the item in your inventory you want to receive in trade!");
+            ItemStack emptyPriceItem = Utils.createButtonItem(Material.RED_STAINED_GLASS_PANE, emptyPriceItemTitle, null);
+
             switch (event.getRawSlot()) {
                 case 0: // Submit button
                     // Check what the condition of the slot is
@@ -78,12 +86,16 @@ public class ItemSellerScreenListener extends ScreenListener {
 
 
                 case 14: // Increase Price
-                    holder.increasePrice();
+                    if (!Objects.equals(holder.getInventory().getItem(15), emptyPriceItem)) {
+                        holder.increasePrice();
+                    }
                     break;
 
 
                 case 16: // Decrease Price
-                    holder.decreasePrice();
+                    if (!Objects.equals(holder.getInventory().getItem(15), emptyPriceItem)) {
+                        holder.decreasePrice();
+                    }
                     break;
 
 
