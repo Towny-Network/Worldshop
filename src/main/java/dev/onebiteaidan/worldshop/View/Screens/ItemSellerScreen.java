@@ -1,5 +1,6 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
+import dev.onebiteaidan.worldshop.Model.StaticItems;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.Screen;
 import dev.onebiteaidan.worldshop.WorldShop;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
 
+import static dev.onebiteaidan.worldshop.Model.StaticItems.*;
 import static net.kyori.adventure.text.Component.text;
 
 
@@ -22,14 +24,6 @@ public class ItemSellerScreen extends Screen {
         CAN_CONFIRM,        // Yellow
         DOUBLE_CONFIRM      // Green
     }
-
-    // Only item stacks that are used multiple times in are declared up here
-    ItemStack cannotConfirmButton;
-    ItemStack canConfirmButton;
-    ItemStack doubleConfirmButton;
-    ItemStack emptySellItem; // Placeholder for empty sellItem
-    ItemStack emptyPriceItem; // Placeholder for empty priceItem
-    ItemStack divider;
 
     // Normal class attributes
     ConfirmStatus confirmStatus;
@@ -47,10 +41,6 @@ public class ItemSellerScreen extends Screen {
 
         setInventory(WorldShop.getPlugin(WorldShop.class).getServer().createInventory(this, 27, title)); //Todo: make the title of the store change based on nation it's in
 
-        // Initialize all non-standard Screen item stacks
-        initializeConfirmButtons();
-        initializeEmptyPlaceholders();
-
         // Initialize screen
         initializeScreen();
     }
@@ -58,7 +48,6 @@ public class ItemSellerScreen extends Screen {
     @Override
     protected void initializeScreen() {
         // Dividers
-        this.divider = Utils.createButtonItem(Material.GRAY_STAINED_GLASS_PANE, null, null);
         getInventory().setItem(1, divider);
         getInventory().setItem(10, divider);
         getInventory().setItem(19, divider);
@@ -210,32 +199,5 @@ public class ItemSellerScreen extends Screen {
             confirmStatus = ConfirmStatus.CANNOT_CONFIRM;
             this.getInventory().setItem(0, cannotConfirmButton);
         }
-    }
-
-    private void initializeConfirmButtons() {
-        // Define RED X
-        String cannotConfirmURL = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmY5ZDlkZTYyZWNhZTliNzk4NTU1ZmQyM2U4Y2EzNWUyNjA1MjkxOTM5YzE4NjJmZTc5MDY2Njk4Yzk1MDhhNyJ9fX0=";
-        TextComponent cannotConfirmTitle = text("You cannot confirm until you have put in a sell item and a price item!");
-        this.cannotConfirmButton = Utils.createButtonItem(Utils.createSkull(cannotConfirmURL), cannotConfirmTitle, null);
-
-        // Define the YELLOW Checkmark
-        String canConfirmURL = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWVmNDI1YjRkYjdkNjJiMjAwZTg5YzAxM2U0MjFhOWUxMTBiZmIyN2YyZDhiOWY1ODg0ZDEwMTA0ZDAwZjRmNCJ9fX0=";
-        TextComponent canConfirmTitle = text("Click to confirm!");
-        this.canConfirmButton = Utils.createButtonItem(Utils.createSkull(canConfirmURL), canConfirmTitle, null);
-
-        // Define the GREEN Checkmark
-        String doubleConfirmURL = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkyZTMxZmZiNTljOTBhYjA4ZmM5ZGMxZmUyNjgwMjAzNWEzYTQ3YzQyZmVlNjM0MjNiY2RiNDI2MmVjYjliNiJ9fX0=";
-        TextComponent doubleConfirmTitle = text("Are you sure?");
-        this.doubleConfirmButton = Utils.createButtonItem(Utils.createSkull(doubleConfirmURL), doubleConfirmTitle, null);
-    }
-
-    private void initializeEmptyPlaceholders() {
-        // Define emptySellItem placeholder
-        TextComponent emptySellItemTitle = text("Left click the item in your inventory you want to sell!");
-        this.emptySellItem = Utils.createButtonItem(Material.RED_STAINED_GLASS_PANE, emptySellItemTitle, null);
-
-        // Define emptyPriceItem placeholder
-        TextComponent emptyPriceItemTitle = text("Right click the item in your inventory you want to receive in trade!");
-        this.emptyPriceItem = Utils.createButtonItem(Material.RED_STAINED_GLASS_PANE, emptyPriceItemTitle, null);
     }
 }
