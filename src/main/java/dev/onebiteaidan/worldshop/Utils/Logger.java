@@ -25,5 +25,13 @@ public class Logger {
         WorldShop.getPlugin(WorldShop.class).getLogger().severe(input);
     }
 
+    /**
+     * Logs into the PaperMC logs with the info tag.
+     * @param input to put into the logs.
+     */
+    public static void info(String input) {
+        WorldShop.getPlugin(WorldShop.class).getLogger().info(input);
+    }
+
 
 }
