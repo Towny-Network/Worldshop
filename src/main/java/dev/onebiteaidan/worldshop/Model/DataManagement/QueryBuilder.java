@@ -107,13 +107,15 @@ public class QueryBuilder {
     }
 
     public ResultSet executeQuery() throws SQLException {
-        PreparedStatement preparedStatement = prepareStatement();
-        return preparedStatement.executeQuery();
+        try (PreparedStatement preparedStatement = prepareStatement()) {
+            return preparedStatement.executeQuery();
+        }
     }
 
     public int executeUpdate() throws SQLException {
-        PreparedStatement preparedStatement = prepareStatement();
-        return preparedStatement.executeUpdate();
+        try (PreparedStatement preparedStatement = prepareStatement()) {
+            return preparedStatement.executeUpdate();
+        }
     }
 
 //    public int executeUpdateWithGeneratedKeys(ResultSetHandler resultSetHandler) throws SQLException {
