@@ -5,10 +5,9 @@ import dev.onebiteaidan.worldshop.Controller.Listeners.PickupListener;
 import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.*;
 import dev.onebiteaidan.worldshop.Controller.Listeners.TradeListener;
 import dev.onebiteaidan.worldshop.Controller.PlayerManager;
-import dev.onebiteaidan.worldshop.Controller.StoreManager;
+import dev.onebiteaidan.worldshop.Controller.TradeManager;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.MySQL;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database.SQLite;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import org.bukkit.Bukkit;
@@ -72,7 +71,7 @@ public final class WorldShop extends JavaPlugin {
                 database.createPickupsTable();
 
                 // Get all trades from database
-                int i = StoreManager.getInstance().syncTradesWithDatabase();
+                int i = TradeManager.getInstance().syncTradesWithDatabase();
                 Logger.info(i + " trades loaded from the database.");
 
         } else {

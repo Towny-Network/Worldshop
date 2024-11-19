@@ -1,32 +1,19 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
-import dev.onebiteaidan.worldshop.Controller.StoreManager;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.TradeColumn;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema;
-import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
+import dev.onebiteaidan.worldshop.Controller.TradeManager;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
-import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
-import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.PageableScreen;
-import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -138,7 +125,7 @@ public class MainShopScreen extends PageableScreen {
     private List<ItemStack> getAllDisplayItems() {
         List<ItemStack> items = new ArrayList<>();
 
-        for (Trade trade : StoreManager.getInstance().getTrades()) {
+        for (Trade trade : TradeManager.getInstance().getTrades()) {
             items.add(trade.generateDisplayItem());
         }
 
@@ -153,7 +140,7 @@ public class MainShopScreen extends PageableScreen {
     private List<ItemStack> getAllDisplayItems(Player player) {
         List<ItemStack> items = new ArrayList<>();
 
-        for (Trade trade : StoreManager.getInstance().getTrades()) {
+        for (Trade trade : TradeManager.getInstance().getTrades()) {
             if (!trade.getSeller().equals(player)) {
                 items.add(trade.generateDisplayItem());
             }

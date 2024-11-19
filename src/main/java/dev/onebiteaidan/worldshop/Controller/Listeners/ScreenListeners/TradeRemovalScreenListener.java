@@ -1,6 +1,6 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
-import dev.onebiteaidan.worldshop.Controller.StoreManager;
+import dev.onebiteaidan.worldshop.Controller.TradeManager;
 import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.TradeRemovalScreen;
 import dev.onebiteaidan.worldshop.View.Screens.ViewCurrentListingsScreen;
@@ -18,7 +18,7 @@ public class TradeRemovalScreenListener extends ScreenListener {
 
             switch(e.getRawSlot()) {
                 case 11:
-                    StoreManager.getInstance().deleteTrade(holder.getTrade());
+                    TradeManager.getInstance().deleteTrade(holder.getTrade());
 
                     // Put the player back on page 1 of current listings
                     new ViewCurrentListingsScreen(holder.getPlayer()).openScreen(1);

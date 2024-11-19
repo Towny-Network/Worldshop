@@ -1,6 +1,6 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
-import dev.onebiteaidan.worldshop.Controller.StoreManager;
+import dev.onebiteaidan.worldshop.Controller.TradeManager;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
@@ -82,7 +82,7 @@ public class ViewCurrentListingsScreen extends PageableScreen {
 
     private List<DisplayItem> getDisplayItems(Player player, int page, int spaces) {
         // Get all OPEN trades with Player's trades filtered out
-        List<Trade> trades = StoreManager.getInstance().getTrades();
+        List<Trade> trades = TradeManager.getInstance().getTrades();
 
         // Filter trades by seller and OPEN status
         trades = trades.stream()

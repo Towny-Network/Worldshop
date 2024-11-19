@@ -1,20 +1,12 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
-import dev.onebiteaidan.worldshop.Controller.StoreManager;
-import dev.onebiteaidan.worldshop.Model.StaticItems;
+import dev.onebiteaidan.worldshop.Controller.TradeManager;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Utils.Logger;
-import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
-import dev.onebiteaidan.worldshop.View.Screen;
 import dev.onebiteaidan.worldshop.View.Screens.ItemSellerScreen;
 import dev.onebiteaidan.worldshop.View.Screens.MainShopScreen;
 import dev.onebiteaidan.worldshop.WorldShop;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -62,7 +54,7 @@ public class ItemSellerScreenListener extends ScreenListener {
                                     break;
                                 }
 
-                                StoreManager.getInstance().createTrade(new Trade(holder.getPlayer(), forSale, inReturn));
+                                TradeManager.getInstance().createTrade(new Trade(holder.getPlayer(), forSale, inReturn));
 
                                 // Brings the player back to the main page of the store.
                                 new MainShopScreen(holder.getPlayer()).openScreen(1);
