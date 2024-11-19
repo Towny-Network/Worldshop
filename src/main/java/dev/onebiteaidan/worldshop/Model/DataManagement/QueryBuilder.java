@@ -70,6 +70,22 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder upsert(DatabaseSchema.Column conflictColumn, DatabaseSchema.Column... updateColumns) {
+        // ON CONFLICT clause for the specified column
+        query.append("ON CONFLICT (").append(conflictColumn).append(") DO UPDATE SET ");
+
+        // Append the columns to update in case of a conflict
+        for (int i = 0; i < updateColumns.length; i++) {
+            query.append(updateColumns[i]).append(" = excluded.").append(updateColumns[i]);
+
+            if (i != updateColumns.length - 1) {
+                query.append(", ");
+            }
+        }
+        query.append(" ");
+        return this;
+    }
+
     public QueryBuilder values(String placeholders) {
         query.append("VALUES (").append(placeholders).append(") ");
         return this;

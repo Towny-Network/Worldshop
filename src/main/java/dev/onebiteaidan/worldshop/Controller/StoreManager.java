@@ -31,6 +31,11 @@ public class StoreManager {
 
     private final ArrayList<Player> playerUpdateList;
 
+    /*
+     Local arraylists act as a cache for their respective table.
+     At all times they should mirror the database.
+     They exist to decrease retrieval times
+     */
     private final ArrayList<Trade> trades;
     private final ArrayList<Pickup> pickups;
 
@@ -102,7 +107,6 @@ public class StoreManager {
     }
 
     public void deleteTrade(Trade trade) {
-
         // Send TradeDeletionEvent
         Bukkit.getPluginManager().callEvent(new TradeDeletionEvent(trade));
     }
@@ -139,41 +143,6 @@ public class StoreManager {
         // No matching pickups found
         Logger.severe("NO PICKUPS MATCHED TRADE ID OR PLAYER DURING PICKUP WITHDRAWAL!");
         Logger.severe("PLAYER: " + player.getName() + ", TRADE ID: " + tradeId);
-    }
-
-    /**
-     * Syncs all locally stored trades to the database regardless of dirty status.
-     * Also syncs all database stored trades with 'OPEN' status to the local list.
-     */
-    public int syncTradesWithDatabase() {
-        int tradesLoaded = 0;
-
-        // Store all trades from this.trades to database
-        //todo: Store all trades from this.trades to database
-
-
-        // Retrieve all trades from database with 'OPEN' trade status
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        qb.select(TradeColumn.TRADE_ID)
-                .from(Table.TRADES)
-                .where(TradeColumn.TRADE_STATUS + " = ?")
-                .addParameter(TradeStatus.OPEN);
-
-        try (ResultSet rs = qb.executeQuery()) {
-            while (rs.next()) {
-                // Get trade and add to this.trades
-                Trade t = new Trade(rs.getInt(TradeColumn.TRADE_ID + ""));
-                this.trades.add(t);
-                tradesLoaded++;
-            }
-
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
-        }
-
-        return tradesLoaded;
     }
 
     public void syncTradesToDatabase() {

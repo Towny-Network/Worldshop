@@ -53,36 +53,15 @@ public class Trade {
         boolean success = addToDatabase();
 
         if (!success) {
-            Logger.severe("Trade " + this.tradeID + " had an error occur in the database.");
+            Logger.severe("Trade " + this.tradeID + " was NOT successfully added to the database.");
         } else {
-            Logger.severe("Trade " + this.tradeID + " was added to the database.");
+            Logger.info("Trade " + this.tradeID + " was successfully added to the database.");
         }
     }
 
     /**
      * Constructor for rebuilding from the database.
-     * @param tradeID         The ID of the trade.
-     * @param tradeStatus     The status of the trade.
-     * @param seller          The player offering the item.
-     * @param buyer           The player who is paying for the item.
-     * @param itemOffered     The item being offered by the seller.
-     * @param itemRequested   The item the seller wants in return.
-     * @param listingTimestamp The time the trade was listed.
-     * @param completionTimestamp The time the trade was completed.
-     */
-    public Trade(int tradeID, TradeStatus tradeStatus, OfflinePlayer seller, OfflinePlayer buyer, ItemStack itemOffered, ItemStack itemRequested, long listingTimestamp, long completionTimestamp) {
-        this.tradeID = tradeID;
-        this.tradeStatus = tradeStatus;
-        this.seller = seller;
-        this.buyer = buyer;
-        this.itemOffered = itemOffered;
-        this.itemRequested = itemRequested;
-        this.listingTimestamp = listingTimestamp;
-        this.completionTimestamp = completionTimestamp;
-    }
-
-    /**
-     * Constructor that pulls the data from the database
+     * Pulls all data from the tradeID
      * @param tradeID       The ID of the trade.
      */
     public Trade(int tradeID) {
@@ -176,55 +155,6 @@ public class Trade {
         }
 
         return false;
-    }
-
-    public void syncToDatabase() {
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        int updateStatus = 0;
-
-//        @param tradeID         The ID of the trade.
-//     * @param tradeStatus     The status of the trade.
-//     * @param seller          The player offering the item.
-//     * @param buyer           The player who is paying for the item.
-//     * @param itemOffered     The item being offered by the seller.
-//     * @param itemRequested   The item the seller wants in return.
-//     * @param listingTimestamp The time the trade was listed.
-//                * @param completionTimestamp The time the trade was completed.
-
-
-        qb.update(Table.TRADES)
-                .set(TradeColumn.TRADE_STATUS + " = ?, " +
-                        TradeColumn.SELLER_UUID + " = ?, " +
-                        TradeColumn.BUYER_UUID + " = ?, " +
-                        TradeColumn.ITEM_OFFERED + " = ?, " +
-                        TradeColumn.ITEM_REQUESTED + " = ?, " +
-                        TradeColumn.LISTING_TIMESTAMP + " = ?, " +
-                        TradeColumn.COMPLETION_TIMESTAMP + " = ? ")
-                .where(TradeColumn.TRADE_ID + " = ?")
-                .addParameter(this.tradeStatus)
-                .addParameter(this.seller.getUniqueId())
-                .addParameter(this.buyer.getUniqueId())
-                .addParameter(this.itemOffered)
-                .addParameter(this.itemRequested)
-                .addParameter(this.listingTimestamp)
-                .addParameter(completionTimestamp);
-
-//        try (ResultSet rs = qb.executeQuery()) {
-//
-//        } catch(SQLException e) {
-//            Logger.logStacktrace(e);
-//        }
-
-        try {
-            // Execute the update query (since this is an update operation)
-            int rowsAffected = qb.executeUpdate();
-            System.out.println("Rows updated: " + rowsAffected);
-
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
-        }
     }
 
     public int getTradeID() {
