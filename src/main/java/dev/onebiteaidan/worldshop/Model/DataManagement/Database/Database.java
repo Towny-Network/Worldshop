@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * SQL-type database driver interface.
@@ -18,8 +19,8 @@ public interface Database {
    Connection getConnection();
 
 
-   ResultSet executeQuery(PreparedStatement ps) throws SQLException;
-   int executeUpdate(PreparedStatement ps) throws SQLException;
-   boolean execute(PreparedStatement ps) throws SQLException;
+   ResultSet executeQuery(String command, List<Object> parameters) throws SQLException;
+   int executeUpdate(String command, List<Object> parameters) throws SQLException;
+   boolean execute(String command, List<Object> parameters) throws SQLException;
 
 }
