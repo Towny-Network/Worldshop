@@ -19,8 +19,8 @@ public interface Database {
    Connection getConnection();
 
 
-   ResultSet executeQuery(String command, List<Object> parameters) throws SQLException;
-   int executeUpdate(String command, List<Object> parameters) throws SQLException;
-   boolean execute(String command, List<Object> parameters) throws SQLException;
+   ResultSet executeQuery(String command, Object[] parameters) throws SQLException;
+   int executeUpdate(String command, Object[] parameters) throws SQLException;
+   boolean execute(String command, Object[] parameters) throws SQLException;
 
 }

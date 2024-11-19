@@ -43,30 +43,30 @@ public class SQLite implements Database {
     }
 
 
-    public ResultSet executeQuery(String command, List<Object> parameters) throws SQLException {
+    public ResultSet executeQuery(String command, Object[] parameters) throws SQLException {
         try (PreparedStatement ps = buildPreparedStatement(command, parameters)) {
             return ps.executeQuery();
         }
     }
 
-    public int executeUpdate(String command, List<Object> parameters) throws SQLException {
+    public int executeUpdate(String command, Object[] parameters) throws SQLException {
         try (PreparedStatement ps = buildPreparedStatement(command, parameters)) {
             return ps.executeUpdate();
         }
     }
 
-    public boolean execute(String command, List<Object> parameters) throws SQLException {
+    public boolean execute(String command, Object[] parameters) throws SQLException {
         try (PreparedStatement ps = buildPreparedStatement(command, parameters)) {
             return ps.execute();
         }
     }
 
-    private PreparedStatement buildPreparedStatement(String command, List<Object> parameters) throws SQLException {
+    private PreparedStatement buildPreparedStatement(String command, Object[] parameters) throws SQLException {
         PreparedStatement ps = this.connection.prepareStatement(command);
 
         // Set parameters
-        for (int i = 0; i < parameters.size(); i++) {
-            ps.setObject(i + 1, parameters.get(i));
+        for (int i = 0; i < parameters.length; i++) {
+            ps.setObject(i + 1, parameters[i]);
         }
 
         return ps;
