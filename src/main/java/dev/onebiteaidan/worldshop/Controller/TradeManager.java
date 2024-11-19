@@ -5,25 +5,20 @@ import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 public class TradeManager {
 
     public TradeManager() {
+        // todo: Verify + Init DB Schema
+        // todo: Initialize Caches for Trades, Pickups, and Players
 
     }
 
-    /**
-     * Create a new trade and push it to storage.
-     * On successful cache push, this method returns the Trade object.
-     * Otherwise it returns Null.
-     * @return
-     */
-    public Trade createTrade() {
+    public void createTrade() {
 
     }
 
-    /**
-     * Remove a trade from storage.
-     * On successful deletion, the
-     * @return
-     */
-    public Trade removeTrade() {
+    public void removeTrade() {
+
+    }
+
+    public void getTrade() {
 
     }
 

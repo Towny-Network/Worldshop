@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WriteThroughCache<K, V> {
 
     //todo: Add a logger implementation. Errors should not go to stdout.
+    //todo: Look into the usage of generate*Command() and generate*Parameters(). They may not be necessary.
 
     private final ConcurrentHashMap<K, V> cache = new ConcurrentHashMap<>();
     private final Database database;

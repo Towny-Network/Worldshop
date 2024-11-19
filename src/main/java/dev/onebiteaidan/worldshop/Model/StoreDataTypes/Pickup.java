@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import java.sql.SQLException;
 
 public class Pickup {
+    int pickupID;
     OfflinePlayer player;
     ItemStack item;
     int tradeID;
@@ -60,6 +61,9 @@ public class Pickup {
         return false;
     }
 
+    public int getPickupID() {
+        return pickupID;
+    }
 
     public OfflinePlayer getPlayer() {
         return player;
