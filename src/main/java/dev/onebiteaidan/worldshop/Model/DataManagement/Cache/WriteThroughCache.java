@@ -12,7 +12,7 @@ public class WriteThroughCache<K, V> {
     //todo: Look into the usage of generate*Command() and generate*Parameters(). They may not be necessary.
 
     private final ConcurrentHashMap<K, V> cache = new ConcurrentHashMap<>();
-    private final Database database;
+    protected final Database database;
 
     public WriteThroughCache(Database database) {
         this.database = database;
@@ -82,6 +82,10 @@ public class WriteThroughCache<K, V> {
     }
 
     protected Object[] generateDeleteParameters(K key) {
+        throw new UnsupportedOperationException("Must be implemented by subclass.");
+    }
+
+    protected void init() {
         throw new UnsupportedOperationException("Must be implemented by subclass.");
     }
 }

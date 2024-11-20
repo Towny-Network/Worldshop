@@ -2,7 +2,7 @@ package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
-import dev.onebiteaidan.worldshop.Controller.TradeManager;
+import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.*;
@@ -56,7 +56,7 @@ public class MainShopScreenListener extends ScreenListener {
                     if (e.getCurrentItem() != null) {
                         if (e.getCurrentItem() instanceof DisplayItem) {
                             DisplayItem displayItem = (DisplayItem) e.getCurrentItem();
-                            Trade trade = TradeManager.getInstance().getTrade(displayItem.getTradeID());
+                            Trade trade = StoreManager.getInstance().getTrade(displayItem.getTradeID());
 
                             if (trade != null) {
                                 new ItemBuyerScreen(holder.getPlayer(), trade).openScreen();

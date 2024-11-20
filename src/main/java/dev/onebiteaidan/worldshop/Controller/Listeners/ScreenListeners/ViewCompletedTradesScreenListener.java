@@ -1,6 +1,6 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
-import dev.onebiteaidan.worldshop.Controller.TradeManager;
+import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.TradeManagementScreen;
@@ -60,7 +60,7 @@ public class ViewCompletedTradesScreenListener extends ScreenListener {
                             return;
                         }
 
-                        TradeManager.getInstance().withdrawPickup(tradeID, holder.getPlayer());
+                        StoreManager.getInstance().withdrawPickup(tradeID, holder.getPlayer());
 
                     } catch (NullPointerException e) {
                         Logger.logStacktrace(e);

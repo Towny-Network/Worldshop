@@ -2,8 +2,14 @@ package dev.onebiteaidan.worldshop.Model.DataManagement.Cache;
 
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
+import dev.onebiteaidan.worldshop.Utils.Logger;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class PickupCache extends WriteThroughCache<Integer, Pickup> {
+    //todo: Database param names need to be gotten from a common source
+
     // Constants assume that COLUMNS[0] is the Pickup's ID.
     private final String TABLE = "PICKUPS";
     private final String[] COLUMNS = {
@@ -17,6 +23,24 @@ public class PickupCache extends WriteThroughCache<Integer, Pickup> {
 
     public PickupCache(Database database) {
         super(database);
+        init();
+    }
+
+    /**
+     * Populates data structure with information from the database.
+     */
+    protected void init() {
+        String command = "SELECT * FROM " + TABLE + ";";
+        try (ResultSet rs = database.executeQuery(command, new Object[]{})) {
+
+            while (rs.next()) {
+                Pickup p = new Pickup(rs);
+                put(p.getPickupID(), p);
+            }
+
+        } catch (SQLException e) {
+            Logger.logStacktrace(e);
+        }
     }
 
     /**

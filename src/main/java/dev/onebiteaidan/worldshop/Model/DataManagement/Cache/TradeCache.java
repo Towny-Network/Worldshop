@@ -2,8 +2,14 @@ package dev.onebiteaidan.worldshop.Model.DataManagement.Cache;
 
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
+import dev.onebiteaidan.worldshop.Utils.Logger;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class TradeCache extends WriteThroughCache<Integer, Trade> {
+
+    //todo: Database param names need to be gotten from a common source
 
     // Constants assume that COLUMNS[0] is the trade's id.
     private final String TABLE = "TRADES";
@@ -20,6 +26,23 @@ public class TradeCache extends WriteThroughCache<Integer, Trade> {
 
     public TradeCache(Database database) {
         super(database);
+        init();
+    }
+
+    /**
+     * Populates the data structure with information from the database.
+     */
+    protected void init() {
+        String command = "SELECT * FROM " + TABLE + ";";
+        try (ResultSet rs = database.executeQuery(command, new Object[]{})) {
+
+            while (rs.next()) {
+                Trade t = new Trade(rs);
+                put(t.getTradeID(), t);
+            }
+        } catch (SQLException e) {
+            Logger.logStacktrace(e);
+        }
     }
 
     /**

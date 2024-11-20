@@ -1,6 +1,6 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners;
 
-import dev.onebiteaidan.worldshop.Controller.TradeManager;
+import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.View.Screen;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,7 +22,7 @@ public abstract class ScreenListener implements Listener {
     @EventHandler
     public void onOpen(InventoryOpenEvent event) {
         if (event.getInventory().getHolder() instanceof Screen) {
-            TradeManager.getInstance().addToUpdateList((Player) event.getPlayer());
+            StoreManager.getInstance().addToUpdateList((Player) event.getPlayer());
         }
     }
 
@@ -34,7 +34,7 @@ public abstract class ScreenListener implements Listener {
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
         if (event.getInventory().getHolder() instanceof Screen) {
-            TradeManager.getInstance().removeFromUpdateList((Player) event.getPlayer());
+            StoreManager.getInstance().removeFromUpdateList((Player) event.getPlayer());
         }
     }
 }

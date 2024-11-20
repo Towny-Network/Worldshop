@@ -1,6 +1,6 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
-import dev.onebiteaidan.worldshop.Controller.TradeManager;
+import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Utils.Utils;
@@ -80,7 +80,7 @@ public class ViewCompletedTradesScreen extends PageableScreen {
 
     private List<DisplayItem> getPickupDisplayItems(Player player, int page, int spaces) {
         // Get all pickups
-        List<Pickup> pickups = TradeManager.getInstance().getPickups();
+        List<Pickup> pickups = StoreManager.getInstance().getPickups();
 
         // Filter trades by seller and withdrawn status
         pickups = pickups.stream()

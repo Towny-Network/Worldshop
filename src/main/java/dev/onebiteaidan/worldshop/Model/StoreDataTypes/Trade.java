@@ -108,6 +108,33 @@ public class Trade {
         }
     }
 
+    /**
+     * Build a Trade object from an SQL ResultSet
+     * @param rs ResultSet to build from.
+     */
+    public Trade(ResultSet rs) throws SQLException {
+        this.tradeID = rs.getInt("TRADE_ID");
+        this.seller = Bukkit.getPlayer(UUID.fromString(rs.getString("SELLER_UUID")));
+
+        String buyerUUID = rs.getString("BUYER_UUID");
+        if (buyerUUID != null) {
+            this.buyer = Bukkit.getPlayer(UUID.fromString(buyerUUID));
+        } else {
+            this.buyer = null;
+        }
+
+        try {
+            this.itemOffered = Utils.loadItemStack(rs.getBytes("ITEM_OFFERED"));
+            this.itemRequested = Utils.loadItemStack(rs.getBytes("ITEM_REQUESTED"));
+        } catch (IOException e) {
+            Logger.logStacktrace(e);
+        }
+
+        this.tradeStatus = TradeStatus.values()[rs.getInt("TRADE_STATUS")];
+        this.listingTimestamp = rs.getLong("LISTING_TIMESTAMP");
+        this.completionTimestamp = rs.getLong("COMPLETION_TIMESTAMP");
+    }
+
     private boolean addToDatabase() {
         Database db = WorldShop.getDatabase();
         QueryBuilder qb = new QueryBuilder(db);

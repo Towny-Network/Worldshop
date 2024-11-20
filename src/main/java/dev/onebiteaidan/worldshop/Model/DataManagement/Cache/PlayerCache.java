@@ -2,9 +2,15 @@ package dev.onebiteaidan.worldshop.Model.DataManagement.Cache;
 
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Profile;
+import dev.onebiteaidan.worldshop.Utils.Logger;
 import org.bukkit.OfflinePlayer;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class PlayerCache extends WriteThroughCache<OfflinePlayer, Profile> {
+
+    //todo: Database param names need to be gotten from a common source
 
     // Constants assume that COLUMNS[0] is the profile's offlinePlayer.
     private final String TABLE = "PLAYERS";
@@ -16,6 +22,20 @@ public class PlayerCache extends WriteThroughCache<OfflinePlayer, Profile> {
 
     public PlayerCache(Database database) {
         super(database);
+        init();
+    }
+
+    protected void init() {
+        String command = "SELECT * FROM " + TABLE + ";";
+        try (ResultSet rs = database.executeQuery(command, new Object[]{})) {
+
+            while (rs.next()) {
+                Profile p = new Profile(rs);
+                put(p.getPlayer(), p);
+            }
+        } catch (SQLException e) {
+            Logger.logStacktrace(e);
+        }
     }
 
     /**

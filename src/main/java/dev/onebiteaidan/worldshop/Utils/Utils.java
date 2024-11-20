@@ -57,7 +57,7 @@ public class Utils {
         ByteArrayInputStream input = new ByteArrayInputStream(data);
         // Reverse the process by reading the byte[] as ByteArrayInputStream and passing that to the NBT reader of Minecraft
         NBTTagCompound tag = NBTCompressedStreamTools.a(input);
-        // At last load the ItemStack from the NBT Compound Tag and convert it back to an Bukkit ItemStack
+        // At last load the ItemStack from the NBT Compound Tag and convert it back to a Bukkit ItemStack
         return CraftItemStack.asBukkitCopy(net.minecraft.world.item.ItemStack.a(tag));
     }
 

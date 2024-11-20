@@ -1,6 +1,6 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
-import dev.onebiteaidan.worldshop.Controller.TradeManager;
+import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.PageableScreen;
@@ -125,7 +125,7 @@ public class MainShopScreen extends PageableScreen {
     private List<ItemStack> getAllDisplayItems() {
         List<ItemStack> items = new ArrayList<>();
 
-        for (Trade trade : TradeManager.getInstance().getTrades()) {
+        for (Trade trade : StoreManager.getInstance().getTrades()) {
             items.add(trade.generateDisplayItem());
         }
 
@@ -140,7 +140,7 @@ public class MainShopScreen extends PageableScreen {
     private List<ItemStack> getAllDisplayItems(Player player) {
         List<ItemStack> items = new ArrayList<>();
 
-        for (Trade trade : TradeManager.getInstance().getTrades()) {
+        for (Trade trade : StoreManager.getInstance().getTrades()) {
             if (!trade.getSeller().equals(player)) {
                 items.add(trade.generateDisplayItem());
             }

@@ -5,12 +5,18 @@ import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.T
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.PickupColumn;
 import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.Utils.Logger;
+import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.WorldShop;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOError;
+import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class Pickup {
     int pickupID;
@@ -29,6 +35,25 @@ public class Pickup {
         this.withdrawn = withdrawn;
         this.withdrawnTimestamp = withdrawnTimestamp;
         this.isDirty = true;
+    }
+
+    /**
+     * Build a Pickup object from an SQL ResultSet
+     * @param rs ResultSet to build from.
+     */
+    public Pickup(ResultSet rs) throws SQLException {
+        //todo: Column names need to be gotten from a common source
+        this.pickupID = rs.getInt("PICKUP_ID");
+        this.player = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("PLAYER_UUD")));
+        try {
+            this.item = Utils.loadItemStack(rs.getBytes("PICKUP_ITEM"));
+        } catch (IOException e) {
+            Logger.logStacktrace(e);
+        }
+
+        this.tradeID = rs.getInt("TRADE_ID");
+        this.withdrawn = rs.getBoolean("COLLECTED");
+        this.withdrawnTimestamp = rs.getLong("TIME_COLLECTED");
     }
 
     public boolean syncToDatabase() {

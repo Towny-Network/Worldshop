@@ -1,6 +1,6 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
-import dev.onebiteaidan.worldshop.Controller.TradeManager;
+import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.TradeManagementScreen;
@@ -60,9 +60,9 @@ public class ViewCurrentListingsScreenListener extends ScreenListener {
                     }
 
                     if (event.getClick().isLeftClick()) {
-                        new TradeViewerScreen(holder.getPlayer(), TradeManager.getInstance().getTrade(tradeID));
+                        new TradeViewerScreen(holder.getPlayer(), StoreManager.getInstance().getTrade(tradeID));
                     } else if (event.getClick().isRightClick()) {
-                        new TradeRemovalScreen(holder.getPlayer(), TradeManager.getInstance().getTrade(tradeID));
+                        new TradeRemovalScreen(holder.getPlayer(), StoreManager.getInstance().getTrade(tradeID));
                     }
 
                 } catch (NullPointerException e) {

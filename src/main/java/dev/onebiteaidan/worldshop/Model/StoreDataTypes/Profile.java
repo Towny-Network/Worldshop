@@ -1,6 +1,11 @@
 package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.UUID;
 
 public class Profile {
 
@@ -12,6 +17,13 @@ public class Profile {
         this.player = player;
         this.purchases = purchases;
         this.sales = sales;
+    }
+
+    public Profile(ResultSet rs) throws SQLException {
+        //todo: Column names need to be retrieved from common source.
+        this.player = Bukkit.getPlayer(UUID.fromString(rs.getString("PLAYER_UUID")));
+        this.purchases = rs.getInt("PURCHASES");
+        this.sales = rs.getInt("SALES");
     }
 
     public OfflinePlayer getPlayer() {
