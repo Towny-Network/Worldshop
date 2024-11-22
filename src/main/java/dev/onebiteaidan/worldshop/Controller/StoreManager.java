@@ -20,7 +20,6 @@ public class StoreManager {
     private final Database db;
     private final TradeCache trades;
     private final PickupCache pickups;
-    private final PlayerCache players;
 
     public StoreManager() {
         // todo: Verify + Init DB Schema
@@ -29,9 +28,9 @@ public class StoreManager {
         this.db = WorldShop.getDatabase();
         this.trades =  new TradeCache(db);
         this.pickups = new PickupCache(db);
-        this.players = new PlayerCache(db);
-
     }
+
+    //todo: Ensure trade and pickup actions trigger the correct player profile updates (could be used in events?)
 
     /**
      * Adds new Trade to the database.
@@ -122,24 +121,6 @@ public class StoreManager {
     }
 
     /**
-     * Creates a new Profile object and stores it in the database.
-     * @param p OfflinePlayer object to create a profile for.
-     */
-    public void createPlayerProfile(OfflinePlayer p) {
-        Profile profile = new Profile(p, 0, 0);
-        players.put(p, profile);
-    }
-
-    /**
-     * Retrieves a Profile object from the database.
-     * @param p OfflinePlayer object to look up the record of.
-     * @return Returns corresponding Profile object.
-     */
-    public Profile getPlayerProfile(OfflinePlayer p) {
-        return players.get(p);
-    }
-
-    /**
      * Gets the next trade ID for the database.
      * @return Returns next highest ID. Returns -1 if command fails.
      */
@@ -170,5 +151,4 @@ public class StoreManager {
 
         return -1;
     }
-
 }

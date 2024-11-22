@@ -1,93 +1,55 @@
 package dev.onebiteaidan.worldshop.Controller;
 
+import dev.onebiteaidan.worldshop.Model.DataManagement.Cache.PlayerCache;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
-import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
-import dev.onebiteaidan.worldshop.Utils.Logger;
+import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Profile;
 import dev.onebiteaidan.worldshop.WorldShop;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.Table;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.PlayerColumn;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class PlayerManager {
+    private final Database db;
+    private final PlayerCache players;
 
-    private static class PlayerProfile {
-        OfflinePlayer player;
-        int purchases;
-        int sales;
-
-        PlayerProfile(OfflinePlayer player, int purchases, int sales) {
-            this.player = player;
-            this.purchases = purchases;
-            this.sales = sales;
-        }
+    public PlayerManager() {
+        this.db = WorldShop.getDatabase();
+        this.players = new PlayerCache(db);
     }
 
-    public PlayerManager() {}
-
-    private PlayerProfile getPlayerStats(Player player) {
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        try (ResultSet rs = qb
-                .select(PlayerColumn.ALL.toString())
-                .from(Table.PLAYERS)
-                .where(PlayerColumn.PLAYER_UUID + " = ? ")
-                .addParameter(player.getUniqueId().toString())
-                .executeQuery()) {
-
-            rs.next();
-
-            return new PlayerProfile(
-                    Bukkit.getOfflinePlayer(rs.getString(PlayerColumn.PLAYER_UUID.toString())),
-                    rs.getInt(PlayerColumn.PURCHASES.toString()),
-                    rs.getInt(PlayerColumn.SALES.toString())
-            );
-
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
-        }
-
-        return null;
+    /**
+     * Creates a new Profile object and stores it in the database.
+     * @param player OfflinePlayer object to create a profile for.
+     */
+    public void createPlayerProfile(OfflinePlayer player) {
+        Profile profile = new Profile(player, 0, 0);
+        players.put(player, profile);
     }
 
-    public void incrementPlayerPurchases(Player player) {
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        try {
-
-            qb.update(Table.PLAYERS)
-                    .set(PlayerColumn.PURCHASES.toString())
-                    .where(PlayerColumn.PLAYER_UUID + " = ?")
-                    .addParameter(PlayerColumn.PURCHASES + " " + 1)
-                    .addParameter(player.getUniqueId().toString())
-                    .executeUpdate();
-
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
-        }
+    /**
+     * Retrieves a Profile object from the database.
+     * @param player OfflinePlayer object to look up the record of.
+     * @return Returns corresponding Profile object.
+     */
+    public Profile getPlayerProfile(OfflinePlayer player) {
+        return players.get(player);
     }
 
-    public void incrementPlayerSales(Player player) {
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
+    /**
+     * Increments the purchases counter in the database for respective player.
+     * @param player OfflinePlayer object to update the record of.
+     */
+    public void incrementPlayerPurchases(OfflinePlayer player) {
+        Profile profile = players.get(player);
+        profile.setPurchases(profile.getPurchases() + 1);
+        players.put(profile.getPlayer(), profile);
+    }
 
-        try {
-
-            qb.update(Table.PLAYERS)
-                    .set(PlayerColumn.SALES + " = " + PlayerColumn.SALES + " + ?")
-                    .where(PlayerColumn.PLAYER_UUID + " = ?")
-                    .addParameter(1)
-                    .addParameter(player.getUniqueId().toString())
-                    .executeUpdate();
-
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
-        }
+    /**
+     * Increments the sales counter in the database for respective player.
+     * @param player OfflinePlayer object to update the record of.
+     */
+    public void incrementPlayerSales(OfflinePlayer player) {
+        Profile profile = players.get(player);
+        profile.setSales(profile.getSales() + 1);
+        players.put(profile.getPlayer(), profile);
     }
 }
