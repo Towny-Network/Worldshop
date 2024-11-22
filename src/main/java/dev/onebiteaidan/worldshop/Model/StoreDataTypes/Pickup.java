@@ -26,15 +26,21 @@ public class Pickup {
     boolean withdrawn;
     long withdrawnTimestamp;
 
-    private boolean isDirty; // Dirty bit for database synchronization
-
-    public Pickup(OfflinePlayer player, ItemStack item, int tradeID, boolean withdrawn, long withdrawnTimestamp) {
+    /**
+     * Use when creating a brand-new Pickup object for the system.
+     * Sets withdraw to false and withdrawnTimestamp to an invalid value.
+     * @param pickupID
+     * @param player
+     * @param item
+     * @param tradeID
+     */
+    public Pickup(int pickupID, OfflinePlayer player, ItemStack item, int tradeID) {
+        this.pickupID = pickupID;
         this.player = player;
         this.item = item;
         this.tradeID = tradeID;
-        this.withdrawn = withdrawn;
-        this.withdrawnTimestamp = withdrawnTimestamp;
-        this.isDirty = true;
+        this.withdrawn = false;
+        this.withdrawnTimestamp = -1L; // Invalid value to show that it has not been withdrawn.
     }
 
     /**

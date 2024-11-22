@@ -28,6 +28,7 @@ public class PickupCache extends WriteThroughCache<Integer, Pickup> {
 
     /**
      * Populates data structure with information from the database.
+     * //todo Should take into account whether the item needs to be cached
      */
     protected void init() {
         String command = "SELECT * FROM " + TABLE + ";";
