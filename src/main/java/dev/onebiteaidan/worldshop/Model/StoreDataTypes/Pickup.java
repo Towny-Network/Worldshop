@@ -45,6 +45,7 @@ public class Pickup {
 
     /**
      * Build a Pickup object from an SQL ResultSet
+     * Needs to be called within a try-with-resources
      * @param rs ResultSet to build from.
      */
     public Pickup(ResultSet rs) throws SQLException {
@@ -62,36 +63,6 @@ public class Pickup {
         this.withdrawnTimestamp = rs.getLong("TIME_COLLECTED");
     }
 
-    public boolean syncToDatabase() {
-        Database db = WorldShop.getDatabase();
-        QueryBuilder qb = new QueryBuilder(db);
-
-        int updateStatus = 0;
-
-        try {
-            updateStatus = qb.insertInto(Table.PICKUPS, PickupColumn.PLAYER_UUID, PickupColumn.PICKUP_ITEM, PickupColumn.TRADE_ID, PickupColumn.COLLECTED, PickupColumn.TIME_COLLECTED)
-                    .values("?,?,?,?,?")
-                    .addParameter(this.player.getUniqueId().toString())
-                    .addParameter(this.item)
-                    .addParameter(this.tradeID)
-                    .addParameter(this.withdrawn)
-                    .addParameter(this.withdrawnTimestamp)
-                    .executeUpdate();
-
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
-        }
-
-
-        // Return status of database operation
-        if (updateStatus > 0) {
-            this.isDirty = false;
-            return true;
-        }
-
-        return false;
-    }
-
     public int getPickupID() {
         return pickupID;
     }
@@ -102,7 +73,6 @@ public class Pickup {
 
     public void setPlayer(Player player) {
         this.player = player;
-        this.isDirty = true;
     }
 
     public ItemStack getItem() {
@@ -111,7 +81,6 @@ public class Pickup {
 
     public void setItem(ItemStack item) {
         this.item = item;
-        this.isDirty = true;
     }
 
     public int getTradeID() {
@@ -120,7 +89,6 @@ public class Pickup {
 
     public void setTradeID(int tradeID) {
         this.tradeID = tradeID;
-        this.isDirty = true;
     }
 
     public boolean isWithdrawn() {
@@ -129,7 +97,6 @@ public class Pickup {
 
     public void setWithdrawn(boolean withdrawn) {
         this.withdrawn = withdrawn;
-        this.isDirty = true;
     }
 
     public long getTimeWithdrawn() {
@@ -138,11 +105,6 @@ public class Pickup {
 
     public void setWithdrawnTimestamp(long withdrawnTimestamp) {
         this.withdrawnTimestamp = withdrawnTimestamp;
-        this.isDirty = true;
-    }
-
-    public boolean isDirty() {
-        return this.isDirty;
     }
 
     public DisplayItem generateDisplayItem() {
