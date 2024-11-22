@@ -13,21 +13,28 @@ import dev.onebiteaidan.worldshop.Utils.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public final class WorldShop extends JavaPlugin {
 
     private static Config config;
     private static Database database;
+    private static StoreManager storeManager;
     private static PlayerManager playerManager;
-
 
     @Override
     public void onEnable() {
         // Checks if data folder exists
         if (!getDataFolder().exists()) {
             this.getLogger().info("Datafolder for WorldShop Does not Exist. Creating now...");
-            getDataFolder().mkdirs();
+            if (getDataFolder().mkdirs()) {
+                Logger.info("Successfully created datafolder.");
+            } else {
+                Logger.severe("Failed to create the datafolder.");
+            }
         }
 
         //Setting up Config
@@ -37,11 +44,23 @@ public final class WorldShop extends JavaPlugin {
         //Setting up database
         switch(Config.getDatabaseType()) {
             case "SQLite":
-                database = new SQLite("worldshop.db");
-                break;
+                File databaseFile = new File(this.getDataFolder(), "worldshop.db");
 
-            case "MySQL":
-                database = new MySQL();
+                // Create the database file if it does not exist.
+                if (!databaseFile.exists()) {
+                    try {
+                        if (databaseFile.createNewFile()) {
+                            Logger.info("Database file created: " + databaseFile.getAbsolutePath());
+                        } else {
+                            Logger.severe("Failed to create the database file.");
+                        }
+                    } catch (IOException e) {
+                        Logger.logStacktrace(e);
+                    }
+                }
+
+                // Create the database object.
+                database = new SQLite(databaseFile);
                 break;
 
             default: // Disables the plugin if the database cannot be initialized.
@@ -61,18 +80,7 @@ public final class WorldShop extends JavaPlugin {
         if (database.isConnected()) {
             this.getLogger().info("Connected to its database successfully!");
 
-                // Initialize the players table if it doesn't exist
-                database.createPlayersTable();
-
-                // Initialize the shop table if it doesn't exit
-                database.createTradesTable();
-
-                // Initialize a rewards pickup table
-                database.createPickupsTable();
-
-                // Get all trades from database
-                int i = StoreManager.getInstance().syncTradesWithDatabase();
-                Logger.info(i + " trades loaded from the database.");
+            // No database initialization required here. Handled by the caches initialized in PlayerManager and TradeManager.
 
         } else {
             this.getLogger().severe("UNABLE TO CONNECT TO THE DATABASE!");
@@ -85,7 +93,8 @@ public final class WorldShop extends JavaPlugin {
         // On loading the database, all trades past the expiry time need to be removed
         // Expiry time should be specified in the config file
 
-        // Initializing the player manager
+        // Initialize managers
+        storeManager = new StoreManager();
         playerManager = new PlayerManager();
 
         // Setting up listeners
@@ -105,9 +114,8 @@ public final class WorldShop extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PickupListener(), this);
 
         // Setting up commands
-        try {  Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand());
-
-
+        try {
+            Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand());
         } catch (NullPointerException exception) {
             Logger.logStacktrace(exception);
         }
@@ -123,14 +131,23 @@ public final class WorldShop extends JavaPlugin {
         return database;
     }
 
+    public static StoreManager getStoreManager() {
+        return storeManager;
+    }
+
     // Player Manager accessor
     public static PlayerManager getPlayerManager() {
         return playerManager;
     }
 
+
     @Override
     public void onDisable() {
         // Close connection from database.
-        database.disconnect();
+        try {
+            database.disconnect();
+        } catch (SQLException e) {
+            Logger.logStacktrace(e);
+        }
     }
 }
