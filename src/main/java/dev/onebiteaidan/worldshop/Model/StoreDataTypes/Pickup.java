@@ -46,11 +46,11 @@ public class Pickup {
         //todo: Column names need to be gotten from a common source
         this.pickupID = rs.getInt("PICKUP_ID");
         this.player = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("PLAYER_UUD")));
-        try {
+//        try {
             this.item = Utils.loadItemStack(rs.getBytes("PICKUP_ITEM"));
-        } catch (IOException e) {
-            Logger.logStacktrace(e);
-        }
+//        } catch (IOException e) {
+//            Logger.logStacktrace(e);
+//        }
 
         this.tradeID = rs.getInt("TRADE_ID");
         this.withdrawn = rs.getBoolean("COLLECTED");

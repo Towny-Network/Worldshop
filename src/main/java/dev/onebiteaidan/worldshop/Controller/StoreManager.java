@@ -15,12 +15,17 @@ import org.bukkit.entity.Player;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StoreManager {
 
     private final Database db;
     private final TradeCache trades;
     private final PickupCache pickups;
+
+    // List of players with a refreshable screen open.
+    private List<Player> activePlayers;
 
     public StoreManager() {
         // todo: Verify + Init DB Schema
@@ -29,6 +34,9 @@ public class StoreManager {
         this.db = WorldShop.getDatabase();
         this.trades =  new TradeCache(db);
         this.pickups = new PickupCache(db);
+
+        // Initialize other variables
+        activePlayers = new ArrayList<>();
     }
 
     //todo: Ensure trade and pickup actions trigger the correct player profile updates (could be used in events?)
@@ -152,5 +160,21 @@ public class StoreManager {
         }
 
         return -1;
+    }
+
+    public List<Trade> getTrades() {
+        return new ArrayList<>(trades.getAll());
+    }
+
+    public List<Pickup> getPickups() {
+        return new ArrayList<>(pickups.getAll());
+    }
+
+    public void addToUpdateList(Player player) {
+        activePlayers.add(player);
+    }
+
+    public void removeFromUpdateList(Player player) {
+        activePlayers.remove(player);
     }
 }

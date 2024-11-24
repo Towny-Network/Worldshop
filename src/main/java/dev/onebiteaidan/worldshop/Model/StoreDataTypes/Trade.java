@@ -59,12 +59,12 @@ public class Trade {
             this.buyer = null;
         }
 
-        try {
+//        try {
             this.itemOffered = Utils.loadItemStack(rs.getBytes("ITEM_OFFERED"));
             this.itemRequested = Utils.loadItemStack(rs.getBytes("ITEM_REQUESTED"));
-        } catch (IOException e) {
-            Logger.logStacktrace(e);
-        }
+//        } catch (IOException e) {
+//            Logger.logStacktrace(e);
+//        }
 
         this.tradeStatus = TradeStatus.values()[rs.getInt("TRADE_STATUS")];
         this.listingTimestamp = rs.getLong("LISTING_TIMESTAMP");

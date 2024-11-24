@@ -6,6 +6,7 @@ import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.PageableScreen;
+import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -82,7 +83,7 @@ public class ViewCurrentListingsScreen extends PageableScreen {
 
     private List<DisplayItem> getDisplayItems(Player player, int page, int spaces) {
         // Get all OPEN trades with Player's trades filtered out
-        List<Trade> trades = StoreManager.getInstance().getTrades();
+        List<Trade> trades = WorldShop.getStoreManager().getTrades();
 
         // Filter trades by seller and OPEN status
         trades = trades.stream()

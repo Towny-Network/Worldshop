@@ -4,6 +4,7 @@ import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.PageableScreen;
+import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -125,7 +126,7 @@ public class MainShopScreen extends PageableScreen {
     private List<ItemStack> getAllDisplayItems() {
         List<ItemStack> items = new ArrayList<>();
 
-        for (Trade trade : StoreManager.getInstance().getTrades()) {
+        for (Trade trade : WorldShop.getStoreManager().getTrades()) {
             items.add(trade.generateDisplayItem());
         }
 
@@ -140,7 +141,7 @@ public class MainShopScreen extends PageableScreen {
     private List<ItemStack> getAllDisplayItems(Player player) {
         List<ItemStack> items = new ArrayList<>();
 
-        for (Trade trade : StoreManager.getInstance().getTrades()) {
+        for (Trade trade : WorldShop.getStoreManager().getTrades()) {
             if (!trade.getSeller().equals(player)) {
                 items.add(trade.generateDisplayItem());
             }

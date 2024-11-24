@@ -5,6 +5,7 @@ import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.PageableScreen;
+import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -80,7 +81,7 @@ public class ViewCompletedTradesScreen extends PageableScreen {
 
     private List<DisplayItem> getPickupDisplayItems(Player player, int page, int spaces) {
         // Get all pickups
-        List<Pickup> pickups = StoreManager.getInstance().getPickups();
+        List<Pickup> pickups = WorldShop.getStoreManager().getPickups();
 
         // Filter trades by seller and withdrawn status
         pickups = pickups.stream()
