@@ -61,7 +61,7 @@ public class ItemSellerScreen extends Screen {
 
 
         // Increase the number of items the player wants in return
-        String increasePriceButtonURL = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjA1NmJjMTI0NGZjZmY5OTM0NGYxMmFiYTQyYWMyM2ZlZTZlZjZlMzM1MWQyN2QyNzNjMTU3MjUzMWYifX19";
+        String increasePriceButtonURL = "http://textures.minecraft.net/texture/b056bc1244fcff99344f12aba42ac23fee6ef6e3351d27d273c1572531f";
         TextComponent increasePriceButtonTitle = text("Increase Price by 1");
         ItemStack increasePriceButton = Utils.createButtonItem(Utils.createSkull(increasePriceButtonURL), increasePriceButtonTitle, null);
         getInventory().setItem(14, increasePriceButton);
@@ -72,7 +72,7 @@ public class ItemSellerScreen extends Screen {
 
 
         // Decrease the number of items the player wants in return
-        String decreasePriceButtonURL = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGU0YjhiOGQyMzYyYzg2NGUwNjIzMDE0ODdkOTRkMzI3MmE2YjU3MGFmYmY4MGMyYzViMTQ4Yzk1NDU3OWQ0NiJ9fX0=";
+        String decreasePriceButtonURL = "http://textures.minecraft.net/texture/4e4b8b8d2362c864e062301487d94d3272a6b570afbf80c2c5b148c954579d46";
         TextComponent decreasePriceButtonTitle = text("Decrease Price by 1");
         ItemStack decreasePriceButton = Utils.createButtonItem(Utils.createSkull(decreasePriceButtonURL), decreasePriceButtonTitle, null);
         getInventory().setItem(16, decreasePriceButton);

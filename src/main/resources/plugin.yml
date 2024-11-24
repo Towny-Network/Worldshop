@@ -3,6 +3,8 @@ version: '${project.version}'
 main: dev.onebiteaidan.worldshop.WorldShop
 api-version: 1.19
 
+depend: [ ProtocolLib ]
+
 authors:
   - OneBiteAidan
 

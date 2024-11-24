@@ -23,6 +23,7 @@ public final class WorldShop extends JavaPlugin {
     private static StoreManager storeManager;
     private static PlayerManager playerManager;
 
+
     @Override
     public void onEnable() {
         // Checks if data folder exists
