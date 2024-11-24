@@ -1,18 +1,12 @@
 package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.Table;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.DatabaseSchema.PickupColumn;
-import dev.onebiteaidan.worldshop.Model.DataManagement.QueryBuilder;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -108,8 +102,10 @@ public class Pickup {
     }
 
     public DisplayItem generateDisplayItem() {
-        ItemStack displayItem = item.clone();
-        return new DisplayItem(displayItem, tradeID);
+        ItemStack copiedItem = item.clone();
+        DisplayItem displayItem = new DisplayItem(copiedItem);
+        displayItem.PickupID = pickupID;
+        return displayItem;
     }
 
     @Override

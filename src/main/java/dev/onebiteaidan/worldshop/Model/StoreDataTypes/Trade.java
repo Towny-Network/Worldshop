@@ -2,6 +2,7 @@ package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
+import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -24,8 +25,6 @@ public class Trade {
     long listingTimestamp;
     long completionTimestamp;
 
-    private boolean isDirty; // Dirty bit for database synchronization
-
 
     /**
      * Constructor for when a player creates a new trade via the GUI.
@@ -34,7 +33,7 @@ public class Trade {
      * @param itemRequested The item the player wants in return.
      */
     public Trade(Player seller, ItemStack itemOffered, ItemStack itemRequested) {
-        this.tradeID = -1; // Setting to invalid. Is updated when synced to database.
+        this.tradeID = WorldShop.getStoreManager().nextTradeID();
         this.tradeStatus = TradeStatus.OPEN;
         this.seller = seller;
         this.buyer = null;
@@ -42,7 +41,6 @@ public class Trade {
         this.itemRequested = itemRequested;
         this.listingTimestamp = System.currentTimeMillis();
         this.completionTimestamp = 0L;
-        this.isDirty = true;
     }
 
     /**
@@ -79,7 +77,6 @@ public class Trade {
 
     public void setTradeID(int tradeID) {
         this.tradeID = tradeID;
-        this.isDirty = true;
     }
 
     public TradeStatus getTradeStatus() {
@@ -88,7 +85,6 @@ public class Trade {
 
     public void setTradeStatus(TradeStatus tradeStatus) {
         this.tradeStatus = tradeStatus;
-        this.isDirty = true;
     }
 
     public OfflinePlayer getSeller() {
@@ -97,7 +93,6 @@ public class Trade {
 
     public void setSeller(OfflinePlayer seller) {
         this.seller = seller;
-        this.isDirty = true;
     }
 
     public OfflinePlayer getBuyer() {
@@ -106,7 +101,6 @@ public class Trade {
 
     public void setBuyer(OfflinePlayer buyer) {
         this.buyer = buyer;
-        this.isDirty = true;
     }
 
     public ItemStack getItemOffered() {
@@ -115,7 +109,6 @@ public class Trade {
 
     public void setItemOffered(ItemStack itemOffered) {
         this.itemOffered = itemOffered;
-        this.isDirty = true;
     }
 
     public ItemStack getItemRequested() {
@@ -124,7 +117,6 @@ public class Trade {
 
     public void setItemRequested(ItemStack itemRequested) {
         this.itemRequested = itemRequested;
-        this.isDirty = true;
     }
 
     public long getListingTimestamp() {
@@ -133,7 +125,6 @@ public class Trade {
 
     public void setListingTimestamp(long listingTimestamp) {
         this.listingTimestamp = listingTimestamp;
-        this.isDirty = true;
     }
 
     public long getCompletionTimestamp() {
@@ -142,16 +133,13 @@ public class Trade {
 
     public void setCompletionTimestamp(long completionTimestamp) {
         this.completionTimestamp = completionTimestamp;
-        this.isDirty = true;
-    }
-
-    public boolean isDirty() {
-        return isDirty;
     }
 
     public DisplayItem generateDisplayItem() {
-        ItemStack displayItem = itemOffered.clone();
-        return new DisplayItem(displayItem, tradeID);
+        ItemStack item = itemOffered.clone();
+        DisplayItem displayItem = new DisplayItem(item);
+        displayItem.setTradeID(tradeID);
+        return displayItem;
     }
 
     @Override

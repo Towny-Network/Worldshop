@@ -4,14 +4,29 @@ import org.bukkit.inventory.ItemStack;
 
 public class DisplayItem extends ItemStack {
 
-    int tradeID;
+    int TradeID;
+    int PickupID;
 
-    public DisplayItem(ItemStack item, int tradeID) {
+    public DisplayItem(ItemStack item) {
         super(item);
-        this.tradeID = tradeID;
+        // Initialize values to invalid defaults
+        this.TradeID = -1;
+        this.PickupID = -1;
     }
 
     public int getTradeID() {
-        return tradeID;
+        return TradeID;
+    }
+
+    public void setTradeID(int tradeID) {
+        TradeID = tradeID;
+    }
+
+    public int getPickupID() {
+        return PickupID;
+    }
+
+    public void setPickupID(int pickupID) {
+        PickupID = pickupID;
     }
 }
