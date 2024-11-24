@@ -1,6 +1,7 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
+import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.TradeManagementScreen;
@@ -49,18 +50,22 @@ public class ViewCompletedTradesScreenListener extends ScreenListener {
                 if (holder.getPlayer().getInventory().firstEmpty() != -1) {
                     try {
 
-                        ItemMeta meta = Objects.requireNonNull(event.getCurrentItem()).getItemMeta();
-                        NamespacedKey key = new NamespacedKey(WorldShop.getPlugin(WorldShop.class), "tradeID");
+                        //todo: May be useful here to add some prompts that encourage the user to make a support ticket (and also let them know something went wrong).
 
-
-                        Integer tradeID = meta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
-
-                        if (tradeID == null) {
-                            WorldShop.getPlugin(WorldShop.class).getLogger().severe("UNABLE TO GET TRADEID FROM PERSISTENT DATA CONTAINER");
+                        if (!(event.getCurrentItem() instanceof DisplayItem)) {
+                            Logger.warning("Item gotten from ViewCompletedTradesScreen was not an instance of DisplayItem!");
                             return;
                         }
 
-                        StoreManager.getInstance().withdrawPickup(tradeID, holder.getPlayer());
+                        DisplayItem item = (DisplayItem) event.getCurrentItem();
+
+                        assert item != null;
+                        if (item.getPickupID() == -1) {
+                            Logger.warning("DisplayItem gotten in ViewCompletedTradesScreen had an invalid pickupID!");
+                            return;
+                        }
+
+                        WorldShop.getStoreManager().withdrawPickup(item.getPickupID());
 
                     } catch (NullPointerException e) {
                         Logger.logStacktrace(e);

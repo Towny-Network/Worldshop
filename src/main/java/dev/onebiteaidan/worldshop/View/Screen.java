@@ -1,9 +1,6 @@
 package dev.onebiteaidan.worldshop.View;
 
-import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.WorldShop;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;

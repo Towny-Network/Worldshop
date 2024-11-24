@@ -11,6 +11,7 @@ import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,19 +68,20 @@ public class StoreManager {
     /**
      * Changes the TradeStatus of the trade to "COMPLETE"
      * Generates respective pickup objects.
-     * @param tradeID ID of Trade to complete.
+     * @param trade Trade object to complete.
+     * @param player Player who bought the item to complete the trade.
      */
-    public void completeTrade(int tradeID) {
-        Trade t = trades.get(tradeID);
-        t.setTradeStatus(TradeStatus.COMPLETE);
-        trades.put(tradeID, t);
+    public void completeTrade(Trade trade, Player player) {
+        trade.setTradeStatus(TradeStatus.COMPLETE);
+        trade.setBuyer(player);
+        trades.put(trade.getTradeID(), trade);
 
         // Send offered items to buyer
-        Pickup p1 = new Pickup(nextPickupID(), t.getBuyer(), t.getItemOffered(), t.getTradeID());
+        Pickup p1 = new Pickup(nextPickupID(), trade.getBuyer(), trade.getItemOffered(), trade.getTradeID());
         pickups.put(p1.getPickupID(), p1);
 
         // Send requested items to seller
-        Pickup p2 = new Pickup(nextPickupID(), t.getSeller(), t.getItemRequested(), t.getTradeID());
+        Pickup p2 = new Pickup(nextPickupID(), trade.getSeller(), trade.getItemRequested(), trade.getTradeID());
         pickups.put(p2.getPickupID(), p2);
     }
 

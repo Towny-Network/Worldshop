@@ -1,6 +1,7 @@
 package dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners;
 
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
+import dev.onebiteaidan.worldshop.Model.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListener;
 import dev.onebiteaidan.worldshop.View.Screens.TradeManagementScreen;
@@ -48,21 +49,25 @@ public class ViewCurrentListingsScreenListener extends ScreenListener {
 
                 try {
 
-                    ItemMeta meta = Objects.requireNonNull(event.getCurrentItem()).getItemMeta();
-                    NamespacedKey key = new NamespacedKey(WorldShop.getPlugin(WorldShop.class), "tradeID");
+                    //todo: May be useful here to add some prompts that encourage the user to make a support ticket (and also let them know something went wrong).
 
+                    if (!(event.getCurrentItem() instanceof DisplayItem)) {
+                        Logger.warning("Item gotten from ViewCompletedTradesScreen was not an instance of DisplayItem!");
+                        return;
+                    }
 
-                    Integer tradeID = meta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+                    DisplayItem item = (DisplayItem) event.getCurrentItem();
 
-                    if (tradeID == null) {
-                        WorldShop.getPlugin(WorldShop.class).getLogger().severe("UNABLE TO GET TRADE ID FROM PERSISTENT DATA CONTAINER");
+                    assert item != null;
+                    if (item.getTradeID() == -1) {
+                        Logger.warning("DisplayItem gotten in ViewCompletedTradesScreen had an invalid tradeID!");
                         return;
                     }
 
                     if (event.getClick().isLeftClick()) {
-                        new TradeViewerScreen(holder.getPlayer(), StoreManager.getInstance().getTrade(tradeID));
+                        new TradeViewerScreen(holder.getPlayer(), WorldShop.getStoreManager().getTrade(item.getTradeID()));
                     } else if (event.getClick().isRightClick()) {
-                        new TradeRemovalScreen(holder.getPlayer(), StoreManager.getInstance().getTrade(tradeID));
+                        new TradeRemovalScreen(holder.getPlayer(), WorldShop.getStoreManager().getTrade(item.getTradeID()));
                     }
 
                 } catch (NullPointerException e) {

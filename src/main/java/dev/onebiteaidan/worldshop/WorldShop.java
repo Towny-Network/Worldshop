@@ -1,9 +1,7 @@
 package dev.onebiteaidan.worldshop;
 
 import dev.onebiteaidan.worldshop.Controller.Commands.WorldshopCommand;
-import dev.onebiteaidan.worldshop.Controller.Listeners.PickupListener;
 import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.*;
-import dev.onebiteaidan.worldshop.Controller.Listeners.TradeListener;
 import dev.onebiteaidan.worldshop.Controller.PlayerManager;
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
@@ -109,9 +107,6 @@ public final class WorldShop extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new TradeViewerScreenListener(), this);
         Bukkit.getPluginManager().registerEvents(new ViewCompletedTradesScreenListener(), this);
         Bukkit.getPluginManager().registerEvents(new ViewCurrentListingsScreenListener(), this);
-
-        Bukkit.getPluginManager().registerEvents(new TradeListener(), this);
-        Bukkit.getPluginManager().registerEvents(new PickupListener(), this);
 
         // Setting up commands
         try {

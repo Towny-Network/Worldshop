@@ -1,6 +1,5 @@
 package dev.onebiteaidan.worldshop.View.Screens;
 
-import dev.onebiteaidan.worldshop.Model.StaticItems;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.View.Screen;
 import dev.onebiteaidan.worldshop.WorldShop;

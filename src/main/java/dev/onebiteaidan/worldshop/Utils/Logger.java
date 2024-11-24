@@ -26,6 +26,14 @@ public class Logger {
     }
 
     /**
+     * Logs into the PaperMC logs with the warning tag.
+     * @param input to put into the logs.
+     */
+    public static void warning(String input) {
+        WorldShop.getPlugin(WorldShop.class).getLogger().warning(input);
+    }
+
+    /**
      * Logs into the PaperMC logs with the info tag.
      * @param input to put into the logs.
      */
