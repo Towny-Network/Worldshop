@@ -136,9 +136,12 @@ public class StoreManager {
      */
     public int nextTradeID() {
         //todo: Table and Column name need to be pulled from common source.
-        String command = "SELECT MAX(TRADE_ID) FROM " + "TRADES" + ";";
+        String command = "SELECT MAX(TRADE_ID) AS MAX_ID FROM " + "TRADES" + ";";
         try (ResultSet rs = db.executeQuery(command, new Object[]{})) {
-            return rs.getInt("TRADE_ID");
+            if (rs.next()) {
+                System.out.println("Gotten from DB");
+                return rs.getInt("MAX_ID");
+            }
         } catch (SQLException e) {
             Logger.logStacktrace(e);
         }

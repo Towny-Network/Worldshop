@@ -44,9 +44,10 @@ public class SQLite implements Database {
 
 
     public ResultSet executeQuery(String command, Object[] parameters) throws SQLException {
-        try (PreparedStatement ps = buildPreparedStatement(command, parameters)) {
-            return ps.executeQuery();
-        }
+        // Cannot be run with try-with resources because the ResultSet object will close as soon as this function returns.
+        PreparedStatement ps = buildPreparedStatement(command, parameters);
+        return ps.executeQuery();
+
     }
 
     public int executeUpdate(String command, Object[] parameters) throws SQLException {
