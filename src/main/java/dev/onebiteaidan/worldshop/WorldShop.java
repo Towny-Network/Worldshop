@@ -6,7 +6,7 @@ import dev.onebiteaidan.worldshop.Controller.PlayerManager;
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.SQLite;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Database.SQLiteDatabase;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -59,7 +59,7 @@ public final class WorldShop extends JavaPlugin {
                 }
 
                 // Create the database object.
-                database = new SQLite(databaseFile);
+                database = new SQLiteDatabase(databaseFile);
                 break;
 
             default: // Disables the plugin if the database cannot be initialized.

@@ -1,18 +1,9 @@
 package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
-import dev.onebiteaidan.worldshop.Utils.Logger;
-import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.WorldShop;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.UUID;
-
 
 public class Trade {
 
@@ -44,31 +35,25 @@ public class Trade {
     }
 
     /**
-     * Build a Trade object from an SQL ResultSet
-     * Needs to be called within a try-with-resources
-     * @param rs ResultSet to build from.
+     * Constructor for recreating the object from a repository.
+     * @param tradeID the ID of the trade
+     * @param tradeStatus The TradeStatus of the trade
+     * @param seller The seller
+     * @param buyer The buyer
+     * @param itemOffered The item the seller is selling
+     * @param itemRequested The item the seller wants in return
+     * @param listingTimestamp The time the listing was published
+     * @param completionTimestamp The time that the listing is completed.
      */
-    public Trade(ResultSet rs) throws SQLException {
-        this.tradeID = rs.getInt("TRADE_ID");
-        this.seller = Bukkit.getPlayer(UUID.fromString(rs.getString("SELLER_UUID")));
-
-        String buyerUUID = rs.getString("BUYER_UUID");
-        if (buyerUUID != null) {
-            this.buyer = Bukkit.getPlayer(UUID.fromString(buyerUUID));
-        } else {
-            this.buyer = null;
-        }
-
-//        try {
-            this.itemOffered = Utils.loadItemStack(rs.getBytes("ITEM_OFFERED"));
-            this.itemRequested = Utils.loadItemStack(rs.getBytes("ITEM_REQUESTED"));
-//        } catch (IOException e) {
-//            Logger.logStacktrace(e);
-//        }
-
-        this.tradeStatus = TradeStatus.values()[rs.getInt("TRADE_STATUS")];
-        this.listingTimestamp = rs.getLong("LISTING_TIMESTAMP");
-        this.completionTimestamp = rs.getLong("COMPLETION_TIMESTAMP");
+    public Trade(int tradeID, TradeStatus tradeStatus, OfflinePlayer seller, OfflinePlayer buyer, ItemStack itemOffered, ItemStack itemRequested, long listingTimestamp, long completionTimestamp) {
+        this.tradeID = tradeID;
+        this.tradeStatus = tradeStatus;
+        this.seller = seller;
+        this.buyer = buyer;
+        this.itemOffered = itemOffered;
+        this.itemRequested = itemRequested;
+        this.listingTimestamp = listingTimestamp;
+        this.completionTimestamp = completionTimestamp;
     }
 
     public int getTradeID() {

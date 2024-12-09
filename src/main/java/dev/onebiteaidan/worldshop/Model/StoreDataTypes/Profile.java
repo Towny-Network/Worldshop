@@ -19,19 +19,6 @@ public class Profile {
         this.sales = sales;
     }
 
-    /**
-     * Build a Profile object using an SQL ResultSet object.
-     * Needs to be called within a try-with-resources
-     * @param rs
-     * @throws SQLException
-     */
-    public Profile(ResultSet rs) throws SQLException {
-        //todo: Column names need to be retrieved from common source.
-        this.player = Bukkit.getPlayer(UUID.fromString(rs.getString("PLAYER_UUID")));
-        this.purchases = rs.getInt("PURCHASES");
-        this.sales = rs.getInt("SALES");
-    }
-
     public OfflinePlayer getPlayer() {
         return player;
     }
