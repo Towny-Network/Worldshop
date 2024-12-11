@@ -1,10 +1,12 @@
 package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.Storable;
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+@Storable(collectionName = "TRADES", primaryKey = "TRADE_ID")
 public class Trade {
 
     int tradeID;

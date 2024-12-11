@@ -17,14 +17,14 @@ public class InMemoryRepository<K, V> implements Repository<K, V> {
     }
 
     @Override
-    public void save(K key, V value) {
+    public void save(K id, V value) {
         Map<String, Object> serializedData = adapter.serialize(value);
-        storage.put(key, serializedData);
+        storage.put(id, serializedData);
     }
 
     @Override
-    public V find(K key) {
-        Map<String, Object> serializedData = storage.get(key); // Retrieve serialized data
+    public V find(K id) {
+        Map<String, Object> serializedData = storage.get(id); // Retrieve serialized data
         return serializedData != null ? adapter.deserialize(serializedData) : null;
     }
 

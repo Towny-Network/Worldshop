@@ -11,7 +11,5 @@ public interface Database {
    void disconnect();
    boolean isConnected();
 
-   boolean put(Object key, Object value);
-   Object get(Object key);
 
 }
