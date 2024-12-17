@@ -6,7 +6,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-@Storable(collectionName = "TRADES", primaryKey = "TRADE_ID")
+@Storable(collectionName = "trades", primaryKey = "tradeID")
 public class Trade {
 
     int tradeID;
