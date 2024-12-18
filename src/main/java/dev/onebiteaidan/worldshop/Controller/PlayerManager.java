@@ -1,18 +1,20 @@
 package dev.onebiteaidan.worldshop.Controller;
 
-import dev.onebiteaidan.worldshop.Model.DataManagement.Cache.PlayerCache;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.ProfileRepository;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Profile;
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.OfflinePlayer;
 
+import java.io.File;
+
 public class PlayerManager {
-    private final Database db;
-    private final PlayerCache players;
+
+
+    private final ProfileRepository profileRepository;
 
     public PlayerManager() {
-        this.db = WorldShop.getDatabase();
-        this.players = new PlayerCache(db);
+        File databaseFile = new File(WorldShop.getPlugin(WorldShop.class).getDataFolder().getAbsolutePath() + "worldshop.db");
+        profileRepository = new ProfileRepository(databaseFile);
     }
 
     /**
@@ -21,7 +23,7 @@ public class PlayerManager {
      */
     public void createPlayerProfile(OfflinePlayer player) {
         Profile profile = new Profile(player, 0, 0);
-        players.put(player, profile);
+        profileRepository.save(player.getUniqueId(), profile);
     }
 
     /**
@@ -30,7 +32,7 @@ public class PlayerManager {
      * @return Returns corresponding Profile object.
      */
     public Profile getPlayerProfile(OfflinePlayer player) {
-        return players.get(player);
+        return profileRepository.find(player.getUniqueId());
     }
 
     /**
@@ -38,9 +40,9 @@ public class PlayerManager {
      * @param player OfflinePlayer object to update the record of.
      */
     public void incrementPlayerPurchases(OfflinePlayer player) {
-        Profile profile = players.get(player);
+        Profile profile = profileRepository.find(player.getUniqueId());
         profile.setPurchases(profile.getPurchases() + 1);
-        players.put(profile.getPlayer(), profile);
+        profileRepository.save(player.getUniqueId(), profile);
     }
 
     /**
@@ -48,8 +50,8 @@ public class PlayerManager {
      * @param player OfflinePlayer object to update the record of.
      */
     public void incrementPlayerSales(OfflinePlayer player) {
-        Profile profile = players.get(player);
-        profile.setSales(profile.getSales() + 1);
-        players.put(profile.getPlayer(), profile);
+        Profile profile = profileRepository.find(player.getUniqueId());
+        profile.setPurchases(profile.getSales() + 1);
+        profileRepository.save(player.getUniqueId(), profile);
     }
 }

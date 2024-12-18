@@ -1,18 +1,15 @@
 package dev.onebiteaidan.worldshop.Controller;
 
-import dev.onebiteaidan.worldshop.Model.DataManagement.Cache.PickupCache;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Cache.PlayerCache;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Cache.TradeCache;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.PickupRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.TradeRepository;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
-import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Profile;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.WorldShop;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,20 +17,17 @@ import java.util.List;
 
 public class StoreManager {
 
-    private final Database db;
-    private final TradeCache trades;
-    private final PickupCache pickups;
+    private final TradeRepository tradeRepository;
+    private final PickupRepository pickupRepository;
 
     // List of players with a refreshable screen open.
     private List<Player> activePlayers;
 
     public StoreManager() {
-        // todo: Verify + Init DB Schema
-
         // Initialize caches using the database.
-        this.db = WorldShop.getDatabase();
-        this.trades =  new TradeCache(db);
-        this.pickups = new PickupCache(db);
+        File databaseFile = new File(WorldShop.getPlugin(WorldShop.class).getDataFolder().getAbsolutePath() + "worldshop.db");
+        tradeRepository = new TradeRepository(databaseFile);
+        pickupRepository = new PickupRepository(databaseFile);
 
         // Initialize other variables
         activePlayers = new ArrayList<>();
@@ -47,7 +41,7 @@ public class StoreManager {
      * @param t Trade to insert.
      */
     public void createTrade(Trade t) {
-        trades.put(t.getTradeID(), t);
+        tradeRepository.save(t.getTradeID(), t);
     }
 
     /**
@@ -55,7 +49,7 @@ public class StoreManager {
      * @param tradeID TradeID of trade to retrieve.
      */
     public Trade getTrade(int tradeID) {
-        return trades.get(tradeID);
+        return tradeRepository.find(tradeID);
     }
 
     /**
@@ -64,13 +58,13 @@ public class StoreManager {
      * @param tradeID ID of Trade to remove
      */
     public void removeTrade(int tradeID) {
-        Trade t = trades.get(tradeID);
+        Trade t = tradeRepository.find(tradeID);
         t.setTradeStatus(TradeStatus.REMOVED);
-        trades.put(tradeID, t);
+        tradeRepository.save(tradeID, t);
 
         // Return offered items to the seller in a Pickup
         Pickup p = new Pickup(nextPickupID(), t.getSeller(), t.getItemOffered(), t.getTradeID());
-        pickups.put(p.getPickupID(), p);
+        pickupRepository.save(p.getPickupID(), p);
     }
 
     /**
@@ -82,15 +76,15 @@ public class StoreManager {
     public void completeTrade(Trade trade, Player player) {
         trade.setTradeStatus(TradeStatus.COMPLETE);
         trade.setBuyer(player);
-        trades.put(trade.getTradeID(), trade);
+        tradeRepository.save(trade.getTradeID(), trade);
 
         // Send offered items to buyer
         Pickup p1 = new Pickup(nextPickupID(), trade.getBuyer(), trade.getItemOffered(), trade.getTradeID());
-        pickups.put(p1.getPickupID(), p1);
+        pickupRepository.save(p1.getPickupID(), p1);
 
         // Send requested items to seller
         Pickup p2 = new Pickup(nextPickupID(), trade.getSeller(), trade.getItemRequested(), trade.getTradeID());
-        pickups.put(p2.getPickupID(), p2);
+        pickupRepository.save(p2.getPickupID(), p2);
     }
 
     /**
@@ -99,13 +93,13 @@ public class StoreManager {
      * @param tradeID ID of Trade to complete.
      */
     public void expireTrade(int tradeID) {
-        Trade t = trades.get(tradeID);
+        Trade t = tradeRepository.find(tradeID);
         t.setTradeStatus(TradeStatus.EXPIRED);
-        trades.put(tradeID, t);
+        tradeRepository.save(tradeID, t);
 
         // Return offered items to the seller in a Pickup
         Pickup p = new Pickup(nextPickupID(), t.getSeller(), t.getItemOffered(), t.getTradeID());
-        pickups.put(p.getPickupID(), p);
+        pickupRepository.save(p.getPickupID(), p);
     }
 
     /**
@@ -113,11 +107,11 @@ public class StoreManager {
      * @param p Pickup to insert.
      */
     public void createPickup(Pickup p) {
-        pickups.put(p.getPickupID(), p);
+        pickupRepository.save(p.getPickupID(), p);
     }
 
     public Pickup getPickup(int pickupID) {
-        return pickups.get(pickupID);
+        return pickupRepository.find(pickupID);
     }
 
     /**
@@ -125,9 +119,9 @@ public class StoreManager {
      * @param pickupID Pickup to set as withdraw.
      */
     public void withdrawPickup(int pickupID) {
-        Pickup p = pickups.get(pickupID);
+        Pickup p = pickupRepository.find(pickupID);
         p.setWithdrawnTimestamp(System.currentTimeMillis());
-        pickups.put(pickupID, p);
+        pickupRepository.save(pickupID, p);
     }
 
     /**
@@ -135,18 +129,7 @@ public class StoreManager {
      * @return Returns next highest ID. Returns -1 if command fails.
      */
     public int nextTradeID() {
-        //todo: Table and Column name need to be pulled from common source.
-        String command = "SELECT MAX(TRADE_ID) AS MAX_ID FROM " + "TRADES" + ";";
-        try (ResultSet rs = db.executeQuery(command, new Object[]{})) {
-            if (rs.next()) {
-                System.out.println("Gotten from DB");
-                return rs.getInt("MAX_ID");
-            }
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
-        }
-
-        return -1;
+        return tradeRepository.getNextTradeID();
     }
 
     /**
@@ -154,23 +137,15 @@ public class StoreManager {
      * @return Returns next highest ID. Returns -1 if command fails.
      */
     public int nextPickupID() {
-        //todo: Table and Column name need to be pulled from common source.
-        String command = "SELECT MAX(PICKUP_ID) FROM " + "PICKUPS" + ";";
-        try (ResultSet rs = db.executeQuery(command, new Object[]{})) {
-            return rs.getInt("PICKUP_ID");
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
-        }
-
-        return -1;
+        return pickupRepository.getNextTradeID();
     }
 
     public List<Trade> getTrades() {
-        return new ArrayList<>(trades.getAll());
+        return new ArrayList<>(tradeRepository.findAll());
     }
 
     public List<Pickup> getPickups() {
-        return new ArrayList<>(pickups.getAll());
+        return new ArrayList<>(pickupRepository.findAll());
     }
 
     public void addToUpdateList(Player player) {
