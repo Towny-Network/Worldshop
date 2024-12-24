@@ -5,7 +5,7 @@ import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import java.io.File;
 import java.util.List;
 
-public class PickupRepository extends SQLiteRepository<Integer, Pickup> {
+public class PickupRepository extends TradeRepository<Integer, Pickup> {
 
     public PickupRepository(File filePath) {
         super(filePath);

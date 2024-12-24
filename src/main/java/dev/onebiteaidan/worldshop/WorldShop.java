@@ -9,12 +9,9 @@ import dev.onebiteaidan.worldshop.Utils.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Objects;
 
-public final class WorldShop extends JavaPlugin {
+public class WorldShop extends JavaPlugin {
 
     private static Config config;
     private static StoreManager storeManager;
@@ -23,6 +20,9 @@ public final class WorldShop extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Setup the Logger
+        Logger.setPlugin(this);
+
         // Checks if data folder exists
         if (!getDataFolder().exists()) {
             this.getLogger().info("Datafolder for WorldShop Does not Exist. Creating now...");
@@ -43,8 +43,8 @@ public final class WorldShop extends JavaPlugin {
         // Expiry time should be specified in the config file
 
         // Initialize managers
-        storeManager = new StoreManager();
-        playerManager = new PlayerManager();
+        storeManager = new StoreManager(this);
+        playerManager = new PlayerManager(this);
 
         // Setting up listeners
 

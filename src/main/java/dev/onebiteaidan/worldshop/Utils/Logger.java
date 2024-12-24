@@ -1,20 +1,33 @@
 package dev.onebiteaidan.worldshop.Utils;
 
-import dev.onebiteaidan.worldshop.WorldShop;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class Logger {
 
+    private static JavaPlugin plugin;
+
+    public static void setPlugin(JavaPlugin pluginInstance) {
+        plugin = pluginInstance;
+    }
+
+    private static void ensureInitialized() {
+        if (plugin == null) {
+            throw new IllegalStateException("Logger is not initialized. Call Logger.setPlugin() during plugin startup.");
+        }
+    }
+
     /**
      * Redirects the output of e.printStackTrace into the PaperMC logs.
      * @param exception to be redirected.
      */
     public static void logStacktrace(Exception exception) {
+        ensureInitialized();
         StringWriter sw = new StringWriter();
         exception.printStackTrace(new PrintWriter(sw));
-        WorldShop.getPlugin(WorldShop.class).getLogger().severe(sw.toString());
+        plugin.getLogger().severe(sw.toString());
     }
 
     /**
@@ -22,7 +35,8 @@ public class Logger {
      * @param input to put into the logs.
      */
     public static void severe(String input) {
-        WorldShop.getPlugin(WorldShop.class).getLogger().severe(input);
+        ensureInitialized();
+        plugin.getLogger().severe(input);
     }
 
     /**
@@ -30,7 +44,8 @@ public class Logger {
      * @param input to put into the logs.
      */
     public static void warning(String input) {
-        WorldShop.getPlugin(WorldShop.class).getLogger().warning(input);
+        ensureInitialized();
+        plugin.getLogger().warning(input);
     }
 
     /**
@@ -38,8 +53,7 @@ public class Logger {
      * @param input to put into the logs.
      */
     public static void info(String input) {
-        WorldShop.getPlugin(WorldShop.class).getLogger().info(input);
+        ensureInitialized();
+        plugin.getLogger().info(input);
     }
-
-
 }

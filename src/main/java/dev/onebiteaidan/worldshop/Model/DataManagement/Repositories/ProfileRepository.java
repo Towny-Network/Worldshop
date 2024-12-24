@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
-public class ProfileRepository extends SQLiteRepository<UUID, Profile> {
+public class ProfileRepository extends TradeRepository<UUID, Profile> {
 
     public ProfileRepository(File filePath) {
         super(filePath);

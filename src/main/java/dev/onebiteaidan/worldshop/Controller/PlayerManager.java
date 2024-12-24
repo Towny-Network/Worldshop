@@ -4,6 +4,7 @@ import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.ProfileRepos
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Profile;
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 
@@ -12,8 +13,8 @@ public class PlayerManager {
 
     private final ProfileRepository profileRepository;
 
-    public PlayerManager() {
-        File databaseFile = new File(WorldShop.getPlugin(WorldShop.class).getDataFolder().getAbsolutePath() + "worldshop.db");
+    public PlayerManager(JavaPlugin plugin) {
+        File databaseFile = new File(plugin.getDataFolder().getAbsolutePath() + "worldshop.db");
         profileRepository = new ProfileRepository(databaseFile);
     }
 

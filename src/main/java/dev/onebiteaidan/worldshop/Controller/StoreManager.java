@@ -1,32 +1,29 @@
 package dev.onebiteaidan.worldshop.Controller;
 
 import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.PickupRepository;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.TradeRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLiteTradeRepository;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
-import dev.onebiteaidan.worldshop.Utils.Logger;
-import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StoreManager {
 
-    private final TradeRepository tradeRepository;
+    private final SQLiteTradeRepository tradeRepository;
     private final PickupRepository pickupRepository;
 
     // List of players with a refreshable screen open.
     private List<Player> activePlayers;
 
-    public StoreManager() {
+    public StoreManager(JavaPlugin plugin) {
         // Initialize caches using the database.
-        File databaseFile = new File(WorldShop.getPlugin(WorldShop.class).getDataFolder().getAbsolutePath() + "worldshop.db");
-        tradeRepository = new TradeRepository(databaseFile);
+        File databaseFile = new File(plugin.getDataFolder().getAbsolutePath() + "/worldshop.db");
+        tradeRepository = new SQLiteTradeRepository(databaseFile);
         pickupRepository = new PickupRepository(databaseFile);
 
         // Initialize other variables
