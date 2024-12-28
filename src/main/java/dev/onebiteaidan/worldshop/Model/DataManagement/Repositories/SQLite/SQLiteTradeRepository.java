@@ -41,6 +41,10 @@ public class SQLiteTradeRepository implements TradeRepository {
 
     @Override
     public Trade findById(int tradeID) {
+        if (tradeID < 0) {
+            throw new IllegalArgumentException("Trade IDs must be greater than or equal to zero!");
+        }
+
         String cmd = "SELECT * FROM " + TRADES_TABLE + " WHERE " + TRADE_ID + " = ?;";
         try (PreparedStatement ps = database.prepareStatement(cmd)) {
             ps.setInt(1, tradeID);
@@ -115,7 +119,7 @@ public class SQLiteTradeRepository implements TradeRepository {
 
     @Override
     public void delete(int id) {
-        throw new NotImplementedException();
+        throw new NotImplementedException("DELETE feature not available in the TradeRepository");
     }
 
     private int getNextTradeID() {

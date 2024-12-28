@@ -1,6 +1,7 @@
 package dev.onebiteaidan.worldshop.Controller;
 
 import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.ProfileRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteProfileRepository;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Profile;
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.OfflinePlayer;
@@ -15,7 +16,7 @@ public class PlayerManager {
 
     public PlayerManager(JavaPlugin plugin) {
         File databaseFile = new File(plugin.getDataFolder().getAbsolutePath() + "worldshop.db");
-        profileRepository = new ProfileRepository(databaseFile);
+        profileRepository = new SQLiteProfileRepository();
     }
 
     /**
@@ -24,7 +25,7 @@ public class PlayerManager {
      */
     public void createPlayerProfile(OfflinePlayer player) {
         Profile profile = new Profile(player, 0, 0);
-        profileRepository.save(player.getUniqueId(), profile);
+        profileRepository.save(profile);
     }
 
     /**
@@ -33,7 +34,7 @@ public class PlayerManager {
      * @return Returns corresponding Profile object.
      */
     public Profile getPlayerProfile(OfflinePlayer player) {
-        return profileRepository.find(player.getUniqueId());
+        return profileRepository.findById(player.getUniqueId());
     }
 
     /**
@@ -41,9 +42,9 @@ public class PlayerManager {
      * @param player OfflinePlayer object to update the record of.
      */
     public void incrementPlayerPurchases(OfflinePlayer player) {
-        Profile profile = profileRepository.find(player.getUniqueId());
+        Profile profile = profileRepository.findById(player.getUniqueId());
         profile.setPurchases(profile.getPurchases() + 1);
-        profileRepository.save(player.getUniqueId(), profile);
+        profileRepository.save(profile);
     }
 
     /**
@@ -51,8 +52,8 @@ public class PlayerManager {
      * @param player OfflinePlayer object to update the record of.
      */
     public void incrementPlayerSales(OfflinePlayer player) {
-        Profile profile = profileRepository.find(player.getUniqueId());
+        Profile profile = profileRepository.findById(player.getUniqueId());
         profile.setPurchases(profile.getSales() + 1);
-        profileRepository.save(player.getUniqueId(), profile);
+        profileRepository.save(profile);
     }
 }

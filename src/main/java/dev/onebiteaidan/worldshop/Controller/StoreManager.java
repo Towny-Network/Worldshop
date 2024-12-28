@@ -1,7 +1,9 @@
 package dev.onebiteaidan.worldshop.Controller;
 
 import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.PickupRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLitePickupRepository;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteTradeRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.TradeRepository;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
@@ -14,7 +16,7 @@ import java.util.List;
 
 public class StoreManager {
 
-    private final SQLiteTradeRepository tradeRepository;
+    private final TradeRepository tradeRepository;
     private final PickupRepository pickupRepository;
 
     // List of players with a refreshable screen open.
@@ -24,7 +26,7 @@ public class StoreManager {
         // Initialize caches using the database.
         File databaseFile = new File(plugin.getDataFolder().getAbsolutePath() + "/worldshop.db");
         tradeRepository = new SQLiteTradeRepository(null);
-        pickupRepository = new PickupRepository(databaseFile);
+        pickupRepository = new SQLitePickupRepository();
 
         // Initialize other variables
         activePlayers = new ArrayList<>();
@@ -60,8 +62,8 @@ public class StoreManager {
         tradeRepository.save(t);
 
         // Return offered items to the seller in a Pickup
-        Pickup p = new Pickup(nextPickupID(), t.getSeller(), t.getItemOffered(), t.getTradeID());
-        pickupRepository.save(p.getPickupID(), p);
+        Pickup p = new Pickup(t.getSeller(), t.getItemOffered(), t.getTradeID());
+        pickupRepository.save(p);
     }
 
     /**
@@ -76,12 +78,12 @@ public class StoreManager {
         tradeRepository.save(trade);
 
         // Send offered items to buyer
-        Pickup p1 = new Pickup(nextPickupID(), trade.getBuyer(), trade.getItemOffered(), trade.getTradeID());
-        pickupRepository.save(p1.getPickupID(), p1);
+        Pickup p1 = new Pickup(trade.getBuyer(), trade.getItemOffered(), trade.getTradeID());
+        pickupRepository.save(p1);
 
         // Send requested items to seller
-        Pickup p2 = new Pickup(nextPickupID(), trade.getSeller(), trade.getItemRequested(), trade.getTradeID());
-        pickupRepository.save(p2.getPickupID(), p2);
+        Pickup p2 = new Pickup(trade.getSeller(), trade.getItemRequested(), trade.getTradeID());
+        pickupRepository.save(p2);
     }
 
     /**
@@ -95,8 +97,8 @@ public class StoreManager {
         tradeRepository.save(t);
 
         // Return offered items to the seller in a Pickup
-        Pickup p = new Pickup(nextPickupID(), t.getSeller(), t.getItemOffered(), t.getTradeID());
-        pickupRepository.save(p.getPickupID(), p);
+        Pickup p = new Pickup(t.getSeller(), t.getItemOffered(), t.getTradeID());
+        pickupRepository.save(p);
     }
 
     /**
@@ -104,11 +106,11 @@ public class StoreManager {
      * @param p Pickup to insert.
      */
     public void createPickup(Pickup p) {
-        pickupRepository.save(p.getPickupID(), p);
+        pickupRepository.save(p);
     }
 
     public Pickup getPickup(int pickupID) {
-        return pickupRepository.find(pickupID);
+        return pickupRepository.findById(pickupID);
     }
 
     /**
@@ -116,25 +118,9 @@ public class StoreManager {
      * @param pickupID Pickup to set as withdraw.
      */
     public void withdrawPickup(int pickupID) {
-        Pickup p = pickupRepository.find(pickupID);
+        Pickup p = pickupRepository.findById(pickupID);
         p.setWithdrawnTimestamp(System.currentTimeMillis());
-        pickupRepository.save(pickupID, p);
-    }
-
-    /**
-     * Gets the next trade ID for the database.
-     * @return Returns next highest ID. Returns -1 if command fails.
-     */
-//    public int nextTradeID() {
-//        return tradeRepository.getNextTradeID();
-//    }
-
-    /**
-     * Gets the next pickup ID for the database.
-     * @return Returns next highest ID. Returns -1 if command fails.
-     */
-    public int nextPickupID() {
-        return pickupRepository.getNextTradeID();
+        pickupRepository.save(p);
     }
 
     public List<Trade> getTrades() {

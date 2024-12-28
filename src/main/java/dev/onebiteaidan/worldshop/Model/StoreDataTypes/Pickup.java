@@ -23,14 +23,13 @@ public class Pickup {
 
     /**
      * Use when creating a brand-new Pickup object for the system.
-     * Sets withdraw to false and withdrawnTimestamp to an invalid value.
-     * @param pickupID
+     * Sets withdraw to false, withdrawnTimestamp to an invalid value, and pickupID to an invalid value.
      * @param player
      * @param item
      * @param tradeID
      */
-    public Pickup(int pickupID, OfflinePlayer player, ItemStack item, int tradeID) {
-        this.pickupID = pickupID;
+    public Pickup(OfflinePlayer player, ItemStack item, int tradeID) {
+        this.pickupID = -1;
         this.player = player;
         this.item = item;
         this.tradeID = tradeID;

@@ -15,6 +15,7 @@ import org.mockbukkit.mockbukkit.entity.PlayerMock;
 
 import java.sql.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -128,77 +129,128 @@ class SQLiteTradeRepositoryTest {
             MockBukkit.unmock();
         }
 
-        @Test
-        void findByIdShouldReturnSameTradeAsInserted() {
-            PlayerMock buyerMock = server.addPlayer();
-            PlayerMock sellerMock = server.addPlayer();
+        @Nested
+        class TestFindById {
+            @Test
+            void findByIdShouldReturnSameTradeAsInserted() {
+                PlayerMock buyerMock = server.addPlayer();
+                PlayerMock sellerMock = server.addPlayer();
 
-            UUID buyerUUID = buyerMock.getUniqueId();
-            UUID sellerUUID = sellerMock.getUniqueId();
+                UUID buyerUUID = buyerMock.getUniqueId();
+                UUID sellerUUID = sellerMock.getUniqueId();
 
-            buyerMock.disconnect();
-            sellerMock.disconnect();
+                buyerMock.disconnect();
+                sellerMock.disconnect();
 
-            OfflinePlayer buyer = server.getOfflinePlayer(buyerUUID);
-            OfflinePlayer seller = server.getOfflinePlayer(sellerUUID);
-            TradeStatus tradeStatus = TradeStatus.OPEN;
-            ItemStack itemOffered = new ItemStack(Material.DIAMOND_AXE);
-            ItemStack itemRequested = new ItemStack(Material.OAK_PLANKS, 35);
+                OfflinePlayer buyer = server.getOfflinePlayer(buyerUUID);
+                OfflinePlayer seller = server.getOfflinePlayer(sellerUUID);
+                TradeStatus tradeStatus = TradeStatus.OPEN;
+                ItemStack itemOffered = new ItemStack(Material.DIAMOND_AXE);
+                ItemStack itemRequested = new ItemStack(Material.OAK_PLANKS, 35);
 
-            Trade trade = new Trade(100, tradeStatus, seller, buyer, itemOffered, itemRequested, 0L, 1L);
+                Trade trade = new Trade(100, tradeStatus, seller, buyer, itemOffered, itemRequested, 0L, 1L);
 
-            // Save trade to database
-            repository.save(trade);
+                // Save trade to database
+                repository.save(trade);
 
-            // Retrieve the trade
-            Trade tradeRetrieved = repository.findById(100);
+                // Retrieve the trade
+                Trade tradeRetrieved = repository.findById(100);
 
-            // Compare
-            assertEquals(trade.getItemOffered(), tradeRetrieved.getItemOffered());
-            // Todo: Mockbukkit sets item amounts to 1 after deserialization. Waiting on fix.
+                // Compare
+                assertEquals(trade.getItemOffered(), tradeRetrieved.getItemOffered());
+                // Fixme: MockBukkit sets item amounts to 1 after deserialization. Waiting on fix.
 //            assertEquals(trade.getItemRequested(), tradeRetrieved.getItemRequested());
 //            assertEquals(trade, tradeRetrieved);
+            }
+
+            @Test
+            void findByIdWithMissingIDShouldReturnNull() {
+                // Retrieve the trade with the missing ID 101
+                assertNull(repository.findById(101));
+            }
+
+            @Test
+            void findByIdWithInvalidIDShouldThrowIllegalArgumentException() {
+                // Retrieve a trade with the tradeID of -1
+                Exception exception = assertThrows(Exception.class, () -> repository.findById(-1));
+                assertEquals("Trade IDs must be greater than or equal to zero!", exception.getMessage());
+            }
         }
 
-        @Test
-        void findByIdWithMissingIDShouldReturnNull() {
-            // Retrieve the trade with the missing ID 101
-            assertNull(repository.findById(101));
+        @Nested
+        class TestFinalAll {
+            @Test
+            void findAllShouldReturnAllTrades() {
+                PlayerMock buyerMock = server.addPlayer();
+                PlayerMock sellerMock = server.addPlayer();
+
+                UUID buyerUUID = buyerMock.getUniqueId();
+                UUID sellerUUID = sellerMock.getUniqueId();
+
+                buyerMock.disconnect();
+                sellerMock.disconnect();
+
+                OfflinePlayer buyer = server.getOfflinePlayer(buyerUUID);
+                OfflinePlayer seller = server.getOfflinePlayer(sellerUUID);
+                TradeStatus tradeStatus = TradeStatus.OPEN;
+                ItemStack itemOffered = new ItemStack(Material.DIAMOND_AXE);
+                ItemStack itemRequested = new ItemStack(Material.OAK_PLANKS, 35);
+
+                Trade trade1 = new Trade(100, tradeStatus, seller, buyer, itemOffered, itemRequested, 0L, 1L);
+                Trade trade2 = new Trade(101, tradeStatus, buyer, seller, itemRequested, itemOffered, 1L, 2L);
+
+                repository.save(trade1);
+                repository.save(trade2);
+
+                List<Trade> trades = repository.findAll();
+
+                assertEquals(2, trades.size());
+                assertEquals(100, trades.get(0).getTradeID());
+                assertEquals(101, trades.get(1).getTradeID());
+
+                // Fixme: These will fail until MockBukkt fixes their implementation
+//                assertEquals(trades.get(0), trade1);
+//                assertEquals(trades.get(1), trade2);
+            }
+
+            @Test
+            void findAllShouldReturnNoTrades() {
+                List<Trade> trades = repository.findAll();
+                assertTrue(trades.isEmpty());
+            }
         }
 
-        @Test
-        void findByIdWithInvalidIDShouldThrowIllegalArgumentException() {
-            // Retrieve a trade with the tradeID of -1
-            Exception exception = assertThrows(Exception.class, () -> repository.findById(-1));
-            assertEquals("Trade ID values below 0 are invalid!", exception.getMessage());
+        @Nested
+        class TestSave {
+
+
+            @Test
+            void saveWithIDShouldUpdateObjectInDatabase() {
+                // Prepopulate database with trade
+
+            }
+
+            @Test
+            void saveWithValidButNotPresentIDThrowsIllegalArgumentException() {
+
+            }
+
+            @Test
+            void saveWithoutIDShouldAddObjectToDatabase() {
+
+            }
+
+            @Test
+            void saveWithInvalidIDThrowsIllegalArgumentException() {
+
+            }
         }
 
-        @Test
-        void findAllShouldReturnAllTrades() {
-        }
-
-        @Test
-        void findAllShouldReturnNoTrades() {
-
-        }
-
-        @Test
-        void saveWithIDShouldUpdateObjectInDatabase() {
-
-        }
-
-        @Test
-        void saveWithoutIDShouldAddObjectToDatabase() {
-
-        }
-
-        @Test
-        void saveWithInvalidIDThrowsIllegalArgumentException() {
-
-        }
-
-        @Test
-        void delete() {
+        @Nested
+        class TestDelete {
+            @Test
+            void delete() {
+            }
         }
     }
 }
