@@ -1,7 +1,7 @@
 package dev.onebiteaidan.worldshop.Controller;
 
 import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.PickupRepository;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLiteTradeRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteTradeRepository;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
@@ -23,7 +23,7 @@ public class StoreManager {
     public StoreManager(JavaPlugin plugin) {
         // Initialize caches using the database.
         File databaseFile = new File(plugin.getDataFolder().getAbsolutePath() + "/worldshop.db");
-        tradeRepository = new SQLiteTradeRepository(databaseFile);
+        tradeRepository = new SQLiteTradeRepository(null);
         pickupRepository = new PickupRepository(databaseFile);
 
         // Initialize other variables
@@ -38,7 +38,7 @@ public class StoreManager {
      * @param t Trade to insert.
      */
     public void createTrade(Trade t) {
-        tradeRepository.save(t.getTradeID(), t);
+        tradeRepository.save(t);
     }
 
     /**
@@ -46,7 +46,7 @@ public class StoreManager {
      * @param tradeID TradeID of trade to retrieve.
      */
     public Trade getTrade(int tradeID) {
-        return tradeRepository.find(tradeID);
+        return tradeRepository.findById(tradeID);
     }
 
     /**
@@ -55,9 +55,9 @@ public class StoreManager {
      * @param tradeID ID of Trade to remove
      */
     public void removeTrade(int tradeID) {
-        Trade t = tradeRepository.find(tradeID);
+        Trade t = tradeRepository.findById(tradeID);
         t.setTradeStatus(TradeStatus.REMOVED);
-        tradeRepository.save(tradeID, t);
+        tradeRepository.save(t);
 
         // Return offered items to the seller in a Pickup
         Pickup p = new Pickup(nextPickupID(), t.getSeller(), t.getItemOffered(), t.getTradeID());
@@ -73,7 +73,7 @@ public class StoreManager {
     public void completeTrade(Trade trade, Player player) {
         trade.setTradeStatus(TradeStatus.COMPLETE);
         trade.setBuyer(player);
-        tradeRepository.save(trade.getTradeID(), trade);
+        tradeRepository.save(trade);
 
         // Send offered items to buyer
         Pickup p1 = new Pickup(nextPickupID(), trade.getBuyer(), trade.getItemOffered(), trade.getTradeID());
@@ -90,9 +90,9 @@ public class StoreManager {
      * @param tradeID ID of Trade to complete.
      */
     public void expireTrade(int tradeID) {
-        Trade t = tradeRepository.find(tradeID);
+        Trade t = tradeRepository.findById(tradeID);
         t.setTradeStatus(TradeStatus.EXPIRED);
-        tradeRepository.save(tradeID, t);
+        tradeRepository.save(t);
 
         // Return offered items to the seller in a Pickup
         Pickup p = new Pickup(nextPickupID(), t.getSeller(), t.getItemOffered(), t.getTradeID());
@@ -125,9 +125,9 @@ public class StoreManager {
      * Gets the next trade ID for the database.
      * @return Returns next highest ID. Returns -1 if command fails.
      */
-    public int nextTradeID() {
-        return tradeRepository.getNextTradeID();
-    }
+//    public int nextTradeID() {
+//        return tradeRepository.getNextTradeID();
+//    }
 
     /**
      * Gets the next pickup ID for the database.

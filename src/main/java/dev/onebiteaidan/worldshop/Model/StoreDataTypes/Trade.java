@@ -5,6 +5,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 public class Trade {
 
     int tradeID;
@@ -24,7 +26,7 @@ public class Trade {
      * @param itemRequested The item the player wants in return.
      */
     public Trade(Player seller, ItemStack itemOffered, ItemStack itemRequested) {
-        this.tradeID = WorldShop.getStoreManager().nextTradeID();
+        this.tradeID = -1;
         this.tradeStatus = TradeStatus.OPEN;
         this.seller = seller;
         this.buyer = null;
@@ -128,16 +130,23 @@ public class Trade {
     }
 
     @Override
-    public String toString() {
-        return "Trade {" +
-                "tradeId=" + tradeID +
-                ", tradeStatus=" + tradeStatus +
-                ", seller=" + (seller != null ? seller.getUniqueId() : "None") +
-                ", buyer=" + (buyer != null ? buyer.getUniqueId() : "None") +
-                ", itemOffered=" + (itemOffered != null ? itemOffered.getType() : "None") +
-                ", itemRequested=" + (itemRequested != null ? itemRequested.getType() : "None") +
-                ", listingTimestamp=" + listingTimestamp +
-                ", completionTimestamp=" + (completionTimestamp > 0 ? completionTimestamp : "Not completed") +
-                '}';
+    public boolean equals(Object o) {
+        if (o instanceof Trade) {
+            Trade trade = (Trade) o;
+            return tradeID == trade.tradeID &&
+                    listingTimestamp == trade.listingTimestamp &&
+                    completionTimestamp == trade.completionTimestamp &&
+                    tradeStatus == trade.tradeStatus &&
+//                    Objects.equals(seller, trade.seller);
+//                    buyer.equals(trade.buyer) &&
+                    itemOffered.equals(trade.itemOffered) &&
+                    itemRequested.equals(trade.itemRequested);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tradeID, tradeStatus, seller, buyer, itemOffered, itemRequested, listingTimestamp, completionTimestamp);
     }
 }

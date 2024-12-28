@@ -19,14 +19,6 @@ import java.util.UUID;
 
 public class Utils {
 
-    public static byte[] saveItemStack(ItemStack item) {
-        return item.serializeAsBytes();
-    }
-
-    public static ItemStack loadItemStack(byte[] data) {
-        return ItemStack.deserializeBytes(data);
-    }
-
     public static ItemStack createSkull(Player player) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
         SkullMeta meta = (SkullMeta) head.getItemMeta();
