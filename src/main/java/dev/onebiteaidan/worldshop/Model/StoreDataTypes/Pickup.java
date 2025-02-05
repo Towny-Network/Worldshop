@@ -1,25 +1,16 @@
 package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
-import dev.onebiteaidan.worldshop.Utils.Logger;
-import dev.onebiteaidan.worldshop.Utils.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.UUID;
 
 public class Pickup {
     int pickupID;
     OfflinePlayer player;
     ItemStack item;
     int tradeID;
-    boolean withdrawn;
-    long withdrawnTimestamp;
+    boolean collected;
+    long collectionTimestamp;
 
     /**
      * Use when creating a brand-new Pickup object for the system.
@@ -33,21 +24,25 @@ public class Pickup {
         this.player = player;
         this.item = item;
         this.tradeID = tradeID;
-        this.withdrawn = false;
-        this.withdrawnTimestamp = -1L; // Invalid value to show that it has not been withdrawn.
+        this.collected = false;
+        this.collectionTimestamp = -1L; // Invalid value to show that it has not been withdrawn.
     }
 
-    public Pickup(int pickupID, OfflinePlayer player, ItemStack item, int tradeID, boolean withdrawn, long withdrawnTimestamp) {
+    public Pickup(int pickupID, OfflinePlayer player, ItemStack item, int tradeID, boolean collected, long collectionTimestamp) {
         this.pickupID = pickupID;
         this.player = player;
         this.item = item;
         this.tradeID = tradeID;
-        this.withdrawn = withdrawn;
-        this.withdrawnTimestamp = withdrawnTimestamp;
+        this.collected = collected;
+        this.collectionTimestamp = collectionTimestamp;
     }
 
     public int getPickupID() {
         return pickupID;
+    }
+
+    public void setPickupID(int pickupID) {
+        this.pickupID = pickupID;
     }
 
     public OfflinePlayer getPlayer() {
@@ -74,20 +69,20 @@ public class Pickup {
         this.tradeID = tradeID;
     }
 
-    public boolean isWithdrawn() {
-        return withdrawn;
+    public boolean isCollected() {
+        return collected;
     }
 
-    public void setWithdrawn(boolean withdrawn) {
-        this.withdrawn = withdrawn;
+    public void setCollectionStatus(boolean collected) {
+        this.collected = collected;
     }
 
-    public long getTimeWithdrawn() {
-        return withdrawnTimestamp;
+    public long getCollectionTimestamp() {
+        return collectionTimestamp;
     }
 
-    public void setWithdrawnTimestamp(long withdrawnTimestamp) {
-        this.withdrawnTimestamp = withdrawnTimestamp;
+    public void setCollectionTimestamp(long collectionTimestamp) {
+        this.collectionTimestamp = collectionTimestamp;
     }
 
     public DisplayItem generateDisplayItem() {
@@ -103,8 +98,8 @@ public class Pickup {
                 "playerUUID=" + player.getUniqueId() + "( " + player.getName() + " )" +
                 ", item=" + (item != null ? item.getType() : "None") +
                 ", tradeID=" + tradeID +
-                ", withdrawn=" + withdrawn +
-                ", withdrawnTimestamp=" + withdrawnTimestamp +
+                ", withdrawn=" + collected +
+                ", withdrawnTimestamp=" + collectionTimestamp +
                 "}";
     }
 }

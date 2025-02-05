@@ -95,10 +95,12 @@ public class SQLiteSchema {
         public static String PICKUPS_TABLE = "PICKUPS";
 
         public enum Column {
+            PICKUP_ID("PICKUP_ID", "INT"),
             PLAYER_UUID("PLAYER_UUID", "VARCHAR(36)"),
             PICKUP_ITEM("PICKUP_ITEM", "BLOB"),
+            TRADE_ID("TRADE_ID", "INT"),
             COLLECTED("COLLECTED", "BOOLEAN"),
-            TIME_COLLECTED("TIME_COLLECTED", "BIGINT");
+            COLLECTION_TIMESTAMP("COLLECTION_TIMESTAMP", "BIGINT");
 
             private final String columnName;
             private final String columnType;

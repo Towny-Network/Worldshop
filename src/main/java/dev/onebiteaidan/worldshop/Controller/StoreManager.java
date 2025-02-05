@@ -1,17 +1,12 @@
 package dev.onebiteaidan.worldshop.Controller;
 
 import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.PickupRepository;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLitePickupRepository;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteTradeRepository;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.TradeRepository;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,7 +114,7 @@ public class StoreManager {
      */
     public void withdrawPickup(int pickupID) {
         Pickup p = pickupRepository.findById(pickupID);
-        p.setWithdrawnTimestamp(System.currentTimeMillis());
+        p.setCollectionTimestamp(System.currentTimeMillis());
         pickupRepository.save(p);
     }
 
