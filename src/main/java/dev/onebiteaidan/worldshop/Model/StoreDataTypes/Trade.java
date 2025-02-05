@@ -9,14 +9,14 @@ import java.util.Objects;
 
 public class Trade {
 
-    int tradeID;
+    int tradeID;                // Set to -1 when unassigned
     TradeStatus tradeStatus;
     OfflinePlayer seller;
     OfflinePlayer buyer;
     ItemStack itemOffered;
     ItemStack itemRequested;
     long listingTimestamp;
-    long completionTimestamp;
+    long completionTimestamp;   // Set to -1L when unassigned
 
 
     /**
@@ -33,7 +33,7 @@ public class Trade {
         this.itemOffered = itemOffered;
         this.itemRequested = itemRequested;
         this.listingTimestamp = System.currentTimeMillis();
-        this.completionTimestamp = 0L;
+        this.completionTimestamp = -1L;
     }
 
     /**
@@ -137,8 +137,8 @@ public class Trade {
                     listingTimestamp == trade.listingTimestamp &&
                     completionTimestamp == trade.completionTimestamp &&
                     tradeStatus == trade.tradeStatus &&
-//                    Objects.equals(seller, trade.seller);
-//                    buyer.equals(trade.buyer) &&
+                    Objects.equals(seller, trade.seller) &&
+                    buyer.equals(trade.buyer) &&
                     itemOffered.equals(trade.itemOffered) &&
                     itemRequested.equals(trade.itemRequested);
         }

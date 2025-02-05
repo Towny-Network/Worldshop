@@ -8,15 +8,17 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class PlayerManager {
 
 
     private final ProfileRepository profileRepository;
 
-    public PlayerManager(JavaPlugin plugin) {
-        File databaseFile = new File(plugin.getDataFolder().getAbsolutePath() + "worldshop.db");
-        profileRepository = new SQLiteProfileRepository();
+    public PlayerManager(ProfileRepository profileRepository) {
+        this.profileRepository = profileRepository;
     }
 
     /**

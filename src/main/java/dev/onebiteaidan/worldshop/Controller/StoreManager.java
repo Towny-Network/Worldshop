@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +23,10 @@ public class StoreManager {
     // List of players with a refreshable screen open.
     private List<Player> activePlayers;
 
-    public StoreManager(JavaPlugin plugin) {
+    public StoreManager(TradeRepository tradeRepository, PickupRepository pickupRepository) {
         // Initialize caches using the database.
-        File databaseFile = new File(plugin.getDataFolder().getAbsolutePath() + "/worldshop.db");
-        tradeRepository = new SQLiteTradeRepository(null);
-        pickupRepository = new SQLitePickupRepository();
+        this.tradeRepository = tradeRepository;
+        this.pickupRepository = pickupRepository;
 
         // Initialize other variables
         activePlayers = new ArrayList<>();

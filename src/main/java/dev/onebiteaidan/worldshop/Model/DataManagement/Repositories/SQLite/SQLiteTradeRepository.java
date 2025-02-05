@@ -6,6 +6,7 @@ import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 
 import java.sql.Connection;
@@ -16,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static dev.onebiteaidan.worldshop.Model.SQLiteSchema.SQLiteTradeSchema.TRADES_INIT_COMMAND;
-import static dev.onebiteaidan.worldshop.Model.SQLiteSchema.SQLiteTradeSchema.TRADES_TABLE;
-import static dev.onebiteaidan.worldshop.Model.SQLiteSchema.SQLiteTradeSchema.Column.*;
+import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteTradeSchema.TRADES_INIT_COMMAND;
+import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteTradeSchema.TRADES_TABLE;
+import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteTradeSchema.Column.*;
 
 public class SQLiteTradeRepository implements TradeRepository {
 
@@ -86,6 +87,11 @@ public class SQLiteTradeRepository implements TradeRepository {
             trade.setTradeID(getNextTradeID());
         }
 
+        if (trade.getTradeID() < -1) {
+            // Trade ID is invalid
+            throw new IllegalArgumentException("Invalid trade ID in the trade passed into SQLite trade repository");
+        }
+
         String cmd = "INSERT INTO " + TRADES_TABLE + " (" + TRADE_ID + ", " + SELLER_UUID + ", " + BUYER_UUID + ", " + ITEM_OFFERED + ", " + ITEM_REQUESTED + ", " + TRADE_STATUS + ", " + LISTING_TIMESTAMP + ", " + COMPLETION_TIMESTAMP + ") " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
                 "ON CONFLICT(" + TRADE_ID + ") DO UPDATE SET " +
@@ -100,7 +106,12 @@ public class SQLiteTradeRepository implements TradeRepository {
         try (PreparedStatement ps = database.prepareStatement(cmd)) {
             ps.setInt(1, trade.getTradeID());
             ps.setString(2, trade.getSeller().getUniqueId().toString());
-            ps.setString(3, trade.getBuyer().getUniqueId().toString());
+
+            if (trade.getBuyer() == null) {
+                ps.setString(3, null);
+            } else {
+                ps.setString(3, trade.getBuyer().getUniqueId().toString());
+            }
 
             ps.setBytes(4, trade.getItemOffered().serializeAsBytes());
             ps.setBytes(5, trade.getItemRequested().serializeAsBytes());
@@ -140,15 +151,24 @@ public class SQLiteTradeRepository implements TradeRepository {
     }
 
     private Trade extractTradeFromResultSet(ResultSet rs) throws SQLException {
+        int tradeID = rs.getInt(TRADE_ID.toString());
+        TradeStatus tradeStatus = TradeStatus.values()[rs.getInt(TRADE_STATUS.toString())];
+        OfflinePlayer seller = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString(SELLER_UUID.toString())));
+        OfflinePlayer buyer = rs.getString(BUYER_UUID.toString()) == null ? null : Bukkit.getOfflinePlayer(UUID.fromString(rs.getString(BUYER_UUID.toString())));
+        ItemStack itemOffered = ItemStack.deserializeBytes(rs.getBytes(ITEM_OFFERED.toString()));
+        ItemStack itemRequested = ItemStack.deserializeBytes(rs.getBytes(ITEM_REQUESTED.toString()));
+        long listingTimestamp = rs.getLong(LISTING_TIMESTAMP.toString());
+        long completionTimestamp = rs.getLong(COMPLETION_TIMESTAMP.toString());
+
         return new Trade(
-                rs.getInt(TRADE_ID.toString()),
-                TradeStatus.values()[rs.getInt(TRADE_STATUS.toString())],
-                Bukkit.getOfflinePlayer(UUID.fromString(rs.getString(SELLER_UUID.toString()))),
-                Bukkit.getOfflinePlayer(UUID.fromString(rs.getString(BUYER_UUID.toString()))),
-                ItemStack.deserializeBytes(rs.getBytes(ITEM_OFFERED.toString())),
-                ItemStack.deserializeBytes(rs.getBytes(ITEM_REQUESTED.toString())),
-                rs.getLong(LISTING_TIMESTAMP.toString()),
-                rs.getLong(COMPLETION_TIMESTAMP.toString())
+                tradeID,
+                tradeStatus,
+                seller,
+                buyer,
+                itemOffered,
+                itemRequested,
+                listingTimestamp,
+                completionTimestamp
         );
     }
 }
