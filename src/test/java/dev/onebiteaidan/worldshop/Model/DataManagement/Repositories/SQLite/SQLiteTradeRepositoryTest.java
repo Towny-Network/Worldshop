@@ -111,7 +111,6 @@ class SQLiteTradeRepositoryTest {
         } catch (SQLException e) {
             fail("SQLException thrown during test: " + e.getMessage());
         }
-
     }
 
     @Nested

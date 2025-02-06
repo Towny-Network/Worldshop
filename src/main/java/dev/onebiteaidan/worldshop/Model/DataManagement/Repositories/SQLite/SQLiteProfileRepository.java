@@ -5,6 +5,7 @@ import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Profile;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -83,13 +84,14 @@ public class SQLiteProfileRepository implements ProfileRepository {
         try (PreparedStatement ps = database.prepareStatement(cmd)) {
             ps.setString(1, profile.getPlayer().getUniqueId().toString());
             ps.setInt(2, profile.getPurchases());
-            ps.setInt(3, profile.getPurchases());
+            ps.setInt(3, profile.getSales());
 
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            Logger.severe("Filed to save profile in SQLite Profile Repository.");
-            Logger.logStacktrace(e);
+//            Logger.severe("Failed to save profile in SQLite Profile Repository.");
+//            Logger.logStacktrace(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -99,12 +101,12 @@ public class SQLiteProfileRepository implements ProfileRepository {
     }
 
     private Profile extractProfileFromResultSet(ResultSet rs) throws SQLException {
-        UUID playerUUID = UUID.fromString(rs.getString(PLAYER_UUID.toString()));
+        OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString(PLAYER_UUID.toString())));
         int purchases = rs.getInt(PURCHASES.toString());
         int sales = rs.getInt(SALES.toString());
 
         return new Profile(
-                Bukkit.getOfflinePlayer(playerUUID),
+                player,
                 purchases,
                 sales
         );

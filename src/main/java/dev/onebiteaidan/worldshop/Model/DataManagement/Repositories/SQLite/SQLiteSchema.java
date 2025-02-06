@@ -85,7 +85,7 @@ public class SQLiteSchema {
 
         public static String PROFILES_INIT_COMMAND = "CREATE TABLE IF NOT EXISTS " + PROFILES_TABLE +
                 "(" +
-                PLAYER_UUID.getColumnName() + " " + PLAYER_UUID.getColumnType() + "," +
+                PLAYER_UUID.getColumnName() + " " + PLAYER_UUID.getColumnType() + "PRIMARY KEY," +
                 PURCHASES.getColumnName() + " " + PURCHASES.getColumnType() + "," +
                 SALES.getColumnName() + " " + SALES.getColumnType() +
                 ");";

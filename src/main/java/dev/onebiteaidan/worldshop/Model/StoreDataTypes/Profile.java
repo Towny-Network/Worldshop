@@ -1,11 +1,8 @@
 package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.UUID;
+import java.util.Objects;
 
 public class Profile {
 
@@ -41,5 +38,16 @@ public class Profile {
 
     public void setSales(int sales) {
         this.sales = sales;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Profile) {
+            Profile profile = (Profile) o;
+            return player == profile.player &&
+                    purchases == profile.purchases &&
+                    sales == profile.sales;
+        }
+        return false;
     }
 }
