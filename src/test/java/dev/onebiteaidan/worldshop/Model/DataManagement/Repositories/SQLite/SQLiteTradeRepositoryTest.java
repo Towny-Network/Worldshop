@@ -157,10 +157,7 @@ class SQLiteTradeRepositoryTest {
                 Trade tradeRetrieved = repository.findById(100);
 
                 // Compare
-                assertEquals(trade.getItemOffered(), tradeRetrieved.getItemOffered());
-                // Fixme: MockBukkit sets item amounts to 1 after deserialization. Waiting on fix.
-//            assertEquals(trade.getItemRequested(), tradeRetrieved.getItemRequested());
-//            assertEquals(trade, tradeRetrieved);
+                assertEquals(trade, tradeRetrieved);
             }
 
             @Test
@@ -208,9 +205,8 @@ class SQLiteTradeRepositoryTest {
                 assertEquals(100, trades.get(0).getTradeID());
                 assertEquals(101, trades.get(1).getTradeID());
 
-                // Fixme: These will fail until MockBukkt fixes their implementation
-//                assertEquals(trades.get(0), trade1);
-//                assertEquals(trades.get(1), trade2);
+                assertEquals(trades.get(0), trade1);
+                assertEquals(trades.get(1), trade2);
             }
 
             @Test
@@ -250,8 +246,7 @@ class SQLiteTradeRepositoryTest {
                 // Retrieve save from database, modify it and save it.
                 Trade trade2 = repository.findById(100);
 
-                // Fixme: Mockbukkit needs to fix their itemstack deserialization first before this test passes
-//                assertEquals(trade, trade2);
+                assertEquals(trade, trade2);
 
                 trade2.setListingTimestamp(10L);
                 trade2.setCompletionTimestamp(25L);
@@ -259,10 +254,8 @@ class SQLiteTradeRepositoryTest {
 
                 // Retrieve again and confirm that it modified the trade.
                 Trade trade3 = repository.findById(100);
-                assertEquals(trade2.getListingTimestamp(), trade3.getListingTimestamp());
-                assertEquals(trade2.getCompletionTimestamp(), trade3.getCompletionTimestamp());
-                // Fixme: Mockbukkit needs to fix their itemstack deserialization first before this test passes
-//                assertEquals(trade2, trade3);
+
+                assertEquals(trade2, trade3);
 
                 assertEquals(1, repository.findAll().size());
             }

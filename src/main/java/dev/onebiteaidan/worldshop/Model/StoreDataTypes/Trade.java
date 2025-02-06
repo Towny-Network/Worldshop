@@ -138,9 +138,10 @@ public class Trade {
                     completionTimestamp == trade.completionTimestamp &&
                     tradeStatus == trade.tradeStatus &&
                     seller.equals(trade.seller) &&
-                    buyer.equals(trade.buyer) &&
-                    itemOffered.equals(trade.itemOffered) &&
-                    itemRequested.equals(trade.itemRequested);
+                    buyer.equals(trade.buyer);
+//                    buyer.equals(trade.buyer) &&
+//                    itemOffered.equals(trade.itemOffered) &&
+//                    itemRequested.equals(trade.itemRequested);
         }
         return false;
     }
