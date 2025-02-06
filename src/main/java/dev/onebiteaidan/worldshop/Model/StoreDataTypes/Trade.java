@@ -137,7 +137,7 @@ public class Trade {
                     listingTimestamp == trade.listingTimestamp &&
                     completionTimestamp == trade.completionTimestamp &&
                     tradeStatus == trade.tradeStatus &&
-                    Objects.equals(seller, trade.seller) &&
+                    seller.equals(trade.seller) &&
                     buyer.equals(trade.buyer) &&
                     itemOffered.equals(trade.itemOffered) &&
                     itemRequested.equals(trade.itemRequested);

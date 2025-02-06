@@ -88,13 +88,12 @@ public class SQLitePickupRepository implements PickupRepository {
 
         if (pickup.getPickupID() < -1) {
             // Pickup ID is invalid
-            throw new IllegalArgumentException("Invalid pickup ID in the trade passed into SQLite pickup repository");
+            throw new IllegalArgumentException("Invalid pickup ID in the pickup passed into SQLite pickup repository");
         }
 
         String cmd = "INSERT INTO " + PICKUPS_TABLE + " (" + PICKUP_ID + ", " + PLAYER_UUID + ", " + PICKUP_ITEM + ", " + TRADE_ID + ", " + COLLECTED + ", " + COLLECTION_TIMESTAMP + ") " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                "VALUES (?, ?, ?, ?, ?, ?) " +
                 "ON CONFLICT(" + PICKUP_ID + ") DO UPDATE SET " +
-                PICKUP_ID + "= excluded." + PICKUP_ID + ", " +
                 PLAYER_UUID + "= excluded." + PLAYER_UUID + ", " +
                 PICKUP_ITEM + "= excluded." + PICKUP_ITEM + ", " +
                 TRADE_ID + "= excluded." + TRADE_ID + ", " +
@@ -112,8 +111,9 @@ public class SQLitePickupRepository implements PickupRepository {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            Logger.severe("Filed to save pickup in SQLite Pickup Repository.");
-            Logger.logStacktrace(e);
+//            Logger.severe("Filed to save pickup in SQLite Pickup Repository.");
+//            Logger.logStacktrace(e);
+            throw new RuntimeException(e);
         }
     }
 

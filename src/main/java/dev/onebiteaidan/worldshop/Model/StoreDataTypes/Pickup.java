@@ -4,6 +4,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 public class Pickup {
     int pickupID;
     OfflinePlayer player;
@@ -90,6 +92,20 @@ public class Pickup {
         DisplayItem displayItem = new DisplayItem(copiedItem);
         displayItem.PickupID = pickupID;
         return displayItem;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Pickup) {
+            Pickup pickup = (Pickup) o;
+            return pickupID == pickup.pickupID &&
+                    player.equals(pickup.player) &&
+//                    item == pickup.item &&            //fixme: Itemstack equivalence doesnt work in MockBukkit. Need to update
+                    tradeID == pickup.tradeID &&
+                    collected == pickup.collected &&
+                    collectionTimestamp == pickup.collectionTimestamp;
+        }
+        return false;
     }
 
     @Override

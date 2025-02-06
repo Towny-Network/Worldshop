@@ -1,8 +1,5 @@
 package dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite;
 
-import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteTradeSchema.Column.*;
-import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteProfileSchema.Column.*;
-
 public class SQLiteSchema {
 
     public static class SQLiteTradeSchema {
@@ -42,14 +39,14 @@ public class SQLiteSchema {
 
         public static String TRADES_INIT_COMMAND = "CREATE TABLE IF NOT EXISTS " + TRADES_TABLE +
                 "(" +
-                TRADE_ID.getColumnName() + " " + TRADE_ID.getColumnType() + " PRIMARY KEY AUTOINCREMENT," +
-                SELLER_UUID.getColumnName() + " " + SELLER_UUID.getColumnType() + "," +
-                BUYER_UUID.getColumnName() + " " + BUYER_UUID.getColumnType() + "," +
-                ITEM_OFFERED.getColumnName() + " " + ITEM_OFFERED.getColumnType() + "," +
-                ITEM_REQUESTED.getColumnName() + " " + ITEM_REQUESTED.getColumnType() + "," +
-                TRADE_STATUS.getColumnName() + " " + TRADE_STATUS.getColumnType() + "," +
-                LISTING_TIMESTAMP.getColumnName() + " " + LISTING_TIMESTAMP.getColumnType() + "," +
-                COMPLETION_TIMESTAMP.getColumnName() + " " + COMPLETION_TIMESTAMP.getColumnType() +
+                Column.TRADE_ID.getColumnName() + " " + Column.TRADE_ID.getColumnType() + " PRIMARY KEY AUTOINCREMENT," +
+                Column.SELLER_UUID.getColumnName() + " " + Column.SELLER_UUID.getColumnType() + "," +
+                Column.BUYER_UUID.getColumnName() + " " + Column.BUYER_UUID.getColumnType() + "," +
+                Column.ITEM_OFFERED.getColumnName() + " " + Column.ITEM_OFFERED.getColumnType() + "," +
+                Column.ITEM_REQUESTED.getColumnName() + " " + Column.ITEM_REQUESTED.getColumnType() + "," +
+                Column.TRADE_STATUS.getColumnName() + " " + Column.TRADE_STATUS.getColumnType() + "," +
+                Column.LISTING_TIMESTAMP.getColumnName() + " " + Column.LISTING_TIMESTAMP.getColumnType() + "," +
+                Column.COMPLETION_TIMESTAMP.getColumnName() + " " + Column.COMPLETION_TIMESTAMP.getColumnType() +
                 ");";
     }
 
@@ -85,9 +82,9 @@ public class SQLiteSchema {
 
         public static String PROFILES_INIT_COMMAND = "CREATE TABLE IF NOT EXISTS " + PROFILES_TABLE +
                 "(" +
-                PLAYER_UUID.getColumnName() + " " + PLAYER_UUID.getColumnType() + "PRIMARY KEY," +
-                PURCHASES.getColumnName() + " " + PURCHASES.getColumnType() + "," +
-                SALES.getColumnName() + " " + SALES.getColumnType() +
+                Column.PLAYER_UUID.getColumnName() + " " + Column.PLAYER_UUID.getColumnType() + " PRIMARY KEY," +
+                Column.PURCHASES.getColumnName() + " " + Column.PURCHASES.getColumnType() + "," +
+                Column.SALES.getColumnName() + " " + Column.SALES.getColumnType() +
                 ");";
     }
 
@@ -124,6 +121,14 @@ public class SQLiteSchema {
             }
         }
 
-        public static String PICKUPS_INIT_COMMAND = "";
+        public static String PICKUPS_INIT_COMMAND = "CREATE TABLE IF NOT EXISTS " + PICKUPS_TABLE +
+                "(" +
+                Column.PICKUP_ID.getColumnName() + " " + Column.PICKUP_ID.getColumnType() + " PRIMARY KEY," +
+                Column.PLAYER_UUID.getColumnName() + " " + Column.PLAYER_UUID.getColumnType() + "," +
+                Column.PICKUP_ITEM.getColumnName() + " " + Column.PICKUP_ITEM.getColumnType() + ", " +
+                Column.TRADE_ID.getColumnName() + " " + Column.TRADE_ID.getColumnType() + ", " +
+                Column.COLLECTED.getColumnName() + " " + Column.COLLECTED.getColumnType() + ", " +
+                Column.COLLECTION_TIMESTAMP.getColumnName() + " " + Column.COLLECTION_TIMESTAMP.getColumnType() +
+                ");";
     }
 }
