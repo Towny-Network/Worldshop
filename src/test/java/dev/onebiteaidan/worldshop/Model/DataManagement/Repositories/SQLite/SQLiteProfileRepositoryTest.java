@@ -1,6 +1,7 @@
 package dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite;
 
-import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Profile;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteProfileRepository;
+import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Profile;
 import org.bukkit.OfflinePlayer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,9 +14,9 @@ import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import java.sql.*;
 import java.util.*;
 
-import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteProfileSchema.Column.*;
-import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteProfileSchema.PROFILES_INIT_COMMAND;
-import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteProfileSchema.PROFILES_TABLE;
+import static dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteProfileSchema.Column.*;
+import static dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteProfileSchema.PROFILES_INIT_COMMAND;
+import static dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteProfileSchema.PROFILES_TABLE;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLiteProfileRepositoryTest {

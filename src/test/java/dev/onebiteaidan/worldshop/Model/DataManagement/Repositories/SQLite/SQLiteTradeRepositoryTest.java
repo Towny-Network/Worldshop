@@ -1,7 +1,8 @@
 package dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite;
 
-import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
-import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteTradeRepository;
+import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
+import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.TradeStatus;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -20,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteTradeSchema.TRADES_TABLE;
-import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteTradeSchema.TRADES_INIT_COMMAND;
-import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteTradeSchema.Column.*;
+import static dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteTradeSchema.TRADES_TABLE;
+import static dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteTradeSchema.TRADES_INIT_COMMAND;
+import static dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteSchema.SQLiteTradeSchema.Column.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SQLiteTradeRepositoryTest {

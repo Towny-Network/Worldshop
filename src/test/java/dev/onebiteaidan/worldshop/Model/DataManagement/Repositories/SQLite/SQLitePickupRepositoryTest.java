@@ -1,11 +1,9 @@
 package dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite;
 
-import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Pickup;
-import dev.onebiteaidan.worldshop.Model.StoreDataTypes.Trade;
-import dev.onebiteaidan.worldshop.Model.StoreDataTypes.TradeStatus;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLitePickupRepository;
+import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Pickup;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLitePickupSchema.*;
-import static dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteSchema.SQLitePickupSchema.Column.*;
+import static dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteSchema.SQLitePickupSchema.*;
+import static dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteSchema.SQLitePickupSchema.Column.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLitePickupRepositoryTest {
