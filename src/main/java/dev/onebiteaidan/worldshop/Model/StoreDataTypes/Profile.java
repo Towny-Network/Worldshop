@@ -2,8 +2,6 @@ package dev.onebiteaidan.worldshop.Model.StoreDataTypes;
 
 import org.bukkit.OfflinePlayer;
 
-import java.util.Objects;
-
 public class Profile {
 
     private OfflinePlayer player;

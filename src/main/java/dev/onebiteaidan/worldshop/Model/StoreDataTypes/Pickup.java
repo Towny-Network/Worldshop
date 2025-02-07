@@ -100,7 +100,7 @@ public class Pickup {
             Pickup pickup = (Pickup) o;
             return pickupID == pickup.pickupID &&
                     player.equals(pickup.player) &&
-//                    item == pickup.item &&            //fixme: Itemstack equivalence doesnt work in MockBukkit. Need to update
+                    item.equals(pickup.item) &&
                     tradeID == pickup.tradeID &&
                     collected == pickup.collected &&
                     collectionTimestamp == pickup.collectionTimestamp;
