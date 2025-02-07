@@ -1,6 +1,5 @@
-package dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite;
+package dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite;
 
-import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteTradeRepository;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.TradeStatus;
 import org.bukkit.Material;

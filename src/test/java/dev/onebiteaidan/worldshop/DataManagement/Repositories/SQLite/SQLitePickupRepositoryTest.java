@@ -1,6 +1,5 @@
-package dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite;
+package dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite;
 
-import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLitePickupRepository;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Pickup;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;

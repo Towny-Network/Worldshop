@@ -1,6 +1,5 @@
-package dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite;
+package dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite;
 
-import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteProfileRepository;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Profile;
 import org.bukkit.OfflinePlayer;
 import org.junit.jupiter.api.AfterEach;
