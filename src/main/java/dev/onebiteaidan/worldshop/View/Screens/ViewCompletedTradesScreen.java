@@ -85,7 +85,7 @@ public class ViewCompletedTradesScreen extends PageableScreen {
 
         // Filter trades by seller and withdrawn status
         pickups = pickups.stream()
-                .filter(pickup -> pickup.getPlayer().equals((OfflinePlayer) player) && !pickup.isWithdrawn())
+                .filter(pickup -> pickup.getPlayer().equals((OfflinePlayer) player) && !pickup.isCollected())
                 .collect(Collectors.toList());
 
         // Map each Pickup to a DisplayItem

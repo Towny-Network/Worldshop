@@ -5,27 +5,35 @@ import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.*;
 import dev.onebiteaidan.worldshop.Controller.PlayerManager;
 import dev.onebiteaidan.worldshop.Controller.StoreManager;
 import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.Database;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Database.SQLite;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.PickupRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.ProfileRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLitePickupRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteProfileRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteTradeRepository;
+import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.TradeRepository;
 import dev.onebiteaidan.worldshop.Utils.Logger;
+import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
 
-public final class WorldShop extends JavaPlugin {
+public class WorldShop extends JavaPlugin {
 
     private static Config config;
-    private static Database database;
     private static StoreManager storeManager;
     private static PlayerManager playerManager;
 
 
     @Override
     public void onEnable() {
+        // Setup the Logger
+        Logger.setPlugin(this);
+
         // Checks if data folder exists
         if (!getDataFolder().exists()) {
             this.getLogger().info("Datafolder for WorldShop Does not Exist. Creating now...");
@@ -40,51 +48,28 @@ public final class WorldShop extends JavaPlugin {
         config = new Config(this, this.getDataFolder(), "config", true, true);
         this.getLogger().info("Setting up the config.yml...");
 
-        //Setting up database
+        // Load the Database file
+        ProfileRepository profileRepository;
+        TradeRepository tradeRepository;
+        PickupRepository pickupRepository;
+
         switch(Config.getDatabaseType()) {
             case "SQLite":
-                File databaseFile = new File(this.getDataFolder(), "worldshop.db");
-
-                // Create the database file if it does not exist.
-                if (!databaseFile.exists()) {
-                    try {
-                        if (databaseFile.createNewFile()) {
-                            Logger.info("Database file created: " + databaseFile.getAbsolutePath());
-                        } else {
-                            Logger.severe("Failed to create the database file.");
-                        }
-                    } catch (IOException e) {
-                        Logger.logStacktrace(e);
-                    }
+                File databaseFile = new File(this.getDataFolder().getAbsolutePath() + "worldshop.db");
+                try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath())) {
+                    profileRepository = new SQLiteProfileRepository(connection);
+                    tradeRepository = new SQLiteTradeRepository(connection);
+                    pickupRepository = new SQLitePickupRepository(connection);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
                 }
-
-                // Create the database object.
-                database = new SQLite(databaseFile);
                 break;
 
-            default: // Disables the plugin if the database cannot be initialized.
-                this.getLogger().severe("DATABASE COULD NOT BE INITIALIZED BECAUSE '" + Config.getDatabaseType() + "' IS AN INVALID DATABASE TYPE");
-                this.onDisable();
-        }
+            case "MySQL":
+                throw new NotImplementedException("Database type 'MySQL' is not yet supported.");
 
-        try {
-            database.connect();
-        } catch (Exception exception) { // Disable the plugin if the database throws exception while trying to connect.
-            Logger.logStacktrace(exception);
-            this.getLogger().severe("ERROR THROWN WHILE CONNECTING TO THE DATABASE!");
-            this.onDisable();
-        }
-
-
-        if (database.isConnected()) {
-            this.getLogger().info("Connected to its database successfully!");
-
-            // No database initialization required here. Handled by the caches initialized in PlayerManager and TradeManager.
-
-        } else {
-            this.getLogger().severe("UNABLE TO CONNECT TO THE DATABASE!");
-            // Disables the plugin if the database doesn't connect.
-            this.onDisable();
+            default:
+                throw new RuntimeException("Database with type " + Config.getDatabaseType() + " is invalid!");
         }
 
         // todo: Initialize runnable that checks every second for expired trades
@@ -93,8 +78,8 @@ public final class WorldShop extends JavaPlugin {
         // Expiry time should be specified in the config file
 
         // Initialize managers
-        storeManager = new StoreManager();
-        playerManager = new PlayerManager();
+        storeManager = new StoreManager(tradeRepository, pickupRepository);
+        playerManager = new PlayerManager(profileRepository);
 
         // Setting up listeners
 
@@ -122,11 +107,6 @@ public final class WorldShop extends JavaPlugin {
         return config;
     }
 
-    // Database accessor
-    public static Database getDatabase() {
-        return database;
-    }
-
     public static StoreManager getStoreManager() {
         return storeManager;
     }
@@ -139,11 +119,6 @@ public final class WorldShop extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Close connection from database.
-        try {
-            database.disconnect();
-        } catch (SQLException e) {
-            Logger.logStacktrace(e);
-        }
+
     }
 }
