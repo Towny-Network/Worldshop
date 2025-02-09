@@ -1,6 +1,5 @@
 package dev.onebiteaidan.worldshop.Commands;
 
-import dev.onebiteaidan.worldshop.GUI.GUIManager;
 import dev.onebiteaidan.worldshop.GUI.Screens.MainShopScreen;
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.command.Command;
@@ -22,12 +21,9 @@ public class WorldshopCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-//            new MainShopScreen(player).openScreen(1);
+            new MainShopScreen(player).openScreen(1);
 
             System.out.println("Command run");
-
-            GUIManager.openItemBuyerGUI(player);
-
 
         } else {
             ArrayList<RegisteredListener> rls = InventoryClickEvent.getHandlerList().getRegisteredListeners(WorldShop.getPlugin(WorldShop.class));

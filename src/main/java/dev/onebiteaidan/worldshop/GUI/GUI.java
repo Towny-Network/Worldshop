@@ -1,5 +1,7 @@
 package dev.onebiteaidan.worldshop.GUI;
 
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -11,9 +13,11 @@ import java.util.Map;
 public class GUI implements Listener {
     private final Inventory inventory;
     private final Map<Integer, Button> buttons = new HashMap<>();
+    private final String id;
 
-    public GUI(Inventory inventory) {
-        this.inventory = inventory;
+    public GUI(int size, Component component, String id) {
+        this.inventory = Bukkit.createInventory(null, size, component);
+        this.id = id;
     }
 
     public void addButton(int slot, Button button) {
@@ -34,5 +38,9 @@ public class GUI implements Listener {
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public String getID() {
+        return id;
     }
 }

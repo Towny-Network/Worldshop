@@ -1,6 +1,8 @@
 package dev.onebiteaidan.worldshop.GUI.Screens;
 
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
+import dev.onebiteaidan.worldshop.GUI.Button;
+import dev.onebiteaidan.worldshop.GUI.GUI;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.GUI.Screen;
 import net.kyori.adventure.text.Component;
@@ -25,7 +27,10 @@ public class TradeViewerScreen extends Screen {
         Component title = text("Trade Viewer")
                 .color(NamedTextColor.DARK_GRAY);
 
-        setInventory(plugin.getServer().createInventory(this, 27, title)); //Todo: make the title of the store change based on nation it's in
+        GUI gui = new GUI(27, title, "TradeViewerScreen");
+        plugin.getServer().getPluginManager().registerEvents(gui, plugin);
+
+        setGUI(gui);
         initializeScreen();
     }
 
@@ -33,26 +38,34 @@ public class TradeViewerScreen extends Screen {
     protected void initializeScreen() {
         // Item Being Sold
         ItemStack beingSold = trade.getItemOffered();
-        getInventory().setItem(2, beingSold);
+        Button beingSoldButton = new Button(beingSold, () -> {
+            player.sendMessage("Clicked item that is being sold!");
+        });
+        gui.addButton(2, beingSoldButton);
 
         // Item Being Sold Marker
-        String beingSoldMarkerURL = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjIyMWRhNDQxOGJkM2JmYjQyZWI2NGQyYWI0MjljNjFkZWNiOGY0YmY3ZDRjZmI3N2ExNjJiZTNkY2IwYjkyNyJ9fX0=";
+        String beingSoldMarkerURL = "http://textures.minecraft.net/texture/3e4f2f9698c3f186fe44cc63d2f3c4f9a241223acf0581775d9cecd7075";
 
-        TextComponent beingSoldMarkerTitle = text("You are selling this item!");
+        TextComponent beingSoldMarkerTitle = text("You are selling them item!");
         ArrayList<TextComponent> beingSoldLore = new ArrayList<>();
         beingSoldLore.add(text("This will go to the player who buys the item from you."));
         beingSoldLore.add(text("In return, you will receive the payment item(s) you specified."));
 
         ItemStack beingSoldMarker = Utils.createButtonItem(Utils.createSkull(beingSoldMarkerURL), beingSoldMarkerTitle, beingSoldLore);
-        getInventory().setItem(11, beingSoldMarker);
-
+        Button beingSoldMarkerButton = new Button(beingSoldMarker, () -> {
+            player.sendMessage("Clicked the marker that tells us which item is being sold!");
+        });
+        gui.addButton(11, beingSoldMarkerButton);
 
         // Payment Item
         ItemStack paymentItem = trade.getItemRequested();
-        getInventory().setItem(6, paymentItem);
+        Button paymentItemButton = new Button(paymentItem, () -> {
+            player.sendMessage("Clicked the payment item!");
+        });
+        gui.addButton(6, paymentItemButton);
 
         // Payment Item Marker
-        String paymentItemMarkerURL = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjIyMWRhNDQxOGJkM2JmYjQyZWI2NGQyYWI0MjljNjFkZWNiOGY0YmY3ZDRjZmI3N2ExNjJiZTNkY2IwYjkyNyJ9fX0=";
+        String paymentItemMarkerURL = "http://textures.minecraft.net/texture/3e4f2f9698c3f186fe44cc63d2f3c4f9a241223acf0581775d9cecd7075";
 
         TextComponent paymentItemMarkerTitle = text("This is the item you requested as payment!");
         ArrayList<TextComponent> paymentItemLore = new ArrayList<>();
@@ -60,15 +73,23 @@ public class TradeViewerScreen extends Screen {
         paymentItemLore.add(text("In return, the buyer will receive the item you are selling."));
 
         ItemStack paymentItemMarker = Utils.createButtonItem(Utils.createSkull(paymentItemMarkerURL), paymentItemMarkerTitle, paymentItemLore);
-        getInventory().setItem(15, paymentItemMarker);
-
+        Button paymentItemMarkerButton = new Button(paymentItemMarker, () -> {
+            player.sendMessage("Clicked the market that tells us where the payment item is!");
+        });
+        gui.addButton(15, paymentItemMarkerButton);
 
         // Back Button
         TextComponent backButtonTitle = text("Go back")
                 .color(NamedTextColor.RED);
 
         ItemStack backButton = Utils.createButtonItem(Material.RED_CONCRETE_POWDER, backButtonTitle, null);
-        getInventory().setItem(22, backButton);
+        Button backButtonButton = new Button(backButton, () -> {
+
+            // Brings the player back to the main page of the store.
+            new MainShopScreen(player).openScreen(1);
+
+        });
+        gui.addButton(22, backButtonButton);
     }
 
     @Override

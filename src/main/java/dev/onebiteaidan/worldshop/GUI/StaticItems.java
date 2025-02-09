@@ -24,17 +24,17 @@ public class StaticItems {
     // Define RED X
     static String cannotConfirmURL = "http://textures.minecraft.net/texture/beb588b21a6f98ad1ff4e085c552dcb050efc9cab427f46048f18fc803475f7";
     static TextComponent cannotConfirmTitle = text("You cannot confirm until you have put in a sell item and a price item!");
-    public static final ItemStack cannotConfirmButton = Utils.createButtonItem(Utils.createSkull(cannotConfirmURL), cannotConfirmTitle, null);
+    public static final ItemStack cannotConfirmButtonItem = Utils.createButtonItem(Utils.createSkull(cannotConfirmURL), cannotConfirmTitle, null);
 
     // Define the YELLOW Checkmark
     static String canConfirmURL = "http://textures.minecraft.net/texture/eef425b4db7d62b200e89c013e421a9e110bfb27f2d8b9f5884d10104d00f4f4";
     static TextComponent canConfirmTitle = text("Click to confirm!");
-    public static final ItemStack canConfirmButton = Utils.createButtonItem(Utils.createSkull(canConfirmURL), canConfirmTitle, null);
+    public static final ItemStack canConfirmButtonItem = Utils.createButtonItem(Utils.createSkull(canConfirmURL), canConfirmTitle, null);
 
     // Define the GREEN Checkmark
     static String doubleConfirmURL = "http://textures.minecraft.net/texture/a92e31ffb59c90ab08fc9dc1fe26802035a3a47c42fee63423bcdb4262ecb9b6";
     static TextComponent doubleConfirmTitle = text("Are you sure?");
-    public static final ItemStack doubleConfirmButton = Utils.createButtonItem(Utils.createSkull(doubleConfirmURL), doubleConfirmTitle, null);
+    public static final ItemStack doubleConfirmButtonItem = Utils.createButtonItem(Utils.createSkull(doubleConfirmURL), doubleConfirmTitle, null);
 
     // Dividers
     public static final ItemStack divider = Utils.createButtonItem(Material.GRAY_STAINED_GLASS_PANE, null, null);

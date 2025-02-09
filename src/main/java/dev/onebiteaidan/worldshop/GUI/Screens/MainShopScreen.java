@@ -1,6 +1,10 @@
 package dev.onebiteaidan.worldshop.GUI.Screens;
 
+import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
+import dev.onebiteaidan.worldshop.GUI.Button;
+import dev.onebiteaidan.worldshop.GUI.GUI;
+import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.GUI.PageableScreen;
 import dev.onebiteaidan.worldshop.WorldShop;
@@ -25,7 +29,10 @@ public class MainShopScreen extends PageableScreen {
         TextComponent title = text("WorldShop")
                 .color(NamedTextColor.DARK_GRAY);
 
-        setInventory(plugin.getServer().createInventory(this, 54, title)); //Todo: make the title of the store change based on nation it's in
+        GUI gui = new GUI(54, title, "MainShopScreen");
+        plugin.getServer().getPluginManager().registerEvents(gui, plugin); //Todo: make the title of the store change based on nation it's in
+
+        setGUI(gui);
         initializeScreen();
     }
 
@@ -41,7 +48,11 @@ public class MainShopScreen extends PageableScreen {
         }
 
         ItemStack prevPage = Utils.createButtonItem(Material.ARROW, prevPageTitle, null);
-        getInventory().setItem(45, prevPage);
+        Button prevPageButton = new Button(prevPage, () -> {
+            player.sendMessage("Opening previous page");
+//            previousPage();
+        });
+        gui.addButton(45, prevPageButton);
 
 
         // Next Page Button
@@ -49,28 +60,40 @@ public class MainShopScreen extends PageableScreen {
                 .color(NamedTextColor.RED);
 
         if (isPageValid(getAllDisplayItems(), getCurrentPage() + 1, 45)) {
-            // Add Strikethrough to nextPageTitle if there is no previous page to go to.
+            // Add Strikethrough to nextPageTitle if there is no next page to go to.
             nextPageTitle = nextPageTitle.decorate(TextDecoration.STRIKETHROUGH);
         }
 
         ItemStack nextPage = Utils.createButtonItem(Material.ARROW, nextPageTitle, null);
-        getInventory().setItem(53, nextPage);
+        Button nextPageButton = new Button(nextPage, () -> {
+            player.sendMessage("Opening next page");
+//            nextPage();
+        });
+        gui.addButton(53, nextPageButton);
 
 
         // View Trades Button
         TextComponent viewTradesTitle = Component.text("Manage Trades")
                 .color(NamedTextColor.YELLOW);
 
-        ItemStack viewTradesButton = Utils.createButtonItem(Material.CHEST, viewTradesTitle, null);
-        getInventory().setItem(51, viewTradesButton);
+        ItemStack viewTrades = Utils.createButtonItem(Material.CHEST, viewTradesTitle, null);
+        Button viewTradesButton = new Button(viewTrades, () -> {
+            player.sendMessage("Opening trade management screen");
+//            new TradeManagementScreen(player).openScreen();
+        });
+        gui.addButton(51, viewTradesButton);
 
 
         // Sell Item Button
         TextComponent sellItemTitle = Component.text("Sell Item")
                 .color(NamedTextColor.GREEN);
 
-        ItemStack sellButton = Utils.createButtonItem(Material.WRITABLE_BOOK, sellItemTitle, null);
-        getInventory().setItem(50, sellButton);
+        ItemStack sell = Utils.createButtonItem(Material.WRITABLE_BOOK, sellItemTitle, null);
+        Button sellButton = new Button(sell, () -> {
+           player.sendMessage("Opening sell menu");
+            new ItemSellerScreen(player).openScreen();
+        });
+        gui.addButton(50, sellButton);
 
 
         // Player head with stats
@@ -78,30 +101,54 @@ public class MainShopScreen extends PageableScreen {
                 .color(NamedTextColor.DARK_AQUA);
 
         ItemStack statsHead = Utils.createButtonItem(Utils.createSkull(player), statsHeadTitle, null);
-        getInventory().setItem(49, statsHead);
+        Button statsHeadButton = new Button(statsHead, () -> {
+            player.sendMessage("Clicked on stats head");
+            // Do nothing else
+        });
+        gui.addButton(49, statsHeadButton);
 
 
-        // Sort Trades Button
-        TextComponent sortTradesTitle = Component.text("Sort")
+        // Filter Trades Button
+        TextComponent filterTradesTitle = Component.text("Filter")
                 .color(NamedTextColor.BLUE);
 
-        ItemStack sortTradesButton = Utils.createButtonItem(Material.HOPPER, sortTradesTitle, null);
-        getInventory().setItem(48, sortTradesButton);
+        ItemStack filterTrades = Utils.createButtonItem(Material.HOPPER, filterTradesTitle, null);
+        Button filterTradesButton = new Button(filterTrades, (event) -> {
+            player.sendMessage("Clicked on trade filter");
+            // Not implemented
+        });
+        gui.addButton(48, filterTradesButton);
 
 
         // Search Items
         TextComponent searchItemsTitle = Component.text("Search")
                 .color(NamedTextColor.AQUA);
 
-        ItemStack searchItemsButton = Utils.createButtonItem(Material.SPYGLASS, searchItemsTitle, null);
-        getInventory().setItem(47, searchItemsButton);
+        ItemStack searchItems = Utils.createButtonItem(Material.SPYGLASS, searchItemsTitle, null);
+        Button searchItemsButton = new Button(searchItems, (event) -> {
+            player.sendMessage("Clicked on search items");
+            // Not implemented
+        });
+        gui.addButton(47, searchItemsButton);
 
 
         // Add stored trades for the first page
         List<ItemStack> items = getPageItems(getAllDisplayItems(player), getCurrentPage(), 45);
         for (int i = 0; i < items.size(); i++) {
-            // Cannot use gui.addItem(item) here because it combines identical listings
-            getInventory().setItem(i, items.get(i));
+            Button itemButton = new Button(items.get(i), (event) -> {
+                // Open new ItemBuyerScreen with player and trade from item clicked on.
+                if (event.getCurrentItem() != null) {
+                    if (event.getCurrentItem() instanceof DisplayItem displayItem) {
+                        Trade trade = WorldShop.getStoreManager().getTrade(displayItem.getTradeID());
+                        if (trade != null) {
+                            new ItemBuyerScreen(player, trade).openScreen();
+                        } else {
+                            Logger.severe("TRADE WAS NULL WHEN OPENING THE BUY SCREEN. PLAYER: " + event.getWhoClicked().getName());
+                        }
+                    }
+                }
+            });
+            gui.addButton(i, itemButton);
         }
     }
 

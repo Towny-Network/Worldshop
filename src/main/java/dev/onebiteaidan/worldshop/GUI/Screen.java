@@ -2,15 +2,17 @@ package dev.onebiteaidan.worldshop.GUI;
 
 import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class Screen implements InventoryHolder {
+public abstract class Screen implements InventoryHolder, Listener {
     protected JavaPlugin plugin = WorldShop.getPlugin(WorldShop.class);
 
     protected Player player;
+    protected GUI gui;
     protected Inventory inventory;
 
     /**
@@ -22,7 +24,7 @@ public abstract class Screen implements InventoryHolder {
      * Opens the corresponding screen for this class's player.
      */
     public void openScreen() {
-        this.player.openInventory(this.inventory);
+        this.player.openInventory(this.gui.getInventory());
     }
 
     /**
@@ -39,6 +41,10 @@ public abstract class Screen implements InventoryHolder {
         this.player = player;
     }
 
+    protected void setGUI(GUI gui) {
+        this.gui = gui;
+    }
+
     protected void setInventory(Inventory inventory) {
         this.inventory = inventory;
     }
@@ -48,6 +54,6 @@ public abstract class Screen implements InventoryHolder {
     }
 
     public @NotNull Inventory getInventory() {
-        return this.inventory;
+        return this.gui.getInventory();
     }
 }

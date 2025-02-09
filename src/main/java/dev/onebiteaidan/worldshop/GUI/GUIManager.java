@@ -1,41 +1,32 @@
 package dev.onebiteaidan.worldshop.GUI;
 
 import dev.onebiteaidan.worldshop.WorldShop;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
+
+import static net.kyori.adventure.text.Component.text;
 
 public class GUIManager {
 
+    private static final Plugin plugin = WorldShop.getPlugin(WorldShop.class);
+
     public static void openItemBuyerGUI(Player player) {
+        Component title = text("Test")
+                .color(NamedTextColor.DARK_GRAY);
 
-        System.out.println("Made it into static function");
-
-        GUI gui = new GUI(Bukkit.createInventory(null, 9, "test"));
-
-        System.out.println("GUI Created");
-
-        JavaPlugin plugin = WorldShop.getPlugin(WorldShop.class);
+        GUI gui = new GUI(9, title);
         plugin.getServer().getPluginManager().registerEvents(gui, plugin);
 
-        System.out.println("Event Registered");
-
         Button button = new Button(new ItemStack(Material.RED_WOOL), () -> {
-           System.out.println("Button Clicked");
+            player.sendMessage("FUCKE!");
         });
-
-        System.out.println("Button Created");
 
         gui.addButton(0, button);
 
-        System.out.println("Button added to GUI");
-
         player.openInventory(gui.getInventory());
-
-        System.out.println("Opened Inventory");
-
     }
-
 }
