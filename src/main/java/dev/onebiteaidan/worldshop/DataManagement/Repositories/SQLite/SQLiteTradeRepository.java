@@ -85,6 +85,7 @@ public class SQLiteTradeRepository implements TradeRepository {
         if (trade.getTradeID() == -1) {
             // Trade has no ID, save new trade
             trade.setTradeID(getNextTradeID());
+
         }
 
         if (trade.getTradeID() < -1) {
@@ -122,6 +123,8 @@ public class SQLiteTradeRepository implements TradeRepository {
 
             ps.executeUpdate();
 
+            Logger.info("Saved trade with ID: " + trade.getTradeID());
+
         } catch (SQLException e) {
             Logger.severe("Failed to save trade in SQLite Trade Repository.");
             Logger.logStacktrace(e);
@@ -140,7 +143,13 @@ public class SQLiteTradeRepository implements TradeRepository {
             PreparedStatement ps = database.prepareStatement(cmd);
             ResultSet rs = ps.executeQuery();
 
-            return rs.getInt("max_id");
+            int id = rs.getInt("max_id");
+
+            if (rs.wasNull()) {
+                return 0;
+            } else {
+                return id + 1;
+            }
 
         } catch (SQLException e) {
             Logger.severe("Failed to get next trade ID from the SQLite database.");

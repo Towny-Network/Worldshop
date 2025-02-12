@@ -2,10 +2,12 @@ package dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite;
 
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.TradeStatus;
+import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -121,6 +123,10 @@ class SQLiteTradeRepositoryTest {
         @BeforeEach
         public void setUp() throws SQLException {
             server = MockBukkit.mock();
+
+            // Ensure that Logger is initialized properly
+            Plugin plugin = MockBukkit.load(WorldShop.class);
+
             repository = new SQLiteTradeRepository(DriverManager.getConnection("jdbc:sqlite::memory:"));
         }
 
@@ -281,6 +287,31 @@ class SQLiteTradeRepositoryTest {
 
                 assertEquals(1, trades.size());
                 assertEquals(0,trades.get(0).getTradeID());
+            }
+
+            @Test
+            void saveMultipleWithoutIDShouldHaveUniqueTradeIDs() {
+                // Create trade with no ID
+                PlayerMock sellerMock = server.addPlayer();
+                UUID sellerUUID = sellerMock.getUniqueId();
+                sellerMock.disconnect();
+
+                OfflinePlayer seller = server.getOfflinePlayer(sellerUUID);
+                ItemStack itemOffered = new ItemStack(Material.DIAMOND_AXE);
+                ItemStack itemRequested = new ItemStack(Material.OAK_PLANKS, 35);
+
+                Trade trade0 = new Trade((Player) seller, itemOffered, itemRequested);
+                Trade trade1 = new Trade((Player) seller, itemRequested, itemOffered);
+
+                // Save trade
+                repository.save(trade0);
+                repository.save(trade1);
+
+                // Confirm trades were given correct trade IDs
+                List<Trade> trades = repository.findAll();
+                assertEquals(2, trades.size());
+                assertEquals(0,trades.get(0).getTradeID());
+                assertEquals(1, trades.get(1).getTradeID());
             }
 
             @Test
