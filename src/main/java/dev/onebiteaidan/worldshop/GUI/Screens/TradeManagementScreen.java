@@ -1,30 +1,27 @@
 package dev.onebiteaidan.worldshop.GUI.Screens;
 
+import dev.onebiteaidan.worldshop.GUI.AbstractMenu;
+import dev.onebiteaidan.worldshop.GUI.Button;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.GUI.Screen;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 
 import static net.kyori.adventure.text.Component.text;
 
-public class TradeManagementScreen extends Screen {
+public class TradeManagementScreen extends AbstractMenu {
 
-    public TradeManagementScreen(Player player) {
-        setPlayer(player);
-
-        TextComponent title = text("Trades");
-
-        setInventory(plugin.getServer().createInventory(this, 27, title));
+    public TradeManagementScreen() {
+        super(text("Trades"), 27);
         initializeScreen();
     }
 
-    @Override
-    protected void initializeScreen() {
+    public void initializeScreen() {
         // View Current Listings Button
         TextComponent currentListingsButtonTitle = text("Current Listings")
                 .color(NamedTextColor.GREEN);
@@ -32,7 +29,10 @@ public class TradeManagementScreen extends Screen {
         currentListingsButtonLore.add(text("Click to view your current listings!"));
 
         ItemStack currentListingsButton = Utils.createButtonItem(Material.CHEST, currentListingsButtonTitle, currentListingsButtonLore);
-        getInventory().setItem(11, currentListingsButton);
+        setButton(11, new Button(currentListingsButton, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicked current listings button");
+        }));
 
 
         // View Completed Trades Button
@@ -42,7 +42,10 @@ public class TradeManagementScreen extends Screen {
         completedListingsButtonLore.add(text("Click to view your recently completed trades!"));
 
         ItemStack completedTradesButton = Utils.createButtonItem(Material.BARREL, completedTradesButtonTitle, completedListingsButtonLore);
-        getInventory().setItem(15, completedTradesButton);
+        setButton(15, new Button(completedTradesButton, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicked completed button");
+        }));
 
 
         // Back Button
@@ -50,11 +53,9 @@ public class TradeManagementScreen extends Screen {
                 .color(NamedTextColor.RED);
 
         ItemStack backButton = Utils.createButtonItem(Material.RED_CONCRETE_POWDER, backButtonTitle, null);
-        getInventory().setItem(22, backButton);
-    }
-
-    @Override
-    public void update() {
-        // Do nothing
+        setButton(22, new Button(backButton, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicked back button button");
+        }));
     }
 }

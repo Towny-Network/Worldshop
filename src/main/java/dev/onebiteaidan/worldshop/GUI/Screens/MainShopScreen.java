@@ -3,10 +3,9 @@ package dev.onebiteaidan.worldshop.GUI.Screens;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.GUI.Button;
-import dev.onebiteaidan.worldshop.GUI.GUI;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.GUI.PageableScreen;
+import dev.onebiteaidan.worldshop.GUI.PageableMenu;
 import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -14,6 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -21,23 +21,17 @@ import java.util.List;
 
 import static net.kyori.adventure.text.Component.text;
 
-public class MainShopScreen extends PageableScreen {
+public class MainShopScreen extends PageableMenu {
+
+    private final Player player;
 
     public MainShopScreen(Player player) {
-        setPlayer(player);
-
-        TextComponent title = text("WorldShop")
-                .color(NamedTextColor.DARK_GRAY);
-
-        GUI gui = new GUI(54, title, "MainShopScreen");
-        plugin.getServer().getPluginManager().registerEvents(gui, plugin); //Todo: make the title of the store change based on nation it's in
-
-        setGUI(gui);
+        super(text("WorldShop").color(NamedTextColor.DARK_GRAY), 54);
+        this.player = player;
         initializeScreen();
     }
 
-    @Override
-    protected void initializeScreen() {
+    private void initializeScreen() {
         // Prev Page Button
         TextComponent prevPageTitle = Component.text("Previous Page")
                 .color(NamedTextColor.RED);
@@ -48,11 +42,14 @@ public class MainShopScreen extends PageableScreen {
         }
 
         ItemStack prevPage = Utils.createButtonItem(Material.ARROW, prevPageTitle, null);
-        Button prevPageButton = new Button(prevPage, () -> {
+        setButton(45, new Button(prevPage, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
             player.sendMessage("Opening previous page");
-//            previousPage();
-        });
-        gui.addButton(45, prevPageButton);
+
+            if (isPageValid(getAllDisplayItems(), getCurrentPage() - 1, 45)) {
+                previousPage();
+            }
+        }));
 
 
         // Next Page Button
@@ -65,11 +62,14 @@ public class MainShopScreen extends PageableScreen {
         }
 
         ItemStack nextPage = Utils.createButtonItem(Material.ARROW, nextPageTitle, null);
-        Button nextPageButton = new Button(nextPage, () -> {
+        setButton(53, new Button(nextPage, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
             player.sendMessage("Opening next page");
-//            nextPage();
-        });
-        gui.addButton(53, nextPageButton);
+
+            if (isPageValid(getAllDisplayItems(), getCurrentPage() + 1, 45)) {
+                nextPage();
+            }
+        }));
 
 
         // View Trades Button
@@ -77,11 +77,12 @@ public class MainShopScreen extends PageableScreen {
                 .color(NamedTextColor.YELLOW);
 
         ItemStack viewTrades = Utils.createButtonItem(Material.CHEST, viewTradesTitle, null);
-        Button viewTradesButton = new Button(viewTrades, () -> {
+        setButton(51, new Button(viewTrades, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
             player.sendMessage("Opening trade management screen");
-//            new TradeManagementScreen(player).openScreen();
-        });
-        gui.addButton(51, viewTradesButton);
+
+            WorldShop.getMenuManager().openMenu(player, new TradeManagementScreen());
+        }));
 
 
         // Sell Item Button
@@ -89,11 +90,12 @@ public class MainShopScreen extends PageableScreen {
                 .color(NamedTextColor.GREEN);
 
         ItemStack sell = Utils.createButtonItem(Material.WRITABLE_BOOK, sellItemTitle, null);
-        Button sellButton = new Button(sell, () -> {
-           player.sendMessage("Opening sell menu");
-            new ItemSellerScreen(player).openScreen();
-        });
-        gui.addButton(50, sellButton);
+        setButton(50, new Button(sell, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Opening sell menu");
+
+            WorldShop.getMenuManager().openMenu(player, new ItemSellerScreen());
+        }));
 
 
         // Player head with stats
@@ -101,11 +103,11 @@ public class MainShopScreen extends PageableScreen {
                 .color(NamedTextColor.DARK_AQUA);
 
         ItemStack statsHead = Utils.createButtonItem(Utils.createSkull(player), statsHeadTitle, null);
-        Button statsHeadButton = new Button(statsHead, () -> {
+        setButton(49, new Button(statsHead, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
             player.sendMessage("Clicked on stats head");
             // Do nothing else
-        });
-        gui.addButton(49, statsHeadButton);
+        }));
 
 
         // Filter Trades Button
@@ -113,11 +115,11 @@ public class MainShopScreen extends PageableScreen {
                 .color(NamedTextColor.BLUE);
 
         ItemStack filterTrades = Utils.createButtonItem(Material.HOPPER, filterTradesTitle, null);
-        Button filterTradesButton = new Button(filterTrades, (event) -> {
+        setButton(48, new Button(filterTrades, (event) -> {
+            Player player = (Player) event.getWhoClicked();
             player.sendMessage("Clicked on trade filter");
             // Not implemented
-        });
-        gui.addButton(48, filterTradesButton);
+        }));
 
 
         // Search Items
@@ -125,30 +127,30 @@ public class MainShopScreen extends PageableScreen {
                 .color(NamedTextColor.AQUA);
 
         ItemStack searchItems = Utils.createButtonItem(Material.SPYGLASS, searchItemsTitle, null);
-        Button searchItemsButton = new Button(searchItems, (event) -> {
+        setButton(47, new Button(searchItems, (event) -> {
+            Player player = (Player) event.getWhoClicked();
             player.sendMessage("Clicked on search items");
             // Not implemented
-        });
-        gui.addButton(47, searchItemsButton);
+        }));
 
 
         // Add stored trades for the first page
         List<ItemStack> items = getPageItems(getAllDisplayItems(player), getCurrentPage(), 45);
         for (int i = 0; i < items.size(); i++) {
-            Button itemButton = new Button(items.get(i), (event) -> {
+            setButton(i, new Button(items.get(i), (event) -> {
                 // Open new ItemBuyerScreen with player and trade from item clicked on.
                 if (event.getCurrentItem() != null) {
                     if (event.getCurrentItem() instanceof DisplayItem displayItem) {
                         Trade trade = WorldShop.getStoreManager().getTrade(displayItem.getTradeID());
                         if (trade != null) {
-                            new ItemBuyerScreen(player, trade).openScreen();
+                            player.sendMessage("OPEN ITEM BUYER SCREEN HERE");
+                            WorldShop.getMenuManager().openMenu(player, new ItemBuyerScreen(trade));
                         } else {
                             Logger.severe("TRADE WAS NULL WHEN OPENING THE BUY SCREEN. PLAYER: " + event.getWhoClicked().getName());
                         }
                     }
                 }
-            });
-            gui.addButton(i, itemButton);
+            }));
         }
     }
 
@@ -156,13 +158,7 @@ public class MainShopScreen extends PageableScreen {
         setCurrentPage(page);
         initializeScreen();
 
-        player.openInventory(getInventory());
-    }
-
-    @Override
-    public void update() {
-        // To update this page, player reopens the GUI.
-        this.player.openInventory(getInventory());
+        open(player);
     }
 
     /**

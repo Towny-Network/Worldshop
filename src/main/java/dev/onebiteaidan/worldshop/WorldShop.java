@@ -8,7 +8,7 @@ import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLitePicku
 import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteProfileRepository;
 import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteTradeRepository;
 import dev.onebiteaidan.worldshop.DataManagement.Repositories.TradeRepository;
-import dev.onebiteaidan.worldshop.Listeners.ScreenListeners.*;
+import dev.onebiteaidan.worldshop.GUI.MenuManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.Bukkit;
@@ -27,6 +27,7 @@ public class WorldShop extends JavaPlugin {
     private static StoreManager storeManager;
     private static PlayerManager playerManager;
     private Connection connection;
+    private static MenuManager menuManager;
 
 
     @Override
@@ -95,23 +96,16 @@ public class WorldShop extends JavaPlugin {
         // Initialize managers
         storeManager = new StoreManager(tradeRepository, pickupRepository);
         playerManager = new PlayerManager(profileRepository);
+        menuManager = new MenuManager();
 
         // Setting up listeners
 
         // GUI Listeners
-//        Bukkit.getPluginManager().registerEvents(new ItemBuyerScreenListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ItemSellerScreenListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new MainShopScreenListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new StoreUpdateScreenListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new TradeManagementScreenListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new TradeRemovalScreenListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new TradeViewerScreenListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new ViewCompletedTradesScreenListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new ViewCurrentListingsScreenListener(), this);
+        Bukkit.getPluginManager().registerEvents(menuManager, this);
 
         // Setting up commands
         try {
-            Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand());
+            Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand(menuManager));
         } catch (NullPointerException exception) {
             Logger.logStacktrace(exception);
         }
@@ -129,6 +123,10 @@ public class WorldShop extends JavaPlugin {
     // Player Manager accessor
     public static PlayerManager getPlayerManager() {
         return playerManager;
+    }
+
+    public static MenuManager getMenuManager() {
+        return menuManager;
     }
 
 

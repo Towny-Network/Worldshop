@@ -1,13 +1,18 @@
 package dev.onebiteaidan.worldshop.GUI;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PageableScreen extends Screen {
+public abstract class PageableMenu extends AbstractMenu {
 
     protected int currentPage;
+
+    public PageableMenu(Component title, int size) {
+        super(title, size);
+    }
 
     /**
      * Open screen on specific page.

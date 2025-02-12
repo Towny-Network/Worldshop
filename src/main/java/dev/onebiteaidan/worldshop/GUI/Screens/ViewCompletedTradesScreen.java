@@ -2,8 +2,9 @@ package dev.onebiteaidan.worldshop.GUI.Screens;
 
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Pickup;
+import dev.onebiteaidan.worldshop.GUI.Button;
 import dev.onebiteaidan.worldshop.Utils.Utils;
-import dev.onebiteaidan.worldshop.GUI.PageableScreen;
+import dev.onebiteaidan.worldshop.GUI.PageableMenu;
 import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -11,6 +12,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -18,14 +20,13 @@ import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.text;
 
-public class ViewCompletedTradesScreen extends PageableScreen {
+public class ViewCompletedTradesScreen extends PageableMenu {
+
+    private final Player player;
 
     public ViewCompletedTradesScreen(Player player) {
-        setPlayer(player);
-
-        TextComponent title = text("Completed Trades");
-
-        setInventory(plugin.getServer().createInventory(this, 36, title));
+        super(text("Completed Trades"), 36);
+        this.player = player;
         initializeScreen();
     }
 
@@ -33,17 +34,20 @@ public class ViewCompletedTradesScreen extends PageableScreen {
     public void openScreen(int page) {
         setCurrentPage(page);
         initializeScreen();
-        player.openInventory(getInventory());
+        open(player);
     }
 
-    @Override
-    protected void initializeScreen() {
+
+    private void initializeScreen() {
         // Back Button
         TextComponent backButtonTitle = text("Go back")
                 .color(NamedTextColor.RED);
 
         ItemStack backButton = Utils.createButtonItem(Material.RED_CONCRETE_POWDER, backButtonTitle, null);
-        getInventory().setItem(31, backButton);
+        setButton(31, new Button(backButton, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicked the back button");
+        }));
 
 
         // Prev Page Button
@@ -56,7 +60,10 @@ public class ViewCompletedTradesScreen extends PageableScreen {
         }
 
         ItemStack prevPage = Utils.createButtonItem(Material.ARROW, prevPageTitle, null);
-        getInventory().setItem(29, prevPage);
+        setButton(29, new Button(prevPage, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicked prev page!");
+        }));
 
 
         // Next Page Button
@@ -69,12 +76,15 @@ public class ViewCompletedTradesScreen extends PageableScreen {
         }
 
         ItemStack nextPage = Utils.createButtonItem(Material.ARROW, nextPageTitle, null);
-        getInventory().setItem(33, nextPage);
+        setButton(33, new Button(nextPage, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicked next page item!");
+        }));
 
 
         // Populate remaining slots w/ completed trades posted by player
         for (ItemStack item: getPageItems(getPickupDisplayItems(player, getCurrentPage(), 27), getCurrentPage(), 27)) {
-            getInventory().addItem(item);
+            inventory.addItem(item);
         }
     }
 
