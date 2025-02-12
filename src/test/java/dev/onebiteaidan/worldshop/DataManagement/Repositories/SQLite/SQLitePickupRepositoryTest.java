@@ -1,9 +1,11 @@
 package dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite;
 
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Pickup;
+import dev.onebiteaidan.worldshop.WorldShop;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -114,6 +116,10 @@ public class SQLitePickupRepositoryTest {
         @BeforeEach
         public void setUp() throws SQLException {
             server = MockBukkit.mock();
+
+            // Ensure that Logger is initialized properly
+            Plugin plugin = MockBukkit.load(WorldShop.class);
+
             repository = new SQLitePickupRepository(DriverManager.getConnection("jdbc:sqlite::memory:"));
         }
 

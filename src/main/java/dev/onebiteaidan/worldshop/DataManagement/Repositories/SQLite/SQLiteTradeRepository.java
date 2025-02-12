@@ -123,8 +123,6 @@ public class SQLiteTradeRepository implements TradeRepository {
 
             ps.executeUpdate();
 
-            Logger.info("Saved trade with ID: " + trade.getTradeID());
-
         } catch (SQLException e) {
             Logger.severe("Failed to save trade in SQLite Trade Repository.");
             Logger.logStacktrace(e);

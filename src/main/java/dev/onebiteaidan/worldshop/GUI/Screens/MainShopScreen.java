@@ -136,6 +136,7 @@ public class MainShopScreen extends PageableMenu {
 
         // Add stored trades for the first page
         List<ItemStack> items = getPageItems(getAllDisplayItems(player), getCurrentPage(), 45);
+
         for (int i = 0; i < items.size(); i++) {
             setButton(i, new Button(items.get(i), (event) -> {
                 // Open new ItemBuyerScreen with player and trade from item clicked on.

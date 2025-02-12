@@ -111,8 +111,8 @@ public class SQLitePickupRepository implements PickupRepository {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-//            Logger.severe("Filed to save pickup in SQLite Pickup Repository.");
-//            Logger.logStacktrace(e);
+            Logger.severe("Filed to save pickup in SQLite Pickup Repository.");
+            Logger.logStacktrace(e);
             throw new RuntimeException(e);
         }
     }

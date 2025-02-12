@@ -12,6 +12,7 @@ public abstract class PageableMenu extends AbstractMenu {
 
     public PageableMenu(Component title, int size) {
         super(title, size);
+        currentPage = 1;
     }
 
     /**
