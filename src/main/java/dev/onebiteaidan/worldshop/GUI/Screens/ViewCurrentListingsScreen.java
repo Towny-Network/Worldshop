@@ -1,6 +1,5 @@
 package dev.onebiteaidan.worldshop.GUI.Screens;
 
-import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.GUI.Button;
@@ -46,6 +45,7 @@ public class ViewCurrentListingsScreen extends PageableMenu {
         ItemStack backButton = Utils.createButtonItem(Material.RED_CONCRETE_POWDER, backButtonTitle, null);
         setButton(31, new Button(backButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
+            WorldShop.getMenuManager().openMenu(player, new TradeManagementScreen());
             player.sendMessage("Clicked the back button");
         }));
 
@@ -61,6 +61,9 @@ public class ViewCurrentListingsScreen extends PageableMenu {
         ItemStack prevPage = Utils.createButtonItem(Material.ARROW, prevPageTitle, null);
         setButton(29, new Button(prevPage, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
+            if (isPageValid(getDisplayItems(player, getCurrentPage() - 1, 27), getCurrentPage() - 1, 27)) {
+                previousPage();
+            }
             player.sendMessage("Clicked prev page!");
         }));
 
@@ -77,6 +80,9 @@ public class ViewCurrentListingsScreen extends PageableMenu {
         ItemStack nextPage = Utils.createButtonItem(Material.ARROW, nextPageTitle, null);
         setButton(33, new Button(nextPage, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
+            if (isPageValid(getDisplayItems(player, getCurrentPage() - 1, 27), getCurrentPage() - 1, 27)) {
+                nextPage();
+            }
             player.sendMessage("Clicked next page item!");
         }));
 

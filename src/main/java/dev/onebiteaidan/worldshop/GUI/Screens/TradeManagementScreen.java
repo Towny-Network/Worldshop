@@ -3,6 +3,7 @@ package dev.onebiteaidan.worldshop.GUI.Screens;
 import dev.onebiteaidan.worldshop.GUI.AbstractMenu;
 import dev.onebiteaidan.worldshop.GUI.Button;
 import dev.onebiteaidan.worldshop.Utils.Utils;
+import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -31,6 +32,7 @@ public class TradeManagementScreen extends AbstractMenu {
         ItemStack currentListingsButton = Utils.createButtonItem(Material.CHEST, currentListingsButtonTitle, currentListingsButtonLore);
         setButton(11, new Button(currentListingsButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
+            WorldShop.getMenuManager().openMenu(player, new ViewCurrentListingsScreen(player));
             player.sendMessage("Clicked current listings button");
         }));
 
@@ -44,6 +46,7 @@ public class TradeManagementScreen extends AbstractMenu {
         ItemStack completedTradesButton = Utils.createButtonItem(Material.BARREL, completedTradesButtonTitle, completedListingsButtonLore);
         setButton(15, new Button(completedTradesButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
+            WorldShop.getMenuManager().openMenu(player, new ViewCompletedTradesScreen(player));
             player.sendMessage("Clicked completed button");
         }));
 
@@ -55,6 +58,7 @@ public class TradeManagementScreen extends AbstractMenu {
         ItemStack backButton = Utils.createButtonItem(Material.RED_CONCRETE_POWDER, backButtonTitle, null);
         setButton(22, new Button(backButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
+            WorldShop.getMenuManager().openMenu(player, new MainShopScreen(player));
             player.sendMessage("Clicked back button button");
         }));
     }

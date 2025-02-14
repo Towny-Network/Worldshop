@@ -2,6 +2,7 @@ package dev.onebiteaidan.worldshop.GUI.Screens;
 
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Pickup;
+import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.GUI.Button;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.GUI.PageableMenu;
@@ -46,6 +47,7 @@ public class ViewCompletedTradesScreen extends PageableMenu {
         ItemStack backButton = Utils.createButtonItem(Material.RED_CONCRETE_POWDER, backButtonTitle, null);
         setButton(31, new Button(backButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
+            WorldShop.getMenuManager().openMenu(player, new TradeManagementScreen());
             player.sendMessage("Clicked the back button");
         }));
 
@@ -62,6 +64,9 @@ public class ViewCompletedTradesScreen extends PageableMenu {
         ItemStack prevPage = Utils.createButtonItem(Material.ARROW, prevPageTitle, null);
         setButton(29, new Button(prevPage, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
+            if (isPageValid(getPickupDisplayItems(player, getCurrentPage() - 1, 27), getCurrentPage() - 1, 27)) {
+                previousPage();
+            }
             player.sendMessage("Clicked prev page!");
         }));
 
@@ -78,13 +83,19 @@ public class ViewCompletedTradesScreen extends PageableMenu {
         ItemStack nextPage = Utils.createButtonItem(Material.ARROW, nextPageTitle, null);
         setButton(33, new Button(nextPage, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
+            if (isPageValid(getPickupDisplayItems(player, getCurrentPage(), 27), getCurrentPage() + 1, 27)) {
+                nextPage();
+            }
             player.sendMessage("Clicked next page item!");
         }));
 
 
         // Populate remaining slots w/ completed trades posted by player
-        for (ItemStack item: getPageItems(getPickupDisplayItems(player, getCurrentPage(), 27), getCurrentPage(), 27)) {
-            inventory.addItem(item);
+        int count = 0;
+        for (ItemStack item : getPageItems(getPickupDisplayItems(player, getCurrentPage(), 27), getCurrentPage(), 27)) {
+            setButton(count, new Button(item, (InventoryClickEvent event) -> {
+                System.out.println("Adding " + item.getType() + " x" + item.getAmount() + " to you inventory!");
+            }));
         }
     }
 
