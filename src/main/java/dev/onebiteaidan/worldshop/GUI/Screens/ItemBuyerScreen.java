@@ -4,6 +4,7 @@ import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.GUI.AbstractMenu;
 import dev.onebiteaidan.worldshop.GUI.Button;
 import dev.onebiteaidan.worldshop.Utils.Utils;
+import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -13,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 
+import static dev.onebiteaidan.worldshop.GUI.StaticItems.doubleConfirmButtonItem;
 import static net.kyori.adventure.text.Component.text;
 
 public class ItemBuyerScreen extends AbstractMenu {
@@ -20,64 +22,64 @@ public class ItemBuyerScreen extends AbstractMenu {
     private final Trade trade;
 
     public ItemBuyerScreen(Trade trade) {
-        super(text("Trade Viewer").color(NamedTextColor.DARK_GRAY), 27);
+        super(text("Item Buyer").color(NamedTextColor.DARK_GRAY), 9);
 
         this.trade = trade;
         initializeScreen();
     }
 
     private void initializeScreen() {
-        // Item Being Sold
-        ItemStack beingSold = trade.getItemOffered();
-        setButton(2, new Button(beingSold, (InventoryClickEvent event) -> {
-            Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked item that is being sold!");
-        }));
-
-        // Item Being Sold Marker
-        String beingSoldMarkerURL = "http://textures.minecraft.net/texture/3e4f2f9698c3f186fe44cc63d2f3c4f9a241223acf0581775d9cecd7075";
-
-        TextComponent beingSoldMarkerTitle = text("You are selling them item!");
-        ArrayList<TextComponent> beingSoldLore = new ArrayList<>();
-        beingSoldLore.add(text("This will go to the player who buys the item from you."));
-        beingSoldLore.add(text("In return, you will receive the payment item(s) you specified."));
-
-        ItemStack beingSoldMarker = Utils.createButtonItem(Utils.createSkull(beingSoldMarkerURL), beingSoldMarkerTitle, beingSoldLore);
-        setButton(11, new Button(beingSoldMarker, (InventoryClickEvent event) -> {
-            Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked the marker that tells us which item is being sold!");
-        }));
-
-        // Payment Item
-        ItemStack paymentItem = trade.getItemRequested();
-        setButton(6, new Button(paymentItem, (InventoryClickEvent event) -> {
-            Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked the payment item!");
-        }));
-
-        // Payment Item Marker
-        String paymentItemMarkerURL = "http://textures.minecraft.net/texture/3e4f2f9698c3f186fe44cc63d2f3c4f9a241223acf0581775d9cecd7075";
-
-        TextComponent paymentItemMarkerTitle = text("This is the item you requested as payment!");
-        ArrayList<TextComponent> paymentItemLore = new ArrayList<>();
-        paymentItemLore.add(text("This will go to you after another player buys from you."));
-        paymentItemLore.add(text("In return, the buyer will receive the item you are selling."));
-
-        ItemStack paymentItemMarker = Utils.createButtonItem(Utils.createSkull(paymentItemMarkerURL), paymentItemMarkerTitle, paymentItemLore);
-        setButton(15, new Button(paymentItemMarker, (InventoryClickEvent event) -> {
-            Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked the market that tells us where the payment item is!");
-        }));
-
         // Back Button
         TextComponent backButtonTitle = text("Go back")
                 .color(NamedTextColor.RED);
 
         ItemStack backButton = Utils.createButtonItem(Material.RED_CONCRETE_POWDER, backButtonTitle, null);
-        setButton(22, new Button(backButton, (InventoryClickEvent event) -> {
+        setButton(0, new Button(backButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-            new MainShopScreen(player).openScreen(1);
+            WorldShop.getMenuManager().openMenu(player, new MainShopScreen(player));
         }));
+
+        // Confirm Button
+        ItemStack confirmButton = doubleConfirmButtonItem;
+        setButton(2, new Button(confirmButton, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicked the confirm button");
+            player.closeInventory();
+        }));
+
+
+        // Item You're Buying
+        ItemStack beingSold = trade.getItemOffered();
+        setButton(4, new Button(beingSold, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicked item that is being sold!");
+        }));
+
+
+        // Buying Marker
+        ItemStack buyingMarker = new ItemStack(Material.OAK_PLANKS);
+        setButton(5, new Button(beingSold, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicking on the buying marker");
+        }));
+
+
+        // Selling Marker
+        ItemStack sellingMarker = new ItemStack(Material.OAK_PLANKS);
+        setButton(6, new Button(beingSold, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicking on the selling marker");
+        }));
+
+
+        // Payment Item
+        ItemStack paymentItem = trade.getItemRequested();
+        setButton(7, new Button(paymentItem, (InventoryClickEvent event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.sendMessage("Clicked the payment item!");
+        }));
+
+
     }
 
     public Trade getTrade() {

@@ -12,9 +12,13 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +26,8 @@ import java.util.List;
 import static net.kyori.adventure.text.Component.text;
 
 public class MainShopScreen extends PageableMenu {
+
+    JavaPlugin plugin = WorldShop.getPlugin(WorldShop.class);
 
     private final Player player;
 
@@ -139,12 +145,15 @@ public class MainShopScreen extends PageableMenu {
 
         for (int i = 0; i < items.size(); i++) {
             setButton(i, new Button(items.get(i), (event) -> {
-                // Open new ItemBuyerScreen with player and trade from item clicked on.
-                if (event.getCurrentItem() != null) {
-                    if (event.getCurrentItem() instanceof DisplayItem displayItem) {
-                        Trade trade = WorldShop.getStoreManager().getTrade(displayItem.getTradeID());
+                ItemStack clickedItem = event.getCurrentItem();
+                if (clickedItem != null && clickedItem.hasItemMeta()) {
+                    ItemMeta meta = clickedItem.getItemMeta();
+
+                    Integer tradeID = meta.getPersistentDataContainer().get(new NamespacedKey(WorldShop.getInstance(), "trade_id"), PersistentDataType.INTEGER);
+
+                    if (tradeID != null) {
+                        Trade trade = WorldShop.getStoreManager().getTrade(tradeID);
                         if (trade != null) {
-                            player.sendMessage("OPEN ITEM BUYER SCREEN HERE");
                             WorldShop.getMenuManager().openMenu(player, new ItemBuyerScreen(trade));
                         } else {
                             Logger.severe("TRADE WAS NULL WHEN OPENING THE BUY SCREEN. PLAYER: " + event.getWhoClicked().getName());

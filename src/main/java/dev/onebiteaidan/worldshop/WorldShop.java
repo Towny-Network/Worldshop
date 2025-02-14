@@ -23,6 +23,8 @@ import java.util.Objects;
 
 public class WorldShop extends JavaPlugin {
 
+    private static WorldShop instance;
+
     private static Config config;
     private static StoreManager storeManager;
     private static PlayerManager playerManager;
@@ -32,6 +34,8 @@ public class WorldShop extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
+
         // Setup the Logger
         Logger.setPlugin(this);
 
@@ -127,6 +131,10 @@ public class WorldShop extends JavaPlugin {
 
     public static MenuManager getMenuManager() {
         return menuManager;
+    }
+
+    public static JavaPlugin getInstance() {
+        return instance;
     }
 
 

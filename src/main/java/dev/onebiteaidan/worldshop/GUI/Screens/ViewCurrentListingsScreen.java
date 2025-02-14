@@ -87,7 +87,7 @@ public class ViewCurrentListingsScreen extends PageableMenu {
         }
     }
 
-    private List<DisplayItem> getDisplayItems(Player player, int page, int spaces) {
+    private List<ItemStack> getDisplayItems(Player player, int page, int spaces) {
         // Get all OPEN trades with Player's trades filtered out
         List<Trade> trades = WorldShop.getStoreManager().getTrades();
 
@@ -97,7 +97,7 @@ public class ViewCurrentListingsScreen extends PageableMenu {
                 .collect(Collectors.toList());
 
         // Map each Trade to a DisplayItem
-        List<DisplayItem> displayItems = trades.stream()
+        List<ItemStack> displayItems = trades.stream()
                 .map(Trade::generateDisplayItem)
                 .collect(Collectors.toList());
 

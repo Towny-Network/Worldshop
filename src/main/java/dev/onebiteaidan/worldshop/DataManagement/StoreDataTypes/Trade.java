@@ -1,8 +1,14 @@
 package dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes;
 
+import dev.onebiteaidan.worldshop.WorldShop;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.N;
 
 import java.util.Objects;
 
@@ -121,11 +127,16 @@ public class Trade {
         this.completionTimestamp = completionTimestamp;
     }
 
-    public DisplayItem generateDisplayItem() {
+    public ItemStack generateDisplayItem() {
         ItemStack item = itemOffered.clone();
-        DisplayItem displayItem = new DisplayItem(item);
-        displayItem.setTradeID(tradeID);
-        return displayItem;
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.getPersistentDataContainer().set(new NamespacedKey(WorldShop.getInstance(), "trade_id"),
+                    PersistentDataType.INTEGER, tradeID);
+            item.setItemMeta(meta);
+        }
+
+        return item;
     }
 
     @Override

@@ -4,6 +4,7 @@ import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.GUI.AbstractMenu;
 import dev.onebiteaidan.worldshop.GUI.Button;
 import dev.onebiteaidan.worldshop.Utils.Utils;
+import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,11 +23,10 @@ public class TradeViewerScreen extends AbstractMenu {
 
     public TradeViewerScreen(Trade trade) {
         super(text("Trade Viewer").color(NamedTextColor.DARK_GRAY), 27);
-        this.trade = trade;
 
+        this.trade = trade;
         initializeScreen();
     }
-
 
     private void initializeScreen() {
         // Item Being Sold
@@ -35,7 +35,6 @@ public class TradeViewerScreen extends AbstractMenu {
             Player player = (Player) event.getWhoClicked();
             player.sendMessage("Clicked item that is being sold!");
         }));
-
 
         // Item Being Sold Marker
         String beingSoldMarkerURL = "http://textures.minecraft.net/texture/3e4f2f9698c3f186fe44cc63d2f3c4f9a241223acf0581775d9cecd7075";
@@ -51,14 +50,12 @@ public class TradeViewerScreen extends AbstractMenu {
             player.sendMessage("Clicked the marker that tells us which item is being sold!");
         }));
 
-
         // Payment Item
         ItemStack paymentItem = trade.getItemRequested();
         setButton(6, new Button(paymentItem, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
             player.sendMessage("Clicked the payment item!");
         }));
-
 
         // Payment Item Marker
         String paymentItemMarkerURL = "http://textures.minecraft.net/texture/3e4f2f9698c3f186fe44cc63d2f3c4f9a241223acf0581775d9cecd7075";
@@ -74,7 +71,6 @@ public class TradeViewerScreen extends AbstractMenu {
             player.sendMessage("Clicked the market that tells us where the payment item is!");
         }));
 
-
         // Back Button
         TextComponent backButtonTitle = text("Go back")
                 .color(NamedTextColor.RED);
@@ -82,9 +78,11 @@ public class TradeViewerScreen extends AbstractMenu {
         ItemStack backButton = Utils.createButtonItem(Material.RED_CONCRETE_POWDER, backButtonTitle, null);
         setButton(22, new Button(backButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-
-            // Brings the player back to the main page of the store.
-            new MainShopScreen(player).openScreen(1);
+            WorldShop.getMenuManager().openMenu(player, new MainShopScreen(player));
         }));
+    }
+
+    public Trade getTrade() {
+        return this.trade;
     }
 }
