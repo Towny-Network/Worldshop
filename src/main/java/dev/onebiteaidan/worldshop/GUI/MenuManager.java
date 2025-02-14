@@ -26,7 +26,7 @@ public class MenuManager implements Listener {
 
             //fixme: There may be a memory leak here. Below is a redundant check. In theory, the player should be removed from all listeners when they dont have a menu open.
 
-            if (menu.inventory.equals(event.getClickedInventory())) {
+            if (menu.inventory.equals(event.getClickedInventory()) || menu.inventory.equals(event.getWhoClicked().getOpenInventory().getTopInventory())) {
                 menu.handleClick(event);
             }
         }

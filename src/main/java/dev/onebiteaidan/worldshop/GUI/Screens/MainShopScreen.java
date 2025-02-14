@@ -1,6 +1,7 @@
 package dev.onebiteaidan.worldshop.GUI.Screens;
 
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
+import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.TradeStatus;
 import dev.onebiteaidan.worldshop.GUI.Button;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
@@ -182,7 +183,8 @@ public class MainShopScreen extends PageableMenu {
     }
 
     /**
-     * Gets all display items from the store manager for display in the main shop page
+     * Gets all display items from the store manager for display in the main shop page.
+     * Only returns trades with the OPEN TradeStatus.
      * @param player Removes any trades with this player as the seller
      * @return returns and arraylist of the display item stacks
      */
@@ -191,7 +193,9 @@ public class MainShopScreen extends PageableMenu {
 
         for (Trade trade : WorldShop.getStoreManager().getTrades()) {
             if (!trade.getSeller().equals(player)) {
-                items.add(trade.generateDisplayItem());
+                if (trade.getTradeStatus() == TradeStatus.OPEN) {
+                    items.add(trade.generateDisplayItem());
+                }
             }
         }
 
