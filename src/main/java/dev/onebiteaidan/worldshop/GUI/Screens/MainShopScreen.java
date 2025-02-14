@@ -154,7 +154,7 @@ public class MainShopScreen extends PageableMenu {
                     if (tradeID != null) {
                         Trade trade = WorldShop.getStoreManager().getTrade(tradeID);
                         if (trade != null) {
-                            WorldShop.getMenuManager().openMenu(player, new ItemBuyerScreen(trade));
+                            WorldShop.getMenuManager().openMenu(player, new ItemBuyerScreen(trade, player));
                         } else {
                             Logger.severe("TRADE WAS NULL WHEN OPENING THE BUY SCREEN. PLAYER: " + event.getWhoClicked().getName());
                         }

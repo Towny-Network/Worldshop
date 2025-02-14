@@ -13,6 +13,7 @@ import org.bukkit.profile.PlayerTextures;
 import javax.annotation.Nullable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,6 +72,36 @@ public class Utils {
             }
         }
         return amount;
+    }
+
+
+    public static void removeNumItems(Player player, ItemStack itemStack, int amount) {
+        int numRemoved = 0;
+        int slot = 0;
+
+        for (ItemStack item : player.getInventory()) {
+            if (numRemoved < amount) {
+                if (item != null) {
+                    if (item.isSimilar(itemStack)) {
+
+                        // Check if the amount of this itemstack would overshoot our target numRemoved
+                        if (item.getAmount() + numRemoved <= amount) {
+                            // Wouldn't overshoot, remove whole stack
+                            numRemoved += item.getAmount();
+                            player.getInventory().setItem(slot, null);
+
+
+                        } else {
+                            // Would overshoot, remove needed amount
+                            item.setAmount(amount - numRemoved);
+                        }
+                    }
+                }
+            } else {
+                break;
+            }
+            slot++;
+        }
     }
 
 
