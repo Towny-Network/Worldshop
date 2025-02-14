@@ -1,6 +1,5 @@
 package dev.onebiteaidan.worldshop.GUI.Screens;
 
-import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.GUI.Button;
 import dev.onebiteaidan.worldshop.Utils.Logger;
@@ -18,7 +17,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +24,6 @@ import java.util.List;
 import static net.kyori.adventure.text.Component.text;
 
 public class MainShopScreen extends PageableMenu {
-
-    JavaPlugin plugin = WorldShop.getPlugin(WorldShop.class);
 
     private final Player player;
 
