@@ -1,6 +1,9 @@
 package dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes;
 
 import dev.onebiteaidan.worldshop.WorldShop;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -10,6 +13,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.units.qual.N;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Trade {
@@ -131,11 +136,33 @@ public class Trade {
         ItemStack item = itemOffered.clone();
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
+            // Add trade ID to PDC for easy trade identification
             meta.getPersistentDataContainer().set(new NamespacedKey(WorldShop.getInstance(), "trade_id"),
                     PersistentDataType.INTEGER, tradeID);
             item.setItemMeta(meta);
+
+            // Add lore to item
+            List<Component> lore = new ArrayList<>();
+
+            lore.add(Component.text("Price:").color(NamedTextColor.GOLD));
+            Component itemName;
+            if (itemRequested.getItemMeta().hasDisplayName()) {
+                itemName = itemRequested.getItemMeta().displayName();
+            } else {
+                itemName = Component.text(itemRequested.getType().toString()).color(NamedTextColor.GRAY);
+            }
+            lore.add(Component.text("- x" + itemRequested.getAmount() + " ").color(NamedTextColor.GRAY).append(itemName));
+
+            if (itemOffered.getItemMeta().hasLore()) {
+                lore.add(Component.text(""));
+                lore.addAll(Objects.requireNonNull(itemOffered.getItemMeta().lore()));
+            }
+
+            // Set the item lore
+            meta.lore(lore);
         }
 
+        item.setItemMeta(meta);
         return item;
     }
 
