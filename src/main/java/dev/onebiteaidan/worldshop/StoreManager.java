@@ -115,6 +115,7 @@ public class StoreManager {
     public void withdrawPickup(int pickupID) {
         Pickup p = pickupRepository.findById(pickupID);
         p.setCollectionTimestamp(System.currentTimeMillis());
+        p.setCollectionStatus(true);
         pickupRepository.save(p);
     }
 

@@ -4,6 +4,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -13,9 +14,7 @@ import org.bukkit.profile.PlayerTextures;
 import javax.annotation.Nullable;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 public class Utils {
@@ -114,6 +113,88 @@ public class Utils {
         }
     }
 
+    /**
+     * Attempts to fit an itemstack into the player's inventory.
+     * @param player Player to fit item into.
+     * @param item Itemstack to fit into player's inventory.
+     * @return True if was able to fit item into inventory. False if it will not fit.
+     */
+    public static boolean fitItem(Player player, ItemStack item) {
+        // Check if an empty slot exists
+        //  -> One exists; add item to inven; return true
+        //  -> No empties; lets find if we can add to existing stacks
+        //      -> Yes we can; add to existing stacks; return true;
+        //      -> no we can't; return false;
+
+
+
+        // Check if an empty slot exists
+        int emptySlot = player.getInventory().firstEmpty();
+
+        if (emptySlot != -1) {
+            // Item into first empty slot
+            player.getInventory().setItem(emptySlot, item);
+            return true;
+        }
+
+        // No empty slots
+        // Check if we can add the amount to existing stacks
+        Map<Integer, Integer> similar_slots = new HashMap<>(); // <slot #, capacity available>
+        int count = 0;
+
+        // Find all similar itemstacks
+        for (ItemStack itemStack : player.getInventory()) {
+            if (itemStack != null) {
+                if (itemStack.isSimilar(item)) {
+                    if (itemStack.getAmount() != itemStack.getMaxStackSize()) {
+                        // ItemStack is not full
+                        int spaceAvailable = itemStack.getMaxStackSize() - itemStack.getAmount();
+                        similar_slots.put(count, spaceAvailable);
+                    }
+                }
+            }
+            count++;
+        }
+
+        // Check if all similar slots have enough capacity to fit the item
+        int totalSpaceAvailable = 0;
+        for (Integer key : similar_slots.keySet()) {
+            totalSpaceAvailable += similar_slots.get(key);
+        }
+
+
+        if (totalSpaceAvailable >= item.getAmount()) {
+            // We have enough space to store all items
+            // Distribute items
+            int itemsGiven = 0;
+
+            for (Integer key : similar_slots.keySet()) {
+                if (itemsGiven >= item.getAmount()) {
+                    // We finished
+                    System.out.println("Finished");
+                    return true;
+                }
+
+                int amountFree = similar_slots.get(key);
+
+                if ((item.getAmount() - itemsGiven) <= amountFree) {
+                    // Items amount fits into amount free
+                    player.getInventory().getItem(key).add(item.getAmount() - itemsGiven);
+                    itemsGiven += item.getAmount() - itemsGiven;
+                } else {
+                    // Items amount is greater than amount free
+                    player.getInventory().getItem(key).add(amountFree);
+                    itemsGiven += amountFree;
+                }
+            }
+
+            return true;
+        } else {
+            // Not enough space to fit the whole stack
+            return false;
+        }
+    }
+
 
     // TODO: Method should probably be moved to the Screen class.
     public static ItemStack createButtonItem(Material material, TextComponent displayName, @Nullable List<TextComponent> lore) {
@@ -145,6 +226,4 @@ public class Utils {
 
         return item;
     }
-
-
 }

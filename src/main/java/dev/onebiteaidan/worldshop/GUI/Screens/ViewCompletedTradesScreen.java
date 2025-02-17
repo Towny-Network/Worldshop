@@ -4,6 +4,7 @@ import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Pickup;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.GUI.Button;
+import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.GUI.PageableMenu;
 import dev.onebiteaidan.worldshop.WorldShop;
@@ -11,10 +12,13 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -94,12 +98,41 @@ public class ViewCompletedTradesScreen extends PageableMenu {
         int count = 0;
         for (ItemStack item : getPageItems(getPickupDisplayItems(player, getCurrentPage(), 27), getCurrentPage(), 27)) {
             setButton(count, new Button(item, (InventoryClickEvent event) -> {
-                System.out.println("Adding " + item.getType() + " x" + item.getAmount() + " to you inventory!");
+                ItemStack clickedItem = event.getCurrentItem();
+                if (clickedItem != null && clickedItem.hasItemMeta()) {
+                    ItemMeta meta = clickedItem.getItemMeta();
+
+                    Integer pickupID = meta.getPersistentDataContainer().get(new NamespacedKey(WorldShop.getInstance(), "pickup_id"), PersistentDataType.INTEGER);
+
+                    System.out.println("Trying out pickupID");
+
+                    if (pickupID != null) {
+                        System.out.println("pickupID retrieved");
+                        Pickup pickup = WorldShop.getStoreManager().getPickup(pickupID);
+                        if (pickup != null) {
+                            System.out.println("Pickup is not null");
+                            // Insert item into inventory if possible
+                            boolean success = Utils.fitItem(player, pickup.getItem());
+                            System.out.println("Able to fit into the inventory: " + success);
+                            if (success) {
+                                player.sendMessage("Added your items to your inventory!");
+                                // Mark pickup as complete
+                                WorldShop.getStoreManager().withdrawPickup(pickupID);
+                                player.closeInventory();
+                            } else {
+                                player.sendMessage("Make room in your inventory for the item!");
+                            }
+
+                        } else {
+                            Logger.severe("PICKUP WAS NULL WHEN TRYING TO CLAIM ITEM FROM COMPLETED TRADES SCREEN. PLAYER: " + event.getWhoClicked().getName());
+                        }
+                    }
+                }
             }));
         }
     }
 
-    private List<DisplayItem> getPickupDisplayItems(Player player, int page, int spaces) {
+    private List<ItemStack> getPickupDisplayItems(Player player, int page, int spaces) {
         // Get all pickups
         List<Pickup> pickups = WorldShop.getStoreManager().getPickups();
 
@@ -109,7 +142,7 @@ public class ViewCompletedTradesScreen extends PageableMenu {
                 .collect(Collectors.toList());
 
         // Map each Pickup to a DisplayItem
-        List<DisplayItem> displayItems = pickups.stream()
+        List<ItemStack> displayItems = pickups.stream()
                 .map(Pickup::generateDisplayItem)
                 .collect(Collectors.toList());
 

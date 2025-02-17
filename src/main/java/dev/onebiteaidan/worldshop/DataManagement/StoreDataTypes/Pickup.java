@@ -1,8 +1,12 @@
 package dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes;
 
+import dev.onebiteaidan.worldshop.WorldShop;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 public class Pickup {
     int pickupID;
@@ -85,11 +89,16 @@ public class Pickup {
         this.collectionTimestamp = collectionTimestamp;
     }
 
-    public DisplayItem generateDisplayItem() {
-        ItemStack copiedItem = item.clone();
-        DisplayItem displayItem = new DisplayItem(copiedItem);
-        displayItem.PickupID = pickupID;
-        return displayItem;
+    public ItemStack generateDisplayItem() {
+        ItemStack itemClone = item.clone();
+        ItemMeta meta = itemClone.getItemMeta();
+        if (meta != null) {
+            meta.getPersistentDataContainer().set(new NamespacedKey(WorldShop.getInstance(), "pickup_id"),
+                    PersistentDataType.INTEGER, pickupID);
+            itemClone.setItemMeta(meta);
+        }
+
+        return itemClone;
     }
 
     @Override

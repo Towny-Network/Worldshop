@@ -97,7 +97,7 @@ public class SQLitePickupRepository implements PickupRepository {
                 PLAYER_UUID + "= excluded." + PLAYER_UUID + ", " +
                 PICKUP_ITEM + "= excluded." + PICKUP_ITEM + ", " +
                 TRADE_ID + "= excluded." + TRADE_ID + ", " +
-                COLLECTED + "= excluded." + TRADE_ID + ", " +
+                COLLECTED + "= excluded." + COLLECTED + ", " +
                 COLLECTION_TIMESTAMP + "= excluded." + COLLECTION_TIMESTAMP + ";";
 
         try (PreparedStatement ps = database.prepareStatement(cmd)) {
@@ -129,7 +129,13 @@ public class SQLitePickupRepository implements PickupRepository {
             PreparedStatement ps = database.prepareStatement(cmd);
             ResultSet rs = ps.executeQuery();
 
-            return rs.getInt("max_id");
+            int id = rs.getInt("max_id");
+
+            if (rs.wasNull()) {
+                return 0;
+            } else {
+                return id + 1;
+            }
 
         } catch (SQLException e) {
             Logger.severe("Failed to get next pickup ID from the SQLite database.");
