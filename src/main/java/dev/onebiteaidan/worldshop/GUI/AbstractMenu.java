@@ -3,6 +3,7 @@ package dev.onebiteaidan.worldshop.GUI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -31,6 +32,20 @@ public abstract class AbstractMenu {
         if (buttons.containsKey(slot)) {
             event.setCancelled(true);
             buttons.get(slot).handleClick(event);
+        } else {
+            // Where was the click performed?
+            if (event.getClickedInventory().equals(event.getView().getTopInventory())) {
+                // Top inventory
+                event.setCancelled(true);
+            } else {
+                // Bottom inventory
+                if (event.getClick().isShiftClick()) {
+                    event.setCancelled(true);
+                }
+                if (event.getAction().equals(InventoryAction.COLLECT_TO_CURSOR)) {
+                    event.setCancelled(true);
+                }
+            }
         }
     }
 }

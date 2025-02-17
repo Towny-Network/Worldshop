@@ -1,8 +1,6 @@
 package dev.onebiteaidan.worldshop.GUI.Screens;
 
-import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.DisplayItem;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Pickup;
-import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.GUI.Button;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
