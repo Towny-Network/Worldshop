@@ -15,8 +15,6 @@ import java.util.ArrayList;
 
 public class WorldshopCommand implements CommandExecutor {
 
-    //Fixme: THIS COMMAND WILL EVENTUALLY BE REMOVED AND REPLACED WITH THE NATION SHOP SYSTEM
-
     private final MenuManager menuManager;
 
     public WorldshopCommand(MenuManager menuManager) {
@@ -24,22 +22,9 @@ public class WorldshopCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-
-//            new MainShopScreen(player).openScreen(1);
-
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+        if (sender instanceof Player player) {
             menuManager.openMenu(player, new MainShopScreen(player));
-
-            System.out.println("Command run");
-
-        } else {
-            ArrayList<RegisteredListener> rls = InventoryClickEvent.getHandlerList().getRegisteredListeners(WorldShop.getPlugin(WorldShop.class));
-
-            for (RegisteredListener rl: rls) {
-                System.out.println(rl.getListener().toString());
-            }
         }
         return false;
     }
