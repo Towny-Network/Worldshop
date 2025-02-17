@@ -1,22 +1,21 @@
 package dev.onebiteaidan.worldshop;
 
-import dev.onebiteaidan.worldshop.Controller.Commands.WorldshopCommand;
-import dev.onebiteaidan.worldshop.Controller.Listeners.ScreenListeners.*;
-import dev.onebiteaidan.worldshop.Controller.PlayerManager;
-import dev.onebiteaidan.worldshop.Controller.StoreManager;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Config;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.PickupRepository;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.ProfileRepository;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLitePickupRepository;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteProfileRepository;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.SQLite.SQLiteTradeRepository;
-import dev.onebiteaidan.worldshop.Model.DataManagement.Repositories.TradeRepository;
+import dev.onebiteaidan.worldshop.Commands.WorldshopCommand;
+import dev.onebiteaidan.worldshop.DataManagement.Config;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.PickupRepository;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.ProfileRepository;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLitePickupRepository;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteProfileRepository;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteTradeRepository;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.TradeRepository;
+import dev.onebiteaidan.worldshop.GUI.MenuManager;
 import dev.onebiteaidan.worldshop.Utils.Logger;
 import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -24,13 +23,19 @@ import java.util.Objects;
 
 public class WorldShop extends JavaPlugin {
 
+    private static WorldShop instance;
+
     private static Config config;
     private static StoreManager storeManager;
     private static PlayerManager playerManager;
+    private Connection connection;
+    private static MenuManager menuManager;
 
 
     @Override
     public void onEnable() {
+        instance = this;
+
         // Setup the Logger
         Logger.setPlugin(this);
 
@@ -55,14 +60,29 @@ public class WorldShop extends JavaPlugin {
 
         switch(Config.getDatabaseType()) {
             case "SQLite":
-                File databaseFile = new File(this.getDataFolder().getAbsolutePath() + "worldshop.db");
-                try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath())) {
+                File databaseFile = new File(this.getDataFolder(), "worldshop.db");
+                if (!databaseFile.exists()) {
+                    try {
+                        databaseFile.createNewFile(); // Create the file
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to create database file!", e);
+                    }
+                }
+
+                try {
+                    // Store a persistent connection
+                    this.connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath());
+
+                    System.out.println("SQLite connection established.");
+
+                    // Pass the same connection to all repositories
                     profileRepository = new SQLiteProfileRepository(connection);
                     tradeRepository = new SQLiteTradeRepository(connection);
                     pickupRepository = new SQLitePickupRepository(connection);
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException("Failed to connect to SQLite database!", e);
                 }
+
                 break;
 
             case "MySQL":
@@ -80,23 +100,16 @@ public class WorldShop extends JavaPlugin {
         // Initialize managers
         storeManager = new StoreManager(tradeRepository, pickupRepository);
         playerManager = new PlayerManager(profileRepository);
+        menuManager = new MenuManager();
 
         // Setting up listeners
 
         // GUI Listeners
-        Bukkit.getPluginManager().registerEvents(new ItemBuyerScreenListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ItemSellerScreenListener(), this);
-        Bukkit.getPluginManager().registerEvents(new MainShopScreenListener(), this);
-        Bukkit.getPluginManager().registerEvents(new StoreUpdateScreenListener(), this);
-        Bukkit.getPluginManager().registerEvents(new TradeManagementScreenListener(), this);
-        Bukkit.getPluginManager().registerEvents(new TradeRemovalScreenListener(), this);
-        Bukkit.getPluginManager().registerEvents(new TradeViewerScreenListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ViewCompletedTradesScreenListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ViewCurrentListingsScreenListener(), this);
+        Bukkit.getPluginManager().registerEvents(menuManager, this);
 
         // Setting up commands
         try {
-            Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand());
+            Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand(menuManager));
         } catch (NullPointerException exception) {
             Logger.logStacktrace(exception);
         }
@@ -116,9 +129,24 @@ public class WorldShop extends JavaPlugin {
         return playerManager;
     }
 
+    public static MenuManager getMenuManager() {
+        return menuManager;
+    }
+
+    public static JavaPlugin getInstance() {
+        return instance;
+    }
+
 
     @Override
     public void onDisable() {
-
+        if (connection != null) {
+            try {
+                connection.close();
+                System.out.println("SQLite connection closed.");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
