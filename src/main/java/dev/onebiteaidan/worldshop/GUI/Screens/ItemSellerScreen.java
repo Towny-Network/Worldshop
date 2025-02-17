@@ -143,9 +143,10 @@ public class ItemSellerScreen extends AbstractMenu {
         }
 
         // Replace the current priceItem or emptyPriceItem placeholder with new priceItem
-        this.priceItem = priceItem;
-        priceItem.setAmount(1);
-        inventory.setItem(15, priceItem);
+        ItemStack priceItemCopy = priceItem.clone();
+        this.priceItem = priceItemCopy;
+        priceItemCopy.setAmount(1);
+        inventory.setItem(15, priceItemCopy);
 
         // Reset item amount to zero
         this.priceAmount = 1;
