@@ -74,7 +74,10 @@ public class MainShopScreen extends PageableMenu {
         TextComponent viewTradesTitle = Component.text("Manage Trades")
                 .color(NamedTextColor.YELLOW);
 
-        ItemStack viewTrades = Utils.createButtonItem(Material.CHEST, viewTradesTitle, null);
+        List<TextComponent> viewTradesLore = new ArrayList<>();
+        viewTradesLore.add(Component.text("Click to view your listings as well as to claim your items from completed trades!"));
+
+        ItemStack viewTrades = Utils.createButtonItem(Material.CHEST, viewTradesTitle, viewTradesLore);
         setButton(51, new Button(viewTrades, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
             WorldShop.getMenuManager().openMenu(player, new TradeManagementScreen());
@@ -85,7 +88,10 @@ public class MainShopScreen extends PageableMenu {
         TextComponent sellItemTitle = Component.text("Sell Item")
                 .color(NamedTextColor.GREEN);
 
-        ItemStack sell = Utils.createButtonItem(Material.WRITABLE_BOOK, sellItemTitle, null);
+        List<TextComponent> sellItemLore = new ArrayList<>();
+        sellItemLore.add(Component.text("Click to sell an item! You can view your currently listed items in Manage Trades!"));
+
+        ItemStack sell = Utils.createButtonItem(Material.WRITABLE_BOOK, sellItemTitle, sellItemLore);
         setButton(50, new Button(sell, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
             WorldShop.getMenuManager().openMenu(player, new ItemSellerScreen());
