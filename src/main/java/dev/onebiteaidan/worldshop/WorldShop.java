@@ -145,7 +145,7 @@ public class WorldShop extends JavaPlugin {
                 connection.close();
                 System.out.println("SQLite connection closed.");
             } catch (SQLException e) {
-                e.printStackTrace();
+                Logger.logStacktrace(e);
             }
         }
     }

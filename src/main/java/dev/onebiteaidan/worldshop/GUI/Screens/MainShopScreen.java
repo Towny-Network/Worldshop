@@ -11,6 +11,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -46,9 +47,6 @@ public class MainShopScreen extends PageableMenu {
 
         ItemStack prevPage = Utils.createButtonItem(Material.ARROW, prevPageTitle, null);
         setButton(45, new Button(prevPage, (InventoryClickEvent event) -> {
-            Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Opening previous page");
-
             if (isPageValid(getAllDisplayItems(), getCurrentPage() - 1, 45)) {
                 previousPage();
             }
@@ -66,9 +64,6 @@ public class MainShopScreen extends PageableMenu {
 
         ItemStack nextPage = Utils.createButtonItem(Material.ARROW, nextPageTitle, null);
         setButton(53, new Button(nextPage, (InventoryClickEvent event) -> {
-            Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Opening next page");
-
             if (isPageValid(getAllDisplayItems(), getCurrentPage() + 1, 45)) {
                 nextPage();
             }
@@ -82,8 +77,6 @@ public class MainShopScreen extends PageableMenu {
         ItemStack viewTrades = Utils.createButtonItem(Material.CHEST, viewTradesTitle, null);
         setButton(51, new Button(viewTrades, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Opening trade management screen");
-
             WorldShop.getMenuManager().openMenu(player, new TradeManagementScreen());
         }));
 
@@ -95,8 +88,6 @@ public class MainShopScreen extends PageableMenu {
         ItemStack sell = Utils.createButtonItem(Material.WRITABLE_BOOK, sellItemTitle, null);
         setButton(50, new Button(sell, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Opening sell menu");
-
             WorldShop.getMenuManager().openMenu(player, new ItemSellerScreen());
         }));
 
@@ -107,32 +98,40 @@ public class MainShopScreen extends PageableMenu {
 
         ItemStack statsHead = Utils.createButtonItem(Utils.createSkull(player), statsHeadTitle, null);
         setButton(49, new Button(statsHead, (InventoryClickEvent event) -> {
-            Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked on stats head");
-            // Do nothing else
+            // Do Nothing
         }));
 
 
         // Filter Trades Button
         TextComponent filterTradesTitle = Component.text("Filter")
-                .color(NamedTextColor.BLUE);
+                .color(NamedTextColor.BLUE)
+                .decorate(TextDecoration.STRIKETHROUGH);
 
-        ItemStack filterTrades = Utils.createButtonItem(Material.HOPPER, filterTradesTitle, null);
+        List<TextComponent> filterLore = new ArrayList<TextComponent>();
+        filterLore.add(Component.text("This feature has not been implemented yet!").color(NamedTextColor.RED));
+
+        ItemStack filterTrades = Utils.createButtonItem(Material.HOPPER, filterTradesTitle, filterLore);
         setButton(48, new Button(filterTrades, (event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked on trade filter");
+            player.sendMessage("This feature has not been implemented yet");
+            player.closeInventory();
             // Not implemented
         }));
 
 
         // Search Items
         TextComponent searchItemsTitle = Component.text("Search")
-                .color(NamedTextColor.AQUA);
+                .color(NamedTextColor.AQUA)
+                .decorate(TextDecoration.STRIKETHROUGH);
 
-        ItemStack searchItems = Utils.createButtonItem(Material.SPYGLASS, searchItemsTitle, null);
+        List<TextComponent> searchLore = new ArrayList<TextComponent>();
+        searchLore.add(Component.text("This feature has not been implemented yet!").color(NamedTextColor.RED));
+
+        ItemStack searchItems = Utils.createButtonItem(Material.SPYGLASS, searchItemsTitle, searchLore);
         setButton(47, new Button(searchItems, (event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked on search items");
+            player.sendMessage("This feature has not been implemented yet");
+            player.closeInventory();
             // Not implemented
         }));
 
