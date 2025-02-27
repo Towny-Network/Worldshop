@@ -108,7 +108,8 @@ public class ViewCompletedTradesScreen extends PageableMenu {
                                 player.sendMessage("Added your items to your inventory!");
                                 // Mark pickup as complete
                                 WorldShop.getStoreManager().withdrawPickup(pickupID);
-                                player.closeInventory();
+                                // Keeps player on the same screen to collect more pickups
+                                WorldShop.getMenuManager().openMenu(player, new ViewCompletedTradesScreen(player));
                             } else {
                                 player.sendMessage("Make room in your inventory for the item!");
                             }
