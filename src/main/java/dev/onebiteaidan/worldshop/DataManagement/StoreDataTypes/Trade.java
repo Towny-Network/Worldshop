@@ -2,7 +2,6 @@ package dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes;
 
 import dev.onebiteaidan.worldshop.WorldShop;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
@@ -10,8 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.units.qual.N;
+
 
 import java.util.ArrayList;
 import java.util.List;

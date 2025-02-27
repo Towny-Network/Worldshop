@@ -5,7 +5,6 @@ import dev.onebiteaidan.worldshop.GUI.AbstractMenu;
 import dev.onebiteaidan.worldshop.GUI.Button;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.WorldShop;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;

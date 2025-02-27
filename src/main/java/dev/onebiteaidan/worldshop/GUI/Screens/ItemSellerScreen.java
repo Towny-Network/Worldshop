@@ -3,18 +3,13 @@ package dev.onebiteaidan.worldshop.GUI.Screens;
 import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Trade;
 import dev.onebiteaidan.worldshop.GUI.AbstractMenu;
 import dev.onebiteaidan.worldshop.GUI.Button;
-import dev.onebiteaidan.worldshop.Utils.Logger;
 import dev.onebiteaidan.worldshop.Utils.Utils;
 import dev.onebiteaidan.worldshop.WorldShop;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
