@@ -33,7 +33,6 @@ public class TradeManagementScreen extends AbstractMenu {
         setButton(11, new Button(currentListingsButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
             WorldShop.getMenuManager().openMenu(player, new ViewCurrentListingsScreen(player));
-            player.sendMessage("Clicked current listings button");
         }));
 
 
@@ -47,7 +46,6 @@ public class TradeManagementScreen extends AbstractMenu {
         setButton(15, new Button(completedTradesButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
             WorldShop.getMenuManager().openMenu(player, new ViewCompletedTradesScreen(player));
-            player.sendMessage("Clicked completed button");
         }));
 
 
@@ -59,7 +57,6 @@ public class TradeManagementScreen extends AbstractMenu {
         setButton(22, new Button(backButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
             WorldShop.getMenuManager().openMenu(player, new MainShopScreen(player));
-            player.sendMessage("Clicked back button button");
         }));
     }
 }

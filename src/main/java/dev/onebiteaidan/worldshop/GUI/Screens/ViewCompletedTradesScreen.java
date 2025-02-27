@@ -50,7 +50,6 @@ public class ViewCompletedTradesScreen extends PageableMenu {
         setButton(31, new Button(backButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
             WorldShop.getMenuManager().openMenu(player, new TradeManagementScreen());
-            player.sendMessage("Clicked the back button");
         }));
 
 
@@ -69,7 +68,6 @@ public class ViewCompletedTradesScreen extends PageableMenu {
             if (isPageValid(getPickupDisplayItems(player, getCurrentPage() - 1, 27), getCurrentPage() - 1, 27)) {
                 previousPage();
             }
-            player.sendMessage("Clicked prev page!");
         }));
 
 
@@ -88,7 +86,6 @@ public class ViewCompletedTradesScreen extends PageableMenu {
             if (isPageValid(getPickupDisplayItems(player, getCurrentPage(), 27), getCurrentPage() + 1, 27)) {
                 nextPage();
             }
-            player.sendMessage("Clicked next page item!");
         }));
 
 

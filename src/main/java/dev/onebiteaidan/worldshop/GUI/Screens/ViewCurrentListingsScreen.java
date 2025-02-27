@@ -46,7 +46,6 @@ public class ViewCurrentListingsScreen extends PageableMenu {
         setButton(31, new Button(backButton, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
             WorldShop.getMenuManager().openMenu(player, new TradeManagementScreen());
-            player.sendMessage("Clicked the back button");
         }));
 
         // Prev Page Button
@@ -64,7 +63,6 @@ public class ViewCurrentListingsScreen extends PageableMenu {
             if (isPageValid(getDisplayItems(player, getCurrentPage() - 1, 27), getCurrentPage() - 1, 27)) {
                 previousPage();
             }
-            player.sendMessage("Clicked prev page!");
         }));
 
 
@@ -83,7 +81,6 @@ public class ViewCurrentListingsScreen extends PageableMenu {
             if (isPageValid(getDisplayItems(player, getCurrentPage() - 1, 27), getCurrentPage() - 1, 27)) {
                 nextPage();
             }
-            player.sendMessage("Clicked next page item!");
         }));
 
 

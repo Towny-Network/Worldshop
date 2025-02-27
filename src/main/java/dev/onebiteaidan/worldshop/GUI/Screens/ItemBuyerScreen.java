@@ -52,6 +52,7 @@ public class ItemBuyerScreen extends AbstractMenu {
             WorldShop.getMenuManager().openMenu(player, new MainShopScreen(player));
         }));
 
+
         // Confirm Button
         if (player.getInventory().containsAtLeast(trade.getItemRequested(), trade.getItemRequested().getAmount())) {
             setYellow();
@@ -60,29 +61,10 @@ public class ItemBuyerScreen extends AbstractMenu {
         }
 
 
-
-//        ItemStack confirmButton = cannotConfirmButtonItem;
-//        setButton(2, new Button(confirmButton, (InventoryClickEvent event) -> {
-//            Player player = (Player) event.getWhoClicked();
-//            player.sendMessage("Clicked the confirm button");
-//            player.closeInventory();
-//
-//            Inventory inven = event.getInventory();
-//            ItemStack forSale = inven.getItem(4);
-//            ItemStack wanted = inven.getItem(6);
-//            int amountWanted = wanted.getAmount();
-//
-//            player.getInventory().removeItem(wanted);
-//
-//            WorldShop.getStoreManager().completeTrade(trade, player);
-//        }));
-
-
         // Item You're Buying
         ItemStack beingSold = trade.getItemOffered();
         setButton(4, new Button(beingSold, (InventoryClickEvent event) -> {
-            Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked item that is being sold!");
+            // Do nothing
         }));
 
 
@@ -103,8 +85,7 @@ public class ItemBuyerScreen extends AbstractMenu {
         // Payment Item
         ItemStack paymentItem = trade.getItemRequested();
         setButton(7, new Button(paymentItem, (InventoryClickEvent event) -> {
-            Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked the payment item!");
+            // Do Nothing
         }));
 
 

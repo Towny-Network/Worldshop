@@ -33,7 +33,6 @@ public class TradeViewerScreen extends AbstractMenu {
         ItemStack beingSold = trade.getItemOffered();
         setButton(2, new Button(beingSold, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked item that is being sold!");
         }));
 
         // Item Being Sold Marker
@@ -47,14 +46,12 @@ public class TradeViewerScreen extends AbstractMenu {
         ItemStack beingSoldMarker = Utils.createButtonItem(Utils.createSkull(beingSoldMarkerURL), beingSoldMarkerTitle, beingSoldLore);
         setButton(11, new Button(beingSoldMarker, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked the marker that tells us which item is being sold!");
         }));
 
         // Payment Item
         ItemStack paymentItem = trade.getItemRequested();
         setButton(6, new Button(paymentItem, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked the payment item!");
         }));
 
         // Payment Item Marker
@@ -68,7 +65,6 @@ public class TradeViewerScreen extends AbstractMenu {
         ItemStack paymentItemMarker = Utils.createButtonItem(Utils.createSkull(paymentItemMarkerURL), paymentItemMarkerTitle, paymentItemLore);
         setButton(15, new Button(paymentItemMarker, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked the market that tells us where the payment item is!");
         }));
 
         // Back Button

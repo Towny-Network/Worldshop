@@ -63,7 +63,6 @@ public class ItemSellerScreen extends AbstractMenu {
         // Item player wants to sell
         setButton(12, new Button(emptySellItem, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Resetting sell slot");
             resetSellSlot();
         }));
 
@@ -75,7 +74,6 @@ public class ItemSellerScreen extends AbstractMenu {
         setButton(14, new Button(increasePriceButtonItem, (InventoryClickEvent event) -> {
             if (!isSellSlotEmpty()) {
                 Player player = (Player) event.getWhoClicked();
-                player.sendMessage("Increasing price");
                 increasePrice();
             }
         }));
@@ -84,7 +82,6 @@ public class ItemSellerScreen extends AbstractMenu {
         // Item player wants to receive
         setButton(15, new Button(emptyPriceItem, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Resetting price slot");
             resetPriceSlot();
         }));
 
@@ -96,7 +93,6 @@ public class ItemSellerScreen extends AbstractMenu {
         setButton(16, new Button(decreasePriceButtonItem, (InventoryClickEvent event) -> {
             if (!isPriceSlotEmpty()) {
                 Player player = (Player) event.getWhoClicked();
-                player.sendMessage("Decreasing price");
                 decreasePrice();
             }
         }));
@@ -109,7 +105,6 @@ public class ItemSellerScreen extends AbstractMenu {
         ItemStack backButtonItem = Utils.createButtonItem(Material.RED_CONCRETE_POWDER, backButtonTitle, null);
         setButton(18, new Button(backButtonItem, (InventoryClickEvent event) -> {
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage("Clicked the back button");
             WorldShop.getMenuManager().openMenu(player, new MainShopScreen(player));
         }));
     }
@@ -285,12 +280,10 @@ public class ItemSellerScreen extends AbstractMenu {
                 Player player = (Player) event.getWhoClicked();
                 // Determine if it's a right or left click
                 if (event.getClick().isLeftClick()) { // Set the item we are selling
-                    player.sendMessage("Setting sell item");
                     setSellItem(event.getCurrentItem());
                     event.setCancelled(true);
 
                 } else if (event.getClick().isRightClick()) { // Set the item we want to receive
-                    player.sendMessage("Setting price item");
                     setPriceItem(event.getCurrentItem());
                     event.setCancelled(true);
                 }
