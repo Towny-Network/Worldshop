@@ -102,16 +102,11 @@ public class ViewCompletedTradesScreen extends PageableMenu {
 
                     Integer pickupID = meta.getPersistentDataContainer().get(new NamespacedKey(WorldShop.getInstance(), "pickup_id"), PersistentDataType.INTEGER);
 
-                    System.out.println("Trying out pickupID");
-
                     if (pickupID != null) {
-                        System.out.println("pickupID retrieved");
                         Pickup pickup = WorldShop.getStoreManager().getPickup(pickupID);
                         if (pickup != null) {
-                            System.out.println("Pickup is not null");
                             // Insert item into inventory if possible
                             boolean success = Utils.fitItem(player, pickup.getItem());
-                            System.out.println("Able to fit into the inventory: " + success);
                             if (success) {
                                 player.sendMessage("Added your items to your inventory!");
                                 // Mark pickup as complete

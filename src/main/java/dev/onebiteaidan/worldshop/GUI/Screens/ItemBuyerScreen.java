@@ -138,13 +138,10 @@ public class ItemBuyerScreen extends AbstractMenu {
             // Remove first occurrence of a repeat item stack in the players inventory
             if (player.getInventory().containsAtLeast(inReturn, trade.getItemRequested().getAmount())) {
                 Utils.removeNumItems(player, trade.getItemRequested(), trade.getItemRequested().getAmount());
-                System.out.println("REMOVED EM");
             } else {
                 WorldShop.getPlugin(WorldShop.class).getLogger().severe("Player attempted to buy an item without the price item being in their inventory");
                 return;
             }
-
-            System.out.println("GAJBFEAKJBFJKDF");
 
             WorldShop.getStoreManager().completeTrade(trade, player);
 

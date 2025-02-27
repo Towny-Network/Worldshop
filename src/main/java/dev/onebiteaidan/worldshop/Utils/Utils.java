@@ -78,18 +78,11 @@ public class Utils {
         int slot = 0;
 
         for (ItemStack item : player.getInventory()) {
-            System.out.println("Iteration " + slot);
-            System.out.println("NumRemoved: " + numRemoved + " Amount: " + amount);
             if (item != null) {
                 if (numRemoved < amount) {
-                    System.out.println("NumRemoved was less than amount");
-                    System.out.println("Material Type: " + item.getType() + " x" + item.getAmount());
                     if (item.isSimilar(itemStack)) {
-                        System.out.println("Item stack was similar");
-
                         // Check if the amount of this itemstack would overshoot our target numRemoved
                         if (item.getAmount() + numRemoved <= amount) {
-                            System.out.println("Undershot");
                             // Wouldn't overshoot, remove whole stack
                             numRemoved += item.getAmount();
                             player.getInventory().setItem(slot, null);
@@ -97,7 +90,6 @@ public class Utils {
 
                         } else {
                             // Would overshoot, remove needed amount
-                            System.out.println("Overshot");
                             int amountNeeded = amount - numRemoved;
                             numRemoved += amountNeeded;
                             item.setAmount(item.getAmount() - amountNeeded);
@@ -170,7 +162,6 @@ public class Utils {
             for (Integer key : similar_slots.keySet()) {
                 if (itemsGiven >= item.getAmount()) {
                     // We finished
-                    System.out.println("Finished");
                     return true;
                 }
 

@@ -73,8 +73,6 @@ public class WorldShop extends JavaPlugin {
                     // Store a persistent connection
                     this.connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath());
 
-                    System.out.println("SQLite connection established.");
-
                     // Pass the same connection to all repositories
                     profileRepository = new SQLiteProfileRepository(connection);
                     tradeRepository = new SQLiteTradeRepository(connection);
@@ -143,7 +141,6 @@ public class WorldShop extends JavaPlugin {
         if (connection != null) {
             try {
                 connection.close();
-                System.out.println("SQLite connection closed.");
             } catch (SQLException e) {
                 Logger.logStacktrace(e);
             }
