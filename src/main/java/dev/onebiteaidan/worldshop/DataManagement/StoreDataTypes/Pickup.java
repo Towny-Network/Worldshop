@@ -1,12 +1,18 @@
 package dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes;
 
 import dev.onebiteaidan.worldshop.WorldShop;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Pickup {
     int pickupID;
@@ -95,6 +101,47 @@ public class Pickup {
         if (meta != null) {
             meta.getPersistentDataContainer().set(new NamespacedKey(WorldShop.getInstance(), "pickup_id"),
                     PersistentDataType.INTEGER, pickupID);
+
+            // Add lore to item
+            List<Component> lore = new ArrayList<>();
+
+            Trade trade = WorldShop.getStoreManager().getTrade(tradeID);
+//            if (player.equals(trade.seller)) {
+//                lore.add(Component.text("Bought From:").color(NamedTextColor.GOLD));
+//                lore.add(Component.text(trade.seller.getName()));
+//            } else {
+//                lore.add(Component.text("Bought By:").color(NamedTextColor.GOLD));
+//                lore.add(Component.text(trade.buyer.getName()));
+//            }
+
+            String buyerName = trade.getBuyer().getName();
+            String sellerName = trade.getSeller().getName();
+
+            ItemStack itemOffered = trade.getItemOffered();
+            Component itemNameOffered;
+            if (itemOffered.getItemMeta().hasDisplayName()) {
+                itemNameOffered = itemOffered.getItemMeta().displayName();
+            } else {
+                itemNameOffered = Component.text(itemOffered.getType().toString()).color(NamedTextColor.GRAY);
+            }
+            Component itemBought = Component.text(trade.getItemOffered().getAmount() + "x ").append(itemNameOffered);
+
+            ItemStack itemRequested = trade.getItemOffered();
+            Component itemNameRequested;
+            if (itemRequested.getItemMeta().hasDisplayName()) {
+                itemNameRequested = itemOffered.getItemMeta().displayName();
+            } else {
+                itemNameRequested = Component.text(itemOffered.getType().toString()).color(NamedTextColor.GRAY);
+            }
+            Component itemSold = Component.text(trade.getItemOffered().getAmount() + "x ").append(itemNameRequested);
+
+            lore.add(Component.text("Trade #" + tradeID));
+            lore.add(Component.text(trade.buyer.getName() + " bought ").append(itemBought));
+            lore.add(Component.text("from " + trade.seller.getName() + " for ").append(itemSold));
+
+            // Set the item lore
+            meta.lore(lore);
+
             itemClone.setItemMeta(meta);
         }
 
