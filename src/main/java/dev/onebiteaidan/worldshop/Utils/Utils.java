@@ -1,66 +1,22 @@
 package dev.onebiteaidan.worldshop.Utils;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import net.minecraft.nbt.NBTCompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerTextures;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.UUID;
+import javax.annotation.Nullable;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
 
 public class Utils {
-
-    // Next two methods grabbed from https://www.spigotmc.org/threads/ways-to-storage-a-inventory-to-a-database.547207/
-
-    public static byte[] saveItemStack(org.bukkit.inventory.ItemStack stack) throws IOException {
-        // Create a NBT Compound Tag to save the item data into
-        NBTTagCompound tag = new NBTTagCompound();
-        // Convert the Bukkit ItemStack to an NMS one and use the NMS ItemStack to save the data in NBT
-        CraftItemStack.asNMSCopy(stack).save(tag);
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        // Now save the data into a ByteArrayOutputStream to be able to convert it to an byte array
-        // You can wrap a GZipOutputStream around if you also want to compress that data
-        NBTCompressedStreamTools.a(tag, output);
-        return output.toByteArray();
-    }
-
-    public static org.bukkit.inventory.ItemStack loadItemStack(byte[] data) throws IOException {
-        ByteArrayInputStream input = new ByteArrayInputStream(data);
-        // Reverse the process by reading the byte[] as ByteArrayInputStream and passing that to the NBT reader of Minecraft
-        NBTTagCompound tag = NBTCompressedStreamTools.a(input);
-        // At last load the ItemStack from the NBT Compound Tag and convert it back to an Bukkit ItemStack
-        return CraftItemStack.asBukkitCopy(net.minecraft.world.item.ItemStack.a(tag));
-    }
-
-    // Function to create playerheads
-    public static ItemStack createSkull(String url) {
-        ItemStack head = new org.bukkit.inventory.ItemStack(Material.PLAYER_HEAD, 1);
-        if (url.isEmpty()) return head;
-
-        SkullMeta headMeta = (SkullMeta) head.getItemMeta();
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-
-        profile.getProperties().put("textures", new Property("textures", url));
-
-        try {
-            Field profileField = headMeta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(headMeta, profile);
-        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        head.setItemMeta(headMeta);
-        return head;
-    }
 
     public static ItemStack createSkull(Player player) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
@@ -72,6 +28,31 @@ public class Utils {
 
         return head;
     }
+
+    public static ItemStack createSkull(String textureUrl) {
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD, 1);
+
+        SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+
+        PlayerProfile playerProfile = Bukkit.createProfile(UUID.randomUUID());
+        PlayerTextures skin = playerProfile.getTextures();
+
+        URL skinURL;
+        try {
+            skinURL = new URL(textureUrl);
+        } catch (MalformedURLException e) {
+            Logger.logStacktrace(e);
+            return skull;
+        }
+
+        skin.setSkin(skinURL);
+        playerProfile.setTextures(skin);
+        skullMeta.setPlayerProfile(playerProfile);
+        skull.setItemMeta(skullMeta);
+
+        return skull;
+    }
+
 
     /**
      * Checks the number of items the player has in their inventory that match the itemstack (excluding itemstack amount)
@@ -89,5 +70,150 @@ public class Utils {
             }
         }
         return amount;
+    }
+
+
+    public static void removeNumItems(Player player, ItemStack itemStack, int amount) {
+        int numRemoved = 0;
+        int slot = 0;
+
+        for (ItemStack item : player.getInventory()) {
+            if (item != null) {
+                if (numRemoved < amount) {
+                    if (item.isSimilar(itemStack)) {
+                        // Check if the amount of this itemstack would overshoot our target numRemoved
+                        if (item.getAmount() + numRemoved <= amount) {
+                            // Wouldn't overshoot, remove whole stack
+                            numRemoved += item.getAmount();
+                            player.getInventory().setItem(slot, null);
+
+
+                        } else {
+                            // Would overshoot, remove needed amount
+                            int amountNeeded = amount - numRemoved;
+                            numRemoved += amountNeeded;
+                            item.setAmount(item.getAmount() - amountNeeded);
+                            player.getInventory().setItem(slot, item);
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+            slot++;
+        }
+    }
+
+    /**
+     * Attempts to fit an itemstack into the player's inventory.
+     * @param player Player to fit item into.
+     * @param item Itemstack to fit into player's inventory.
+     * @return True if was able to fit item into inventory. False if it will not fit.
+     */
+    public static boolean fitItem(Player player, ItemStack item) {
+        // Check if an empty slot exists
+        //  -> One exists; add item to inven; return true
+        //  -> No empties; lets find if we can add to existing stacks
+        //      -> Yes we can; add to existing stacks; return true;
+        //      -> no we can't; return false;
+
+
+
+        // Check if an empty slot exists
+        int emptySlot = player.getInventory().firstEmpty();
+
+        if (emptySlot != -1) {
+            // Item into first empty slot
+            player.getInventory().setItem(emptySlot, item);
+            return true;
+        }
+
+        // No empty slots
+        // Check if we can add the amount to existing stacks
+        Map<Integer, Integer> similar_slots = new HashMap<>(); // <slot #, capacity available>
+        int count = 0;
+
+        // Find all similar itemstacks
+        for (ItemStack itemStack : player.getInventory()) {
+            if (itemStack != null) {
+                if (itemStack.isSimilar(item)) {
+                    if (itemStack.getAmount() != itemStack.getMaxStackSize()) {
+                        // ItemStack is not full
+                        int spaceAvailable = itemStack.getMaxStackSize() - itemStack.getAmount();
+                        similar_slots.put(count, spaceAvailable);
+                    }
+                }
+            }
+            count++;
+        }
+
+        // Check if all similar slots have enough capacity to fit the item
+        int totalSpaceAvailable = 0;
+        for (Integer key : similar_slots.keySet()) {
+            totalSpaceAvailable += similar_slots.get(key);
+        }
+
+
+        if (totalSpaceAvailable >= item.getAmount()) {
+            // We have enough space to store all items
+            // Distribute items
+            int itemsGiven = 0;
+
+            for (Integer key : similar_slots.keySet()) {
+                if (itemsGiven >= item.getAmount()) {
+                    // We finished
+                    return true;
+                }
+
+                int amountFree = similar_slots.get(key);
+
+                if ((item.getAmount() - itemsGiven) <= amountFree) {
+                    // Items amount fits into amount free
+                    player.getInventory().getItem(key).add(item.getAmount() - itemsGiven);
+                    itemsGiven += item.getAmount() - itemsGiven;
+                } else {
+                    // Items amount is greater than amount free
+                    player.getInventory().getItem(key).add(amountFree);
+                    itemsGiven += amountFree;
+                }
+            }
+
+            return true;
+        } else {
+            // Not enough space to fit the whole stack
+            return false;
+        }
+    }
+
+
+    // TODO: Method should probably be moved to the Screen class.
+    public static ItemStack createButtonItem(Material material, TextComponent displayName, @Nullable List<TextComponent> lore) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta != null) {
+            meta.displayName(displayName);
+            if (lore != null) {
+                meta.lore(lore);
+            }
+        }
+
+        item.setItemMeta(meta);
+
+        return item;
+    }
+
+    // TODO: Method should probably be moved to the Screen class.
+    public static ItemStack createButtonItem(ItemStack item, @Nullable TextComponent displayName, @Nullable List<TextComponent> lore) {
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta != null) {
+            meta.displayName(displayName);
+            meta.lore(lore);
+        }
+
+        item.setItemMeta(meta);
+
+        return item;
     }
 }

@@ -1,5 +1,6 @@
 package dev.onebiteaidan.worldshop.DataManagement;
 
+import dev.onebiteaidan.worldshop.Utils.Logger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -40,7 +41,7 @@ public class Config {
             try {
                 copyInputStreamToFile(Objects.requireNonNull(plugin.getResource(this.name)), file);
             } catch(IOException e) {
-                e.printStackTrace();
+                Logger.logStacktrace(e);
             }
         }
 

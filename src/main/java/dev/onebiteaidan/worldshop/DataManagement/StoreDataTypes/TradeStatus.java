@@ -1,4 +1,4 @@
-package dev.onebiteaidan.worldshop.StoreDataTypes;
+package dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes;
 
 public enum TradeStatus
 {

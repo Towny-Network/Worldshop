@@ -1,6 +1,7 @@
 package dev.onebiteaidan.worldshop.Commands;
 
-import dev.onebiteaidan.worldshop.WorldShop;
+import dev.onebiteaidan.worldshop.GUI.MenuManager;
+import dev.onebiteaidan.worldshop.GUI.Screens.MainShopScreen;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,15 +10,18 @@ import org.jetbrains.annotations.NotNull;
 
 public class WorldshopCommand implements CommandExecutor {
 
-    //Fixme: THIS COMMAND WILL EVENTUALLY BE REMOVED AND REPLACED WITH THE NATION SHOP SYSTEM
+    private final MenuManager menuManager;
+
+    public WorldshopCommand(MenuManager menuManager) {
+        this.menuManager = menuManager;
+    }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-
-            WorldShop.getStoreManager().openShop(player, 1);
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+        if (sender instanceof Player player) {
+            menuManager.openMenu(player, new MainShopScreen(player));
         }
+
         return false;
     }
 }

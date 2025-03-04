@@ -2,72 +2,92 @@ package dev.onebiteaidan.worldshop;
 
 import dev.onebiteaidan.worldshop.Commands.WorldshopCommand;
 import dev.onebiteaidan.worldshop.DataManagement.Config;
-import dev.onebiteaidan.worldshop.DataManagement.Database;
-import dev.onebiteaidan.worldshop.DataManagement.MySQL;
-import dev.onebiteaidan.worldshop.DataManagement.SQLite;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.PickupRepository;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.ProfileRepository;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLitePickupRepository;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteProfileRepository;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.SQLite.SQLiteTradeRepository;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.TradeRepository;
+import dev.onebiteaidan.worldshop.GUI.MenuManager;
+import dev.onebiteaidan.worldshop.Utils.Logger;
+import org.apache.commons.lang3.NotImplementedException;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class WorldShop extends JavaPlugin {
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Objects;
+
+public class WorldShop extends JavaPlugin {
+
+    private static WorldShop instance;
 
     private static Config config;
-    private static Database database;
-    private static PlayerManager playerManager;
     private static StoreManager storeManager;
+    private static PlayerManager playerManager;
+    private Connection connection;
+    private static MenuManager menuManager;
 
 
     @Override
     public void onEnable() {
+        instance = this;
+
+        // Setup the Logger
+        Logger.setPlugin(this);
+
         // Checks if data folder exists
         if (!getDataFolder().exists()) {
             this.getLogger().info("Datafolder for WorldShop Does not Exist. Creating now...");
-            getDataFolder().mkdirs();
+            if (getDataFolder().mkdirs()) {
+                Logger.info("Successfully created datafolder.");
+            } else {
+                Logger.severe("Failed to create the datafolder.");
+            }
         }
 
         //Setting up Config
         config = new Config(this, this.getDataFolder(), "config", true, true);
         this.getLogger().info("Setting up the config.yml...");
 
-        //Setting up database
+        // Load the Database file
+        ProfileRepository profileRepository;
+        TradeRepository tradeRepository;
+        PickupRepository pickupRepository;
+
         switch(Config.getDatabaseType()) {
             case "SQLite":
-                database = new SQLite("worldshop.db");
+                File databaseFile = new File(this.getDataFolder(), "worldshop.db");
+                if (!databaseFile.exists()) {
+                    try {
+                        databaseFile.createNewFile(); // Create the file
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to create database file!", e);
+                    }
+                }
+
+                try {
+                    // Store a persistent connection
+                    this.connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath());
+
+                    // Pass the same connection to all repositories
+                    profileRepository = new SQLiteProfileRepository(connection);
+                    tradeRepository = new SQLiteTradeRepository(connection);
+                    pickupRepository = new SQLitePickupRepository(connection);
+                } catch (SQLException e) {
+                    throw new RuntimeException("Failed to connect to SQLite database!", e);
+                }
+
                 break;
 
             case "MySQL":
-                database = new MySQL();
-                break;
+                throw new NotImplementedException("Database type 'MySQL' is not yet supported.");
 
-            default: // Disables the plugin if the database cannot be initialized.
-                this.getLogger().severe("DATABASE COULD NOT BE INITIALIZED BECAUSE '" + Config.getDatabaseType() + "' IS AN INVALID DATABASE TYPE");
-                this.onDisable();
-        }
-
-        try {
-            database.connect();
-        } catch (Exception e) { // Disable the plugin if the database throws exception while trying to connect.
-            e.printStackTrace();
-            this.getLogger().severe("ERROR THROWN WHILE CONNECTING TO THE DATABASE!");
-            this.onDisable();
-        }
-
-
-        if (database.isConnected()) {
-            this.getLogger().info("Connected to its database successfully!");
-
-                // Initialize the players table if it doesn't exist
-                database.createPlayersTable();
-
-                // Initialize the shop table if it doesn't exit
-                database.createTradesTable();
-
-                // Initialize a rewards pickup table
-                database.createPickupsTable();
-
-        } else {
-            this.getLogger().severe("UNABLE TO CONNECT TO THE DATABASE!");
-            // Disables the plugin if the database doesn't connect.
-            this.onDisable();
+            default:
+                throw new RuntimeException("Database with type " + Config.getDatabaseType() + " is invalid!");
         }
 
         // todo: Initialize runnable that checks every second for expired trades
@@ -75,18 +95,22 @@ public final class WorldShop extends JavaPlugin {
         // On loading the database, all trades past the expiry time need to be removed
         // Expiry time should be specified in the config file
 
-        // Initializing the player manager
-        playerManager = new PlayerManager();
-
-        // Initializing the store manager
-        storeManager = new StoreManager();
+        // Initialize managers
+        storeManager = new StoreManager(tradeRepository, pickupRepository);
+        playerManager = new PlayerManager(profileRepository);
+        menuManager = new MenuManager();
 
         // Setting up listeners
-        Bukkit.getPluginManager().registerEvents(new StoreListener(), this);
+
+        // GUI Listeners
+        Bukkit.getPluginManager().registerEvents(menuManager, this);
 
         // Setting up commands
-        getCommand("worldshop").setExecutor(new WorldshopCommand());
-
+        try {
+            Objects.requireNonNull(getCommand("worldshop")).setExecutor(new WorldshopCommand(menuManager));
+        } catch (NullPointerException exception) {
+            Logger.logStacktrace(exception);
+        }
     }
 
     // Config accessor
@@ -94,9 +118,8 @@ public final class WorldShop extends JavaPlugin {
         return config;
     }
 
-    // Database accessor
-    public static Database getDatabase() {
-        return database;
+    public static StoreManager getStoreManager() {
+        return storeManager;
     }
 
     // Player Manager accessor
@@ -104,14 +127,23 @@ public final class WorldShop extends JavaPlugin {
         return playerManager;
     }
 
-    // Store Manager accessor
-    public static StoreManager getStoreManager() {
-        return storeManager;
+    public static MenuManager getMenuManager() {
+        return menuManager;
     }
+
+    public static JavaPlugin getInstance() {
+        return instance;
+    }
+
 
     @Override
     public void onDisable() {
-        // Close connection from database.
-        database.disconnect();
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                Logger.logStacktrace(e);
+            }
+        }
     }
 }

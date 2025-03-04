@@ -1,65 +1,53 @@
 package dev.onebiteaidan.worldshop;
 
-import org.bukkit.Bukkit;
+import dev.onebiteaidan.worldshop.DataManagement.Repositories.ProfileRepository;
+import dev.onebiteaidan.worldshop.DataManagement.StoreDataTypes.Profile;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
 
 public class PlayerManager {
 
-    private static class PlayerProfile {
-        OfflinePlayer player;
-        int purchases;
-        int sales;
 
-        PlayerProfile(OfflinePlayer player, int purchases, int sales) {
-            this.player = player;
-            this.purchases = purchases;
-            this.sales = sales;
-        }
+    private final ProfileRepository profileRepository;
+
+    public PlayerManager(ProfileRepository profileRepository) {
+        this.profileRepository = profileRepository;
     }
 
-    public PlayerManager() {}
-
-    public PlayerProfile getPlayerStats(Player player) {
-        Connection connection = WorldShop.getDatabase().getConnection();
-        try {
-            ResultSet rs = WorldShop.getDatabase().query("SELECT * FROM players WHERE uuid = ?;",
-                    new Object[]{player.getUniqueId()},
-                    new int[]{Types.VARCHAR}, connection);
-
-            rs.next();
-
-            PlayerProfile pp = new PlayerProfile(
-                    Bukkit.getOfflinePlayer(rs.getString("uuid")),
-                    rs.getInt("purchases"),
-                    rs.getInt("sales")
-            );
-
-            rs.close();
-            connection.close();
-
-            return pp;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+    /**
+     * Creates a new Profile object and stores it in the database.
+     * @param player OfflinePlayer object to create a profile for.
+     */
+    public void createPlayerProfile(OfflinePlayer player) {
+        Profile profile = new Profile(player, 0, 0);
+        profileRepository.save(profile);
     }
 
-    public void incrementPlayerPurchases(Player player) {
-        WorldShop.getDatabase().update("UPDATE players SET purchases = purchases + ? WHERE uuid = ?;",
-                new Object[]{1, player.getUniqueId()},
-                new int[]{Types.INTEGER, Types.VARCHAR});
+    /**
+     * Retrieves a Profile object from the database.
+     * @param player OfflinePlayer object to look up the record of.
+     * @return Returns corresponding Profile object.
+     */
+    public Profile getPlayerProfile(OfflinePlayer player) {
+        return profileRepository.findById(player.getUniqueId());
     }
 
-    public void incrementPlayerSales(Player player) {
-        WorldShop.getDatabase().update("UPDATE players SET sales = sales + ? WHERE uuid = ?;",
-                new Object[]{1, player.getUniqueId()},
-                new int[]{Types.INTEGER, Types.VARCHAR});
+    /**
+     * Increments the purchases counter in the database for respective player.
+     * @param player OfflinePlayer object to update the record of.
+     */
+    public void incrementPlayerPurchases(OfflinePlayer player) {
+        Profile profile = profileRepository.findById(player.getUniqueId());
+        profile.setPurchases(profile.getPurchases() + 1);
+        profileRepository.save(profile);
+    }
+
+    /**
+     * Increments the sales counter in the database for respective player.
+     * @param player OfflinePlayer object to update the record of.
+     */
+    public void incrementPlayerSales(OfflinePlayer player) {
+        Profile profile = profileRepository.findById(player.getUniqueId());
+        profile.setPurchases(profile.getSales() + 1);
+        profileRepository.save(profile);
     }
 }
